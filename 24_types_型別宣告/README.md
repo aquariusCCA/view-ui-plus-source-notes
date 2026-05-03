@@ -1,10 +1,10 @@
-# 99 總結
+# 24 types 型別宣告
 
 ## 學習目標
 
-- [ ] 整理全套學習成果
-- [ ] 列出可回查索引與待補強項目
-- [ ] 規劃下一個開源專案閱讀方向
+- [ ] 閱讀 types 型別宣告
+- [ ] 理解元件 props、事件、install 的型別暴露
+- [ ] 整理 TS 對元件庫使用體驗的影響
 
 ## 源碼定位
 
@@ -96,4 +96,5 @@
 
 ## 關聯章節
 
-- 上一章：[39_ViewUIPlus設計模式總結](../39_ViewUIPlus設計模式總結/README.md)
+- 上一章：[23_src-styles_樣式系統](../23_src-styles_樣式系統/README.md)
+- 下一章：[25_examples_範例與Demo](../25_examples_範例與Demo/README.md)

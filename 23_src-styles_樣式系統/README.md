@@ -1,10 +1,10 @@
-# 99 總結
+# 23 src-styles 樣式系統
 
 ## 學習目標
 
-- [ ] 整理全套學習成果
-- [ ] 列出可回查索引與待補強項目
-- [ ] 規劃下一個開源專案閱讀方向
+- [ ] 理解 Less/Sass/CSS 變數與樣式入口
+- [ ] 追蹤 prefixCls、BEM、狀態 class 的使用
+- [ ] 整理主題覆蓋與客製化策略
 
 ## 源碼定位
 
@@ -96,4 +96,5 @@
 
 ## 關聯章節
 
-- 上一章：[39_ViewUIPlus設計模式總結](../39_ViewUIPlus設計模式總結/README.md)
+- 上一章：[22_src-locale_國際化](../22_src-locale_國際化/README.md)
+- 下一章：[24_types_型別宣告](../24_types_型別宣告/README.md)

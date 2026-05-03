@@ -1,10 +1,10 @@
-# 99 總結
+# 07 元件註冊機制
 
 ## 學習目標
 
-- [ ] 整理全套學習成果
-- [ ] 列出可回查索引與待補強項目
-- [ ] 規劃下一個開源專案閱讀方向
+- [ ] 理解 components 如何被集中註冊
+- [ ] 追蹤 component.install 的設計
+- [ ] 比較全域註冊與按需引入的差異
 
 ## 源碼定位
 
@@ -96,4 +96,5 @@
 
 ## 關聯章節
 
-- 上一章：[39_ViewUIPlus設計模式總結](../39_ViewUIPlus設計模式總結/README.md)
+- 上一章：[06_src_入口與插件機制](../06_src_入口與插件機制/README.md)
+- 下一章：[08_全域配置與globalProperties](../08_全域配置與globalProperties/README.md)

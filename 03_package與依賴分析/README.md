@@ -1,10 +1,10 @@
-# 99 總結
+# 03 package與依賴分析
 
 ## 學習目標
 
-- [ ] 整理全套學習成果
-- [ ] 列出可回查索引與待補強項目
-- [ ] 規劃下一個開源專案閱讀方向
+- [ ] 分析 package.json scripts、dependencies、devDependencies
+- [ ] 判斷每個依賴在元件庫中的用途
+- [ ] 理解 peerDependencies 對使用者專案的影響
 
 ## 源碼定位
 
@@ -96,4 +96,5 @@
 
 ## 關聯章節
 
-- 上一章：[39_ViewUIPlus設計模式總結](../39_ViewUIPlus設計模式總結/README.md)
+- 上一章：[02_根目錄與工程設定](../02_根目錄與工程設定/README.md)
+- 下一章：[04_build_打包腳本與建置流程](../04_build_打包腳本與建置流程/README.md)

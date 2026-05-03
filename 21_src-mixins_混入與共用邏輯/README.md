@@ -1,10 +1,10 @@
-# 99 總結
+# 21 src-mixins 混入與共用邏輯
 
 ## 學習目標
 
-- [ ] 整理全套學習成果
-- [ ] 列出可回查索引與待補強項目
-- [ ] 規劃下一個開源專案閱讀方向
+- [ ] 理解 mixins 的共用邏輯
+- [ ] 記錄 mixin 帶來的隱式依賴
+- [ ] 思考如何用 composables 重構
 
 ## 源碼定位
 
@@ -96,4 +96,5 @@
 
 ## 關聯章節
 
-- 上一章：[39_ViewUIPlus設計模式總結](../39_ViewUIPlus設計模式總結/README.md)
+- 上一章：[20_src-utils_工具函式](../20_src-utils_工具函式/README.md)
+- 下一章：[22_src-locale_國際化](../22_src-locale_國際化/README.md)

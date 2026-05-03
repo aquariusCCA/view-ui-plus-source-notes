@@ -1,10 +1,10 @@
-# 99 總結
+# 09 元件庫整體設計模式
 
 ## 學習目標
 
-- [ ] 整理全套學習成果
-- [ ] 列出可回查索引與待補強項目
-- [ ] 規劃下一個開源專案閱讀方向
+- [ ] 總結 View UI Plus 的元件設計模式
+- [ ] 辨識 Options API、Mixin、Composition API 的使用比例
+- [ ] 建立後續讀碼的分類框架
 
 ## 源碼定位
 
@@ -96,4 +96,5 @@
 
 ## 關聯章節
 
-- 上一章：[39_ViewUIPlus設計模式總結](../39_ViewUIPlus設計模式總結/README.md)
+- 上一章：[08_全域配置與globalProperties](../08_全域配置與globalProperties/README.md)
+- 下一章：[10_src-components_元件總覽](../10_src-components_元件總覽/README.md)
