@@ -29,12 +29,13 @@ TypeScript 型別怎麼輸出
 2. 我要讀哪個版本？
 3. 官方資料入口在哪裡？
 4. 本地環境要怎麼準備？
-5. 專案要怎麼 clone 與啟動？
-6. 啟動失敗要怎麼排查？
-7. 一般使用者怎麼安裝 View UI Plus？
-8. 使用者視角和源碼視角有什麼差異？
-9. 讀碼版本與 commit hash 要怎麼記錄？
-10. 進入下一章前要完成哪些檢核？
+5. Vue 專案中的 TypeScript 設定與型別宣告要怎麼理解？
+6. 專案要怎麼 clone 與啟動？
+7. 啟動失敗要怎麼排查？
+8. 一般使用者怎麼安裝 View UI Plus？
+9. 使用者視角和源碼視角有什麼差異？
+10. 讀碼版本與 commit hash 要怎麼記錄？
+11. 進入下一章前要完成哪些檢核？
 ```
 
 本章的核心目標是：
@@ -96,12 +97,13 @@ GitHub master 和 npm 版本對不起來
 ├── 01-02_版本選擇策略_讀源碼要選哪個版本.md
 ├── 01-03_官方倉庫_npm_文檔站_資源入口整理.md
 ├── 01-04_本地開發環境準備_Node_pnpm_Vue版本.md
-├── 01-05_從零Clone與啟動ViewUIPlus源碼.md
-├── 01-06_啟動失敗排查清單.md
-├── 01-07_使用者視角安裝ViewUIPlus.md
-├── 01-08_源碼讀碼視角與使用者視角的差異.md
-├── 01-09_版本鎖定與讀碼基準紀錄.md
-└── 01-10_本章學習檢核表.md
+├── 01-05_Vue專案TypeScript設定與型別宣告前置知識.md
+├── 01-06_從零Clone與啟動ViewUIPlus源碼.md
+├── 01-07_啟動失敗排查清單.md
+├── 01-08_使用者視角安裝ViewUIPlus.md
+├── 01-09_源碼讀碼視角與使用者視角的差異.md
+├── 01-10_版本鎖定與讀碼基準紀錄.md
+└── 01-11_本章學習檢核表.md
 ```
 
 ---
@@ -117,6 +119,7 @@ GitHub master 和 npm 版本對不起來
 再決定讀哪個版本
 再整理官方資源
 再準備環境
+再理解 TypeScript 設定與型別宣告前置知識
 再 clone 與啟動
 再處理啟動失敗
 再建立使用者視角
@@ -133,12 +136,13 @@ GitHub master 和 npm 版本對不起來
 | 2 | `01-02_版本選擇策略_讀源碼要選哪個版本.md` | 確認讀碼版本策略 |
 | 3 | `01-03_官方倉庫_npm_文檔站_資源入口整理.md` | 建立官方資源入口地圖 |
 | 4 | `01-04_本地開發環境準備_Node_pnpm_Vue版本.md` | 準備 Node、npm、pnpm、Vue、Vite 環境 |
-| 5 | `01-05_從零Clone與啟動ViewUIPlus源碼.md` | clone 本體源碼並嘗試啟動 |
-| 6 | `01-06_啟動失敗排查清單.md` | 建立錯誤排查流程 |
-| 7 | `01-07_使用者視角安裝ViewUIPlus.md` | 建立乾淨 Vue 3 使用者測試專案 |
-| 8 | `01-08_源碼讀碼視角與使用者視角的差異.md` | 把使用者 API 轉成源碼問題 |
-| 9 | `01-09_版本鎖定與讀碼基準紀錄.md` | 固定版本、commit、Node、啟動結果 |
-| 10 | `01-10_本章學習檢核表.md` | 檢查是否能進入下一章 |
+| 5 | `01-05_Vue專案TypeScript設定與型別宣告前置知識.md` | 理解 tsconfig、vue-tsc、types、typings、.d.ts 的角色 |
+| 6 | `01-06_從零Clone與啟動ViewUIPlus源碼.md` | clone 本體源碼並嘗試啟動 |
+| 7 | `01-07_啟動失敗排查清單.md` | 建立錯誤排查流程 |
+| 8 | `01-08_使用者視角安裝ViewUIPlus.md` | 建立乾淨 Vue 3 使用者測試專案 |
+| 9 | `01-09_源碼讀碼視角與使用者視角的差異.md` | 把使用者 API 轉成源碼問題 |
+| 10 | `01-10_版本鎖定與讀碼基準紀錄.md` | 固定版本、commit、Node、啟動結果 |
+| 11 | `01-11_本章學習檢核表.md` | 檢查是否能進入下一章 |
 
 ---
 
@@ -253,7 +257,35 @@ VS Code 與 Git 設定
 
 ---
 
-### 5.5 `01-05_從零Clone與啟動ViewUIPlus源碼.md`
+### 5.5 `01-05_Vue專案TypeScript設定與型別宣告前置知識.md`
+
+這篇回答：
+
+> Vue 專案中的 TypeScript 設定、型別入口與 `.d.ts` 到底各自負責什麼？
+
+重點包含：
+
+```text
+typescript / tsc / vue-tsc 的角色
+tsconfig.json 的常見設定
+package.json 的 types / typings
+tsconfig.json 的 types
+.ts 和 .d.ts 的差異
+Vue 專案常見 env.d.ts / shims-vue.d.ts
+為什麼編輯器沒有執行 tsc 也會提示 TS 錯誤
+如何從 TypeScript 提示反推元件庫的 types 目錄
+```
+
+完成這篇後，你應該知道：
+
+```text
+TypeScript 設定不是單一檔案問題；
+tsconfig、vue-tsc、package types、typings 與 .d.ts 共同決定使用者能否取得正確型別提示。
+```
+
+---
+
+### 5.6 `01-06_從零Clone與啟動ViewUIPlus源碼.md`
 
 這篇回答：
 
@@ -286,7 +318,7 @@ clone 成功
 
 ---
 
-### 5.6 `01-06_啟動失敗排查清單.md`
+### 5.7 `01-07_啟動失敗排查清單.md`
 
 這篇回答：
 
@@ -315,7 +347,7 @@ npm registry / proxy 問題
 
 ---
 
-### 5.7 `01-07_使用者視角安裝ViewUIPlus.md`
+### 5.8 `01-08_使用者視角安裝ViewUIPlus.md`
 
 這篇回答：
 
@@ -343,7 +375,7 @@ app.use(ViewUIPlus)
 
 ---
 
-### 5.8 `01-08_源碼讀碼視角與使用者視角的差異.md`
+### 5.9 `01-09_源碼讀碼視角與使用者視角的差異.md`
 
 這篇回答：
 
@@ -374,7 +406,7 @@ TypeScript 對應 typings
 
 ---
 
-### 5.9 `01-09_版本鎖定與讀碼基準紀錄.md`
+### 5.10 `01-10_版本鎖定與讀碼基準紀錄.md`
 
 這篇回答：
 
@@ -402,7 +434,7 @@ dist / types 檢查
 
 ---
 
-### 5.10 `01-10_本章學習檢核表.md`
+### 5.11 `01-11_本章學習檢核表.md`
 
 這篇回答：
 
@@ -445,12 +477,13 @@ README.md
 01-02_版本選擇策略_讀源碼要選哪個版本.md
 01-03_官方倉庫_npm_文檔站_資源入口整理.md
 01-04_本地開發環境準備_Node_pnpm_Vue版本.md
-01-05_從零Clone與啟動ViewUIPlus源碼.md
-01-06_啟動失敗排查清單.md
-01-07_使用者視角安裝ViewUIPlus.md
-01-08_源碼讀碼視角與使用者視角的差異.md
-01-09_版本鎖定與讀碼基準紀錄.md
-01-10_本章學習檢核表.md
+01-05_Vue專案TypeScript設定與型別宣告前置知識.md
+01-06_從零Clone與啟動ViewUIPlus源碼.md
+01-07_啟動失敗排查清單.md
+01-08_使用者視角安裝ViewUIPlus.md
+01-09_源碼讀碼視角與使用者視角的差異.md
+01-10_版本鎖定與讀碼基準紀錄.md
+01-11_本章學習檢核表.md
 ```
 
 ### 6.2 本地專案產出
@@ -492,13 +525,14 @@ logs/
 3. 已 clone 官方倉庫
 4. 已記錄 commit hash
 5. 已確認 package.json 的 name / version / main / typings
-6. 已安裝依賴，或已記錄安裝失敗原因
-7. 已嘗試 npm run dev2
-8. 已嘗試 npm run dev
-9. 已建立使用者視角測試專案
-10. 已成功在測試專案中使用 Button 或 Input
-11. 已知道使用者視角與源碼視角的差異
-12. 已建立至少一份讀碼基準紀錄
+6. 已理解 tsconfig、vue-tsc、types / typings、.d.ts 的基本分工
+7. 已安裝依賴，或已記錄安裝失敗原因
+8. 已嘗試 npm run dev2
+9. 已嘗試 npm run dev
+10. 已建立使用者視角測試專案
+11. 已成功在測試專案中使用 Button 或 Input
+12. 已知道使用者視角與源碼視角的差異
+13. 已建立至少一份讀碼基準紀錄
 ```
 
 如果以上項目沒有完成，不建議直接進入下一章。
@@ -510,23 +544,24 @@ logs/
 完整完成本章後，你應該做到：
 
 ```text
-1. 本章 10 篇筆記全部完成
+1. 本章 11 篇筆記全部完成
 2. View UI Plus 本體已 clone
 3. branch / tag / commit hash 已記錄
 4. Node / npm / pnpm 版本已記錄
-5. npm install 成功
-6. npm run dev2 成功
-7. npm run dev 成功或失敗原因明確
-8. npm run build 成功或已分段定位失敗
-9. dist / types 已檢查
-10. 使用者 playground 已建立
-11. playground 已安裝 view-ui-plus
-12. playground 已測試 Button、Input、Form、Message
-13. playground 已執行 dev / build
-14. logs 已建立
-15. 後續每篇筆記的讀碼基準模板已建立
-16. 使用者 API → 源碼問題對照表已建立
-17. 已知道下一章要看根目錄結構
+5. TypeScript 設定與型別宣告前置概念已理解
+6. npm install 成功
+7. npm run dev2 成功
+8. npm run dev 成功或失敗原因明確
+9. npm run build 成功或已分段定位失敗
+10. dist / types 已檢查
+11. 使用者 playground 已建立
+12. playground 已安裝 view-ui-plus
+13. playground 已測試 Button、Input、Form、Message
+14. playground 已執行 dev / build
+15. logs 已建立
+16. 後續每篇筆記的讀碼基準模板已建立
+17. 使用者 API → 源碼問題對照表已建立
+18. 已知道下一章要看根目錄結構
 ```
 
 ---
@@ -754,10 +789,10 @@ types 型別宣告
 建議你按照以下方式使用本章：
 
 ```text
-第一輪：按順序讀完 01-01 到 01-10
+第一輪：按順序讀完 01-01 到 01-11
 第二輪：一邊操作一邊補 logs
-第三輪：確認 01-10 檢核表是否達標
-第四輪：把 01-09 的讀碼基準複製到後續章節模板
+第三輪：確認 01-11 檢核表是否達標
+第四輪：把 01-10 的讀碼基準複製到後續章節模板
 第五輪：進入 02_根目錄與工程設定
 ```
 

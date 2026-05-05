@@ -502,7 +502,7 @@ pnpm -v
 並寫到：
 
 ```text
-01-09_版本鎖定與讀碼基準紀錄.md
+01-10_版本鎖定與讀碼基準紀錄.md
 ```
 
 ---
@@ -831,7 +831,7 @@ git remote -v
 記錄到：
 
 ```text
-01-09_版本鎖定與讀碼基準紀錄.md
+01-10_版本鎖定與讀碼基準紀錄.md
 ```
 
 ---
@@ -1596,9 +1596,10 @@ build 是否成功
 
 | 後續章節 | 本篇環境準備的作用 |
 |---|---|
-| `01-05_從零Clone與啟動ViewUIPlus源碼` | 直接依本篇 Node / npm 策略執行 |
-| `01-06_啟動失敗排查清單` | 本篇提供錯誤分類基礎 |
-| `01-07_使用者視角安裝ViewUIPlus` | 自建 pnpm playground 會用到 |
+| `01-05_Vue專案TypeScript設定與型別宣告前置知識` | 說明 Vue / Vite / TypeScript 專案設定與型別入口 |
+| `01-06_從零Clone與啟動ViewUIPlus源碼` | 直接依本篇 Node / npm 策略執行 |
+| `01-07_啟動失敗排查清單` | 本篇提供錯誤分類基礎 |
+| `01-08_使用者視角安裝ViewUIPlus` | 自建 pnpm playground 會用到 |
 | `02_根目錄與工程設定` | 需要本地 clone 後觀察目錄 |
 | `03_package與依賴分析` | 需要理解 dependency / devDependency |
 | `04_build_打包腳本與建置流程` | 需要理解 dev / dev2 / build script |
@@ -1710,7 +1711,7 @@ View UI Plus 本體源碼
 - [ ] 我已建立 `logs/env-record.md`。
 - [ ] 我知道啟動失敗時不要先亂升級依賴。
 - [ ] 我知道如何記錄 Node、npm、pnpm、Vue、Vite、View UI Plus 版本。
-- [ ] 我知道下一篇要進入 clone 與啟動流程。
+- [ ] 我知道下一篇要先補齊 Vue 專案 TypeScript 設定與型別宣告前置知識。
 
 ---
 
@@ -1719,18 +1720,16 @@ View UI Plus 本體源碼
 本篇完成後，下一篇建議進入：
 
 ```text
-01-05_從零Clone與啟動ViewUIPlus源碼.md
+01-05_Vue專案TypeScript設定與型別宣告前置知識.md
 ```
 
-下一篇要真正執行：
+下一篇要先釐清：
 
 ```text
-clone ViewUIPlus
-切 Node
-npm install
-npm run dev / dev2
-記錄錯誤
-確認啟動成功
+tsconfig.json 如何影響型別檢查
+package.json types / typings 是什麼
+vue-tsc 和 tsc 的差異
+.d.ts 在 Vue 專案中的角色
 ```
 
 ---
