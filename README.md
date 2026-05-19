@@ -40,7 +40,11 @@
 | `18-practice/` | 根據 `notes/` 生成練習題、實作任務、改錯題、重構題。 |
 | `19-review/` | 根據 `notes/` 生成重點摘要、問答題、填空題、複習卡片。 |
 | `20-supplements/` | 根據 `notes/` 延伸補充底層原理、進階觀念、相關比較與實務案例。 |
-| `21-prompts/` | 用於源碼閱讀、筆記整理、仿作實作、重構分析的提示詞。 |
+| `21-prompts/` | 用於源碼閱讀、筆記整理、仿作實作、重構分析的提示詞集合。 |
+| `21-prompts/system/` | 系統規則提示詞，存放穩定的 AI 角色設定與總體規則，例如語言、教學風格與輸出原則。 |
+| `21-prompts/workflows/` | 工作流程提示詞，存放完整生成流程，例如依主題/模組來源範圍生成對應的 `02-notes/` 筆記，或從 `02-notes/` 生成練習與複習材料。 |
+| `21-prompts/formats/` | 輸出格式提示詞，存放固定輸出格式，例如教書型筆記、練習題、複習卡與 API 表格格式。 |
+| `21-prompts/requests/` | 實際提問範例，存放可直接使用或參考的具體提問，例如針對某章節、某份原始資料或某個任務的問題。 |
 | `22-appendix/` | 根據 `notes/` 生成查表型資料，方便快速查找名詞、API、設定與實作對照。 |
 | `22-appendix/glossary/` | 名詞表，例如 plugin、provide/inject、teleport、composable。 |
 | `22-appendix/api-tables/` | API 查表，例如全局 API、命令式 API、方法參數與回傳值。 |
