@@ -6,30 +6,52 @@ View UI Plus 是一個提供給 npm 使用者安裝的 Vue 3 `component library`
 
 ## 1. 為什麼 Repo 要這樣拆分
 
-一個 UI `component library` 的生命週期可以粗略看成：
+一個 UI `component library` 的 repo，通常不是只按「檔案種類」拆目錄，而是按 package 生命週期拆責任。先有可維護的 source 和 type contract，再透過 build 產出 dist；`examples/` 則從使用者視角回頭驗證 source 與 types 是否正確。
+
+產出 package 的主流程可以看成：
 
 ```txt
-write source
-  -> describe public types
-  -> build runtime/style/locale artifacts
-  -> publish package outputs
-  -> verify behavior in examples
+Author-maintained source
+┌────────────┐    ┌────────────┐
+│   src/     │    │  types/    │
+│ runtime    │    │ public TS  │
+│ behavior   │    │ contract   │
+└─────┬──────┘    └─────┬──────┘
+      │                 │
+      └────────┬────────┘
+               v
+        ┌────────────┐
+        │  build/    │
+        │ packaging  │
+        │ rules      │
+        └─────┬──────┘
+              v
+        ┌────────────┐
+        │  dist/     │
+        │ published  │
+        │ artifacts  │
+        └─────┬──────┘
+              v
+        npm / browser consumers
 ```
 
-對應到 repo 目錄，就是：
+`examples/` 不是發佈流程的下一站，而是開發時的回饋迴路：
 
 ```txt
-src/ + types/
-  -> build scripts and root build config
-  -> dist/
-  -> npm consumers
-
-examples/
-  -> development usage scenarios
-  -> feedback into src/ and types/
+Development feedback loop
+┌────────────┐
+│ examples/  │
+│ consumer   │
+│ simulation │
+└─────┬──────┘
+      │ verifies usage, behavior, style, locale
+      v
+┌────────────┐    ┌────────────┐
+│   src/     │    │  types/    │
+└────────────┘    └────────────┘
 ```
 
-這個分層的重點不是目錄名稱，而是責任邊界：
+換句話說，這個分層的重點不是目錄名稱，而是責任邊界：
 
 - `src/` 是可維護的 `runtime source`，也就是實際執行行為的原始碼。
 - `types/` 是提供給 TypeScript 使用者的 `public type contract`，也就是對外承諾的型別形狀。
@@ -141,4 +163,3 @@ examples/
 - `00-roadmap/01-source-map.md`：偏索引，協助快速定位 entry points 和後續閱讀路線。
 - `03-architecture/01-overview.md`：偏 runtime architecture，說明 plugin install、public API shape 和 dependency direction。
 - 本篇：偏 repository architecture，說明主要目錄為什麼被拆成不同責任區，以及閱讀時如何區分 source、contract、artifact。
-
