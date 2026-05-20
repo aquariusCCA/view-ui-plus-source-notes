@@ -2,7 +2,7 @@
 
 這份筆記是 View UI Plus 原始碼閱讀的第一張地圖。它只整理 entry points（入口）、目錄角色、public surface（對外介面）與後續閱讀路線，不深入分析單一 component（元件）或架構取捨。
 
-View UI Plus 是一套 Vue 3 UI component library。閱讀原始碼時，先把它拆成幾個大面向：可重用 UI components、Vue plugin install、directives、locale/i18n、Less styles、TypeScript declarations，以及 build/release 產物。這份 source map 只負責指出這些面向分別從哪裡開始讀。
+View UI Plus 是一套 Vue 3 UI component library。閱讀原始碼時，先把它拆成幾個大面向：可重用 UI components、Vue plugin install（外掛安裝）、directives、locale/i18n、Less styles、TypeScript declarations，以及 build/release 產物。這份 source map 只負責指出這些面向分別從哪裡開始讀。
 
 ## 1. Source Baseline 來源基準
 
@@ -88,7 +88,7 @@ public surface 指的是「套件使用者能直接接觸到的 API 邊界」。
 
 | 對外入口 | 使用者看到的形式 | 原始碼起點 | 讀碼重點 |
 | --- | --- | --- | --- |
-| Vue plugin install | `app.use(ViewUIPlus, options)` | `src/index.js` | 全量安裝流程如何啟動，包括註冊元件、指令、全域設定與服務 API |
+| Vue plugin install（外掛安裝） | `app.use(ViewUIPlus, options)` | `src/index.js` | 全量安裝流程如何啟動，包括註冊元件、指令、全域設定與服務 API |
 | Named component exports | `import { Button } from 'view-ui-plus'` | `src/components/index.js` | 哪些元件支援單獨匯入，以及匯出名稱如何對應到 component |
 | Global components | 安裝後可在 template 使用元件 | `install()` in `src/index.js` | `install()` 如何把所有元件註冊到 Vue app |
 | Global config | `$VIEWUI` | `src/index.js` | 全域 `size`、`transfer` 與各 component 預設選項如何保存 |

@@ -1,6 +1,6 @@
 # Architecture Overview 整體架構總覽
 
-這份筆記整理 View UI Plus 作為 Vue 3 UI library 的整體架構骨架。它承接 `00-roadmap/01-source-map.md`，但不重複做閱讀路線；重點是理解 package entry、runtime composition（執行期組裝）、Vue plugin install flow（外掛安裝流程）與 public API shape（對外 API 形狀）。
+這份筆記整理 View UI Plus 作為 Vue 3 UI library 的整體架構骨架。它承接 `00-roadmap/01-source-map.md`，但不重複做閱讀路線；重點是理解 package entry（套件入口）、runtime composition（執行期組裝）、Vue plugin install flow（外掛安裝流程）與 public API shape（對外 API 形狀）。
 
 這篇只看整體結構，不深入單一 component 的 props、events、slots 或內部實作。component、type、style、directive、build 等細節會分流到後續主題筆記。
 
@@ -59,7 +59,7 @@ package.json
 
 `ViewUI` 除了展開 `components`，也額外建立部分 `i` 前綴 alias，例如 `iButton`、`iForm`、`iInput`、`iTable`。這代表全量註冊時，同一個 component 可能會同時有標準名稱與相容名稱。
 
-## 3. Vue Plugin Install Flow
+## 3. Vue Plugin Install Flow 外掛安裝流程
 
 使用者通常會透過以下形式安裝：
 
@@ -149,21 +149,7 @@ package.json
 
 也就是說，`src/index.js` 是 runtime 的組裝點；`components` 是 UI 與 service API 的主體；`utils`、`mixins`、`directives`、`locale` 是共用支撐；`styles` 管理視覺樣式；`types`、`dist` 與 `build` 則把原始碼整理成對外可消費的 package。
 
-## 7. Follow-up Architecture Notes 後續分流
-
-| 主題 | 目標檔案 |
-| --- | --- |
-| Vue plugin install flow | `04-plugin-system/01-install-flow.md` |
-| TypeScript declarations | `06-type-system/01-type-entry-map.md` |
-| Components map | `07-components/01-components-map.md` |
-| Overlay components | `08-overlay-system/01-overlay-map.md` |
-| Form system | `09-form-system/01-form-map.md` |
-| Imperative APIs | `10-imperative-api/01-global-services-map.md` |
-| Directives | `11-directives/01-directives-map.md` |
-| Style system | `12-style-system/01-style-entry-map.md` |
-| Build/release | `14-build-release/01-build-map.md` |
-
-## 8. Reading Boundaries 閱讀邊界
+## 7. Reading Boundaries 閱讀邊界
 
 這份 overview 只建立架構理解，不處理以下內容：
 
