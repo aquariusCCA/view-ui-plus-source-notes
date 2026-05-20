@@ -97,7 +97,7 @@ public surface 指的是「套件使用者能直接接觸到的 API 邊界」。
 | Type declarations | TypeScript import 與 IDE 型別提示 | `types/index.d.ts` | 對外 API 的型別入口；細節放到 `06-type-system/` |
 | Locale APIs | `locale`、`i18n`、`lang` | `src/index.js` 與 `src/locale/` | 語系與 i18n API 如何被匯出與初始化 |
 
-## 6. Reading Route 閱讀路線
+## 6. Suggested Reading Route 建議閱讀路線
 
 建議先照這個順序讀，避免一開始就陷入單一 component 的實作細節。
 
@@ -112,22 +112,7 @@ public surface 指的是「套件使用者能直接接觸到的 API 邊界」。
 9. `src/locale/`、`src/utils/`、`src/mixins/` 的共用支撐
 10. `build/` 與 root config 的建置設定
 
-## 7. Follow-up Notes 後續筆記
-
-| 主題 | 目標檔案 |
-| --- | --- |
-| 整體架構 | `03-architecture/01-overview.md` |
-| Vue plugin install 流程 | `04-plugin-system/01-install-flow.md` |
-| 型別系統 | `06-type-system/01-type-entry-map.md` |
-| components 總覽 | `07-components/01-components-map.md` |
-| overlay 類元件 | `08-overlay-system/01-overlay-map.md` |
-| form 類元件 | `09-form-system/01-form-map.md` |
-| imperative API | `10-imperative-api/01-global-services-map.md` |
-| directives | `11-directives/01-directives-map.md` |
-| style system | `12-style-system/01-style-entry-map.md` |
-| build/release | `14-build-release/01-build-map.md` |
-
-## 8. Boundaries 邊界
+## 7. Boundaries 邊界
 
 這份 source map 只回答「入口在哪、模組怎麼分、後續要讀哪裡」。以下內容不要寫在這份檔案中：
 
