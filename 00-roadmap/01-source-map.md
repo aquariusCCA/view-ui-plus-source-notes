@@ -84,16 +84,18 @@ View UI Plus 是一套 Vue 3 UI component library。閱讀原始碼時，先把�
 
 ## 5. Public Surface Map 對外介面地圖
 
-| Public surface | Source | 說明 |
-| --- | --- | --- |
-| Vue plugin install | `src/index.js` | `app.use(ViewUIPlus, options)` 的主流程 |
-| Named component exports | `src/components/index.js` | 支援單獨 import component |
-| Global components | `install()` in `src/index.js` | 全量註冊到 Vue app |
-| Global config | `$VIEWUI` | 保存 size、transfer 與各 component 全域選項 |
-| Imperative APIs | `$Message`, `$Notice`, `$Modal`, `$Spin`, `$Loading` | 後續放到 `10-imperative-api/` |
-| Directives | `display`, `width`, `height`, `resize`, `line-clamp` 等 | 後續放到 `11-directives/` |
-| Type declarations | `types/index.d.ts` | 後續放到 `06-type-system/` |
-| Locale APIs | `locale`, `i18n`, `lang` | 後續可放到 architecture 或 supplements |
+public surface 指的是「套件使用者能直接接觸到的 API 邊界」。讀原始碼時，可以先用這張表判斷：哪些檔案是在定義對外用法，哪些只是內部實作細節。
+
+| 對外入口 | 使用者看到的形式 | 原始碼起點 | 讀碼重點 |
+| --- | --- | --- | --- |
+| Vue plugin install | `app.use(ViewUIPlus, options)` | `src/index.js` | 全量安裝流程如何啟動，包括註冊元件、指令、全域設定與服務 API |
+| Named component exports | `import { Button } from 'view-ui-plus'` | `src/components/index.js` | 哪些元件支援單獨匯入，以及匯出名稱如何對應到 component |
+| Global components | 安裝後可在 template 使用元件 | `install()` in `src/index.js` | `install()` 如何把所有元件註冊到 Vue app |
+| Global config | `$VIEWUI` | `src/index.js` | 全域 `size`、`transfer` 與各 component 預設選項如何保存 |
+| Imperative APIs | `$Message`、`$Notice`、`$Modal`、`$Spin`、`$Loading` | `src/index.js` 與 `src/components/` | 這類不用寫 component、直接呼叫的方法如何掛到 app 上；細節放到 `10-imperative-api/` |
+| Directives | `display`、`width`、`height`、`resize`、`line-clamp` 等 | `src/directives/` 與 `src/index.js` | directive 從哪裡定義，並如何在 install 時註冊；細節放到 `11-directives/` |
+| Type declarations | TypeScript import 與 IDE 型別提示 | `types/index.d.ts` | 對外 API 的型別入口；細節放到 `06-type-system/` |
+| Locale APIs | `locale`、`i18n`、`lang` | `src/index.js` 與 `src/locale/` | 語系與 i18n API 如何被匯出與初始化 |
 
 ## 6. Reading Route 閱讀路線
 
