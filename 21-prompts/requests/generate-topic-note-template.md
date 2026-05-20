@@ -2,6 +2,15 @@
 
 請依以下設定，協助我生成一篇 View UI Plus 的書本型、教學型、詳細筆記。
 
+## 搭配使用的提示詞檔案
+
+執行本請求時，請依序搭配以下提示詞檔案：
+
+1. `21-prompts/system/view-ui-plus-note-assistant.md`
+2. `21-prompts/workflows/generate-topic-note.md`
+3. `21-prompts/formats/book-style-note.md`
+4. 本檔案：`21-prompts/requests/generate-topic-note-template.md`
+
 ## 任務
 
 將指定來源整理成 `02-notes/` 下的主幹學習筆記。請使用繁體中文，寫成技術書章節風格，不要只做摘要或 API 清單。
