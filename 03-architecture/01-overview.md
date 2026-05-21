@@ -622,7 +622,7 @@ build system
 | Component implementation layer | `src/components/*` | 實作各 component 與 service API | 不要一次深入全部 component，先依系統分類閱讀，例如 form、overlay、data display | `07-components/`, `08-overlay-system/`, `09-form-system/`, `10-imperative-api/` |
 | Directive layer | `src/directives/*` | 實作 Vue directives | 觀察 directive 的註冊名稱、生命週期與 DOM 行為 | `11-directives/01-directives-map.md` |
 | Locale layer | `src/locale/*` | 處理 locale 與 i18n | 觀察 `localeFile.use()`、`localeFile.i18n()` 與 component 文案如何互動 | 後續可獨立成 locale 筆記 |
-| Shared layer | `src/mixins/*`, `src/utils/*` | 提供共用 mixins 與 utilities | 優先關注被多個 components 共用的工具，而不是孤立函式 | `05-composables/` 或 architecture 補充 |
+| Shared layer | `src/mixins/*`, `src/utils/*` | 提供共用 mixins 與 utilities | 優先關注被多個 components 共用的工具，而不是孤立函式 | `05-shared-logic/` 或 architecture 補充 |
 | Style layer | `src/styles/*` | 管理 Less 樣式入口與樣式模組 | 觀察樣式入口、common、mixins、components style 的依賴方向 | `12-style-system/01-style-entry-map.md` |
 | Type layer | `types/*` | 提供 TypeScript declarations | 觀察 plugin、component props、instance globalProperties 的型別如何對外暴露 | `06-type-system/01-type-entry-map.md` |
 | Build layer | `build/*` | 定義 build、style、lang 相關流程 | 觀察 source 如何轉成 dist、types、style artifacts | `14-build-release/01-build-map.md` |

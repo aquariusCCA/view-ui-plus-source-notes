@@ -470,9 +470,9 @@ View UI Plus 在 `install()` 中會掛載類似：
 | `src/components/` | components 與 service API 主體 | 元件與命令式 API 的核心來源 | `07-components/`, `08-overlay-system/`, `09-form-system/`, `10-imperative-api/` |
 | `src/directives/` | Vue directives | directive 如何定義與被 install 註冊 | `11-directives/` |
 | `src/locale/` | 語系與 i18n | locale 如何初始化與對外提供 API | `03-architecture/`, `20-supplements/` |
-| `src/mixins/` | 共用 mixins | 多個元件共用的 Vue Options API 邏輯 | `03-architecture/`, `05-composables/` |
+| `src/mixins/` | 共用 mixins | 多個元件共用的 Vue Options API 邏輯 | `03-architecture/`, `05-shared-logic/` |
 | `src/styles/` | Less style system | 樣式變數、元件樣式與樣式入口 | `12-style-system/` |
-| `src/utils/` | 共用 utilities | 跨元件使用的工具函式 | `03-architecture/`, `05-composables/` |
+| `src/utils/` | 共用 utilities | 跨元件使用的工具函式 | `03-architecture/`, `05-shared-logic/` |
 | `types/` | TypeScript declarations | 對外 API 的型別邊界 | `06-type-system/` |
 | `build/` | build scripts | 樣式、語系、bundle 的建置流程 | `14-build-release/` |
 | `dist/` | 發布後產物 | 給使用者安裝後消費的 JS、CSS、locale 產物 | `14-build-release/` |

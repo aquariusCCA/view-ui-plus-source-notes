@@ -23,7 +23,7 @@
 | `02-notes/` | 存放來自源碼閱讀、Vue/TypeScript/工程化等背景知識補強，或針對不熟悉概念的延伸學習，例如 `app.config.globalProperties`、plugin install、provide/inject、Teleport 等。筆記應以自己的理解重新整理，必要時附上參考來源。 |
 | `03-architecture/` | 組件庫整體架構、模組分層、目錄組織、依賴關係與設計思想。 |
 | `04-plugin-system/` | Vue plugin 安裝流程、全局註冊、配置注入與插件化設計。 |
-| `05-composables/` | composables/hooks 的抽象方式、復用策略、狀態管理與事件封裝。 |
+| `05-shared-logic/` | View UI Plus 沒有獨立 composables/hooks 層；本區整理 `src/mixins/`、`src/utils/` 的共用邏輯、復用方式與事件/狀態封裝。 |
 | `06-type-system/` | TypeScript 型別設計，包含 props、emits、instance、public API 與泛型。 |
 | `07-components/` | 通用元件分類、元件源碼閱讀、props 設計、插槽設計與元件模式。 |
 | `08-overlay-system/` | Modal、Drawer、Tooltip、Dropdown、Popper 等浮層系統的設計與實作。 |
