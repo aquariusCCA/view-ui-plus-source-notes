@@ -1,31 +1,5 @@
 # Table and Form as Type Case Studies：複雜資料型元件的型別取捨
 
-## 0. 原始筆記問題分析
-
-這篇原始筆記屬於「原始碼閱讀筆記」與「TypeScript 型別設計案例筆記」的混合型。它不是單純介紹 `Table` 或 `Form` 的使用方式，而是透過這兩個複雜資料型元件，觀察 View UI Plus v1.3.20 在 `.d.ts` 型別宣告上的設計取捨。
-
-原始筆記已經抓到非常重要的主軸：`Table` 與 `Form` 都是資料驅動元件，真正困難的地方不在於 props 數量，而在於「資料 shape」是否能和 columns、render callback、event payload、rules、FormItem.prop 建立型別關聯。
-
-不過，原始筆記仍有幾個可以補強的地方：
-
-1. **整體背景還可以再補強**  
-   原文直接進入 `types/table.d.ts` 與 `types/form.d.ts`，但初次閱讀 UI library 型別檔的人，可能還不清楚什麼是 `type surface`、什麼是「強契約」與「弱契約」，以及為什麼 `any`、`Function`、`object` 會影響 IDE 提示與型別安全。
-
-2. **Table 與 Form 的共同問題可以再系統化**  
-   原文已指出 Table / Form 都沒有把資料 shape 泛型化，但可以進一步整理成一個通用心智模型：  
-   「資料型 props」通常需要和「設定物件」、「callback 參數」、「event payload」、「slot props」互相連動，否則型別只能停留在寬鬆宣告。
-
-3. **泛型化範例需要標清楚邊界**  
-   原文提供了現代 TypeScript 的改良方向，這很適合學習。但需要明確提醒：這些設計不是 View UI Plus v1.3.20 目前的實際宣告，而是用來訓練型別設計思維的重構方向。
-
-4. **部分 `.d.ts` 寫法需要補充閱讀注意事項**  
-   例如 `export declare const TableColumnConfig: { ... }` 從語法上看是宣告一個 exported value 的型別，而不是 `interface TableColumnConfig`。原始筆記將它視為 column option shape 來分析是合理的閱讀方向，但若要在專案中直接當作 type 使用，仍需要實測或回到完整 declaration 確認。
-
-5. **可以補上閱讀路線與後續拆分方向**  
-   這篇筆記很適合作為後續深入 `Table`、`Form`、`async-validator`、slot props、emits typing、泛型元件設計的入口，因此需要補出明確的學習路線。
-
----
-
 ## 1. 本章定位
 
 本章位於 `06-type-system/` 目錄，主題是 View UI Plus 的 TypeScript 型別設計。這個目錄主要用來整理 props、emits、instance、public API 與泛型等型別層面的設計，而本章選擇 `Table` 與 `Form` 作為案例，是因為它們最能暴露 UI library 型別設計的核心難題。
@@ -200,7 +174,7 @@ types/form.d.ts
 
 ### 4.2 `Table` 的 Type Surface
 
-原始筆記中整理的 `types/table.d.ts` 主要包含 `Table` 與 `TableColumnConfig` 兩個部分：
+`types/table.d.ts` 主要包含 `Table` 與 `TableColumnConfig` 兩個部分：
 
 ```ts
 export declare const Table: DefineComponent<{
@@ -239,7 +213,7 @@ export declare const Table: DefineComponent<{
 
 ### 4.3 `TableColumnConfig` 的角色與限制
 
-原始筆記整理的 `TableColumnConfig` 如下：
+`TableColumnConfig` 如下：
 
 ```ts
 export declare const TableColumnConfig: {
@@ -301,8 +275,6 @@ interface UserRow {
 ```
 
 但目前宣告是 `string`，所以使用者寫成 `'nage'`、`'username'` 或其他不存在的欄位，TypeScript 仍然不會報錯。
-
-另外要注意，原始筆記中的 `TableColumnConfig` 是以 `export declare const TableColumnConfig: { ... }` 的形式出現。這代表它在 declaration 中被宣告成 exported value 的型別形狀，而不是 `export interface TableColumnConfig`。如果實務上想直接把它當成型別名稱使用，需要回到完整 declaration 或實際專案中確認匯入方式。此處筆記先把它當作「column option shape 的觀察點」。
 
 ---
 
@@ -383,7 +355,7 @@ onOnSelectionChange?: (event?: any) => any
 
 ### 4.6 `Table` 的泛型化思路：讓 row data 成為型別中心
 
-如果用現代 TypeScript 重新設計 `Table` 的型別，可以讓 row data 成為整個型別系統的中心。原始筆記提供的改良方向如下：
+如果用現代 TypeScript 重新設計 `Table` 的型別，可以讓 row data 成為整個型別系統的中心。
 
 ```ts
 export interface TableColumn<TRecord = any> {
@@ -436,7 +408,7 @@ TRecord
 
 ### 4.7 `Form` 的 Type Surface
 
-原始筆記整理的 `types/form.d.ts` 主要包含 `Form` 與 `FormItem`：
+`types/form.d.ts` 主要包含 `Form` 與 `FormItem`：
 
 ```ts
 export declare const Form: DefineComponent<{
@@ -538,7 +510,7 @@ onOnValidate?: (event?: any) => any
 
 ### 4.9 `Form` 的泛型化思路：讓 model 成為型別中心
 
-原始筆記提供的 Form 改良方向如下：
+Form 改良方向如下：
 
 ```ts
 type FieldPath<TModel> = keyof TModel & string;
@@ -647,8 +619,6 @@ model
 
 這也是 UI library 型別設計中最常見的難題：  
 **越精準的型別越能幫使用者抓錯，但也越容易增加 declaration 複雜度、相容性風險與維護成本。**
-
-對 View UI Plus v1.3.20 來說，從原始筆記提供的內容可觀察到，它在複雜資料型元件上偏向「保留 runtime 彈性與相容性」，因此使用較多 `any`、`Function`、`object`。這是一種典型的 library 型別設計取捨，而不是單純的好或壞。
 
 ---
 

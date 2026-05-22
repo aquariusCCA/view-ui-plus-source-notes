@@ -1,37 +1,5 @@
 # Type System Boundaries and Tradeoffs：型別系統的邊界與取捨
 
-> 所屬目錄：`06-type-system/`  
-> 筆記定位：整理 View UI Plus 的 TypeScript 型別設計邊界，包含 `props`、`emits`、component instance、public API、global API、slots 與泛型化能力的取捨。
-
----
-
-## 0. 原始筆記問題分析
-
-這份原始筆記屬於「原始碼閱讀筆記 + 架構分析筆記 + TypeScript declaration 分析筆記」。它不是單純介紹某個 API，而是在總結 View UI Plus v1.3.20 型別系統的整體邊界：哪些地方已經有實用型別支援，哪些地方仍停留在寬鬆型別，哪些地方則受限於歷史相容性與維護成本。
-
-原始筆記已經抓到幾個很重要的核心觀察，例如：
-
-- View UI Plus 有明確的 `types/` 目錄與 `typings` 入口。
-- `types/viewuiplus.components.d.ts` 提供 component registry，讓 named import 有基礎型別。
-- 許多 props 已經使用 literal union，能提供實際 autocomplete 與型別保護。
-- 仍存在大量 `any`、`Function`、弱化的 event payload 與缺少泛型的資料型元件。
-- `$Message`、`$Modal`、`$Notice` 等 global API 只做到 property-level，還沒有完整 service contract。
-- `on-change` 這類歷史事件命名會導致 listener prop type 出現 `onOnChange` 這類不自然命名。
-
-不過，原始筆記仍有幾個可以補強的地方。
-
-第一，原始筆記雖然列出了「做得好的地方」與「型別邊界」，但還可以再補一層心智模型：閱讀元件庫型別時，不應只問「有沒有型別」，而應該問「型別精準到哪一層」。例如 `this.$Message` 存在，只是 property-level；`this.$Message.success()` 有參數型別，才是 method-level；Table 的 `row`、`column`、`key` 能互相關聯，才接近 data-flow-level。
-
-第二，原始筆記對 `.d.ts` 和 runtime 分離的問題已經有指出，但可以進一步說明這種架構對 library 維護者與使用者各自代表什麼。對維護者來說，這代表每次改 runtime 都要人工同步 declaration；對使用者來說，這代表 TypeScript 顯示能用，不一定等於 runtime 實際存在或行為完全一致。
-
-第三，原始筆記有提到泛型缺席，但可以補成更完整的「資料型元件型別設計」問題。像 `Table`、`Form`、`Select`、`Tree` 這類元件不只是 props 多，而是資料會在多個位置流動：`data`、`columns`、`row`、`render`、slot props、event payload 之間如果沒有泛型關聯，TypeScript 就只能做表層提示，無法保護資料流。
-
-第四，原始筆記的改善優先順序是正確方向，但還可以補上「為什麼這樣排」。型別改造不應一開始就全面泛型化，因為元件庫的 public API 一旦變嚴格，可能會破壞既有使用者。比較安全的做法是先修 runtime/type 明顯缺口，再補 global service interface，再逐步精準化高頻元件的 event、slot 與 helper types，最後才考慮泛型化 component declaration。
-
-第五，原始筆記已經具備總結性，但如果要放在 `06-type-system/` 目錄下，應該更明確串起此目錄的主題：`props`、`emits`、instance、public API、global API 與泛型。這樣這篇筆記才會像「型別系統總結章」，而不是單篇零散觀察。
-
----
-
 ## 1. 本章定位
 
 本章是 View UI Plus 型別系統閱讀筆記中的「邊界與取捨總結章」。
@@ -141,7 +109,7 @@ View UI Plus v1.3.20 的型別系統大多已達到 props-level 與部分 existe
 
 ### 3.1 View UI Plus 型別系統的大致結構
 
-從原始筆記提供的線索來看，View UI Plus v1.3.20 有明確的 TypeScript declaration layer。它至少包含以下幾個角色：
+View UI Plus v1.3.20 有明確的 TypeScript declaration layer。它至少包含以下幾個角色：
 
 ```txt
 package.json
@@ -173,7 +141,7 @@ runtime source
 
 ### 3.2 這套型別系統目前的主要成就
 
-原始筆記已經指出 View UI Plus 型別系統有幾個實用成果。
+View UI Plus 型別系統有幾個實用成果。
 
 第一，它在 `package.json` 中透過 `typings` 指向 `types/index.d.ts`：
 
@@ -256,7 +224,7 @@ declare module '@vue/runtime-core' {
 
 ### 4.2 Component registry：讓 public components 有集中出口
 
-`types/viewuiplus.components.d.ts` 這類檔案通常扮演 component registry 的角色。原始筆記中的例子是：
+`types/viewuiplus.components.d.ts` 這類檔案通常扮演 component registry 的角色。
 
 ```ts
 export { Button, ButtonGroup } from './button'
@@ -318,7 +286,7 @@ align?: 'left' | 'right' | 'center';
 
 ### 4.4 Vue module augmentation：讓 global properties 被 TypeScript 承認
 
-Vue 3 的 Options API 中，元件實例上的全域屬性需要透過 module augmentation 告訴 TypeScript。原始筆記中的例子是：
+Vue 3 的 Options API 中，元件實例上的全域屬性需要透過 module augmentation 告訴 TypeScript。
 
 ```ts
 declare module '@vue/runtime-core' {
@@ -385,7 +353,7 @@ runtime code 不會自動產生型別
 
 ### 4.6 邊界二：`any` / `Function` 是彈性也是風險
 
-原始筆記列出一些常見弱型別：
+一些常見弱型別：
 
 ```ts
 data?: any[];
@@ -429,7 +397,7 @@ View UI Plus 保留 `on-change`、`on-visible-change` 這類事件命名習慣�
 <Modal @on-visible-change="handleVisibleChange" />
 ```
 
-當這種事件名稱被轉成 listener prop type 時，就可能出現原始筆記中提到的寫法：
+當這種事件名稱被轉成 listener prop type 時，就可能出的寫法：
 
 ```ts
 onOnChange?: (event?: any) => any;
@@ -524,7 +492,7 @@ data row
 
 如果 `data` 是 `any[]`，`columns` 是 `any[]`，那 TypeScript 不知道 row 長什麼樣，也無法檢查 column key 是否真的存在於 row 上。
 
-原始筆記列出的典型問題如下：
+典型問題如下：
 
 | 元件 | 目前常見寬鬆型別 | 泛型可改善的方向 |
 | --- | --- | --- |
@@ -582,7 +550,7 @@ export type FormRules<TModel = any> = ...
 
 ### 4.10 邊界六：Slots 型別通常只能做到提示名稱
 
-原始筆記提到有些元件的 `.d.ts` 可能會用以下方式描述 slots：
+有些元件的 `.d.ts` 可能會用以下方式描述 slots：
 
 ```ts
 'v-slots'?: {

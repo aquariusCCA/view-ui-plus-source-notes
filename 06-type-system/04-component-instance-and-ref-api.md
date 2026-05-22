@@ -1,15 +1,5 @@
 # Component Instance and Ref API：Instance、Template Ref 與 Public Methods
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經抓到 View UI Plus 型別系統中一個很重要的邊界：**component 的 public API 不只有 props 與 emits，還包含使用者透過 `ref` 可能呼叫到的 instance methods**。例如 `Input` 在 runtime 中確實存在 `focus()`、`blur()`，但 `types/input.d.ts` 的 `DefineComponent<{ ... }>` 主要描述 props、listener props 與 slots，沒有明確補上 template ref 可以看到的 method 型別。
-
-原始筆記目前比較像「觀察紀錄」：已經列出 runtime method、`DefineComponent`、`InstanceType`、slots 與 service object 的差異，但章節之間仍可再補成更完整的閱讀流程。對初次閱讀 View UI Plus 型別設計的人來說，還需要先建立幾個前置觀念：什麼是 component instance、什麼是 template ref、Options API 的 `methods` 為什麼不等於穩定 public API、以及 service object API 和 component ref API 為什麼不能混在一起。
-
-本次重構會保留原始筆記的核心內容，並把它整理成 `06-type-system/` 中專門討論 **instance / ref API 型別邊界** 的教材型章節。重點不是背誦 `Input` 有哪些方法，而是建立一套判斷方法：看到 runtime methods 時，如何分辨它們是內部實作、可被 ref 拿到的 instance method，還是應該被 `.d.ts` 明確承諾的 public ref API。
-
----
-
 ## 1. 本章定位
 
 本章是 `06-type-system/` 中討論 **component instance、template ref 與 public methods 型別設計** 的專章。
@@ -172,7 +162,7 @@ function focusInput() {
 
 這代表使用者不只是透過 props 控制 `Input`，而是希望拿到 `Input` 實例並主動呼叫 `focus()`。
 
-從原始筆記提供的 runtime 片段來看，`src/components/input/input.vue` 的 `methods` 中確實有 `focus()` 與 `blur()`：
+`src/components/input/input.vue` 的 `methods` 中確實有 `focus()` 與 `blur()`：
 
 ```js
 methods: {
@@ -201,7 +191,7 @@ methods: {
 
 ### 4.2 `DefineComponent` 主要描述了什麼
 
-原始筆記中提供的 `types/input.d.ts` 形狀大致如下：
+`types/input.d.ts` 形狀大致如下：
 
 ```ts
 export declare const Input: DefineComponent<{
@@ -359,7 +349,7 @@ export interface InputInstance {
 
 ### 4.7 Slots 不是 instance API
 
-原始筆記中特別提醒：`'v-slots'` 不是 instance API。這點很重要。
+`'v-slots'` 不是 instance API。這點很重要。
 
 在 `.d.ts` 中可能會看到：
 
@@ -397,7 +387,7 @@ export interface InputInstance {
 
 `Message`、`Modal` 這類命令式 API 是另一種 public API，它們不是透過 component template ref 使用，而是透過 service object 呼叫。
 
-例如原始筆記中提到 `src/components/message/index.js` 可能提供：
+`src/components/message/index.js` 可能提供：
 
 ```js
 export default {
@@ -500,7 +490,7 @@ function focusInput() {
 </script>
 ```
 
-這段程式在 runtime 是否可行，要看 `Input` runtime methods 是否有 `focus()`。從原始筆記提供的程式片段可知，`Input` runtime 確實有 `focus()`。
+這段程式在 runtime 是否可行，要看 `Input` runtime methods 是否有 `focus()`。
 
 但如果希望 TypeScript 也能提供提示，理想上應該讓 ref 具備明確型別：
 

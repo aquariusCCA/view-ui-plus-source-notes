@@ -1,23 +1,5 @@
 # Public Component Registry：`viewuiplus.components.d.ts` 的匯出地圖
 
-## 0. 原始筆記問題分析
-
-這篇原始筆記的主題很明確：它在分析 View UI Plus 的 `types/viewuiplus.components.d.ts`，也就是元件型別匯出的集中 registry。原始筆記已經整理出幾個重要觀察，例如 `types/index.d.ts` 會轉出 `viewuiplus.components.d.ts`、runtime 的 `src/components/index.js` 與 type registry 應該同步、registry 中不只包含元件，也包含一些 config / instance-like 型別，並且指出 v1.3.20 中可能存在 runtime 與 type registry 的差異。
-
-不過，原始筆記目前比較像「原始碼閱讀後的重點紀錄」，適合快速回查，但如果要放在 `06-type-system/` 目錄下作為長期學習材料，還可以再補強幾個地方。
-
-第一，原始筆記已經列出 registry 的結構，但對於「為什麼 UI library 需要 public component registry」的背景說明還不夠。初次閱讀元件庫原始碼時，如果只看到一串 `export { ... } from './xxx'`，容易把它當成普通匯出清單，而忽略它其實是在定義套件的 public type surface。
-
-第二，原始筆記已經對照 runtime registry 與 type registry，但還可以更明確地拆分「runtime value export」、「type declaration export」與「plugin global component registration」三個層次。這三者在 Vue component library 中很容易混淆：使用者可以 `import { Button }`，也可以透過 plugin install 使用全域元件，甚至還可能有 `iButton` 這類 alias；但這些入口背後由不同檔案與不同機制支撐。
-
-第三，原始筆記提到 registry 中不只 component，也有 `TableColumnConfig`、`MessageConfig`、`ModalInstance` 等型別，但可以進一步說明這代表 registry 的責任不是「只匯出 Vue component」，而是「集中暴露套件願意公開給 TypeScript 使用者的元件相關型別」。
-
-第四，原始筆記指出 v1.3.20 中存在 registry gap，這是很有價值的觀察，但需要補上判讀方式：看到 runtime 有、type 沒有，不一定馬上等於 bug；它可能代表缺少型別、可能是內部元件不打算公開，也可能是型別檔維護落差。這些都需要回到實際使用情境與 package entry 測試來確認。
-
-因此，優化後的版本會保留原始筆記所有核心內容，並補成一篇「原始碼閱讀 + TypeScript public API 設計」的教材型筆記，讓你之後閱讀其他 UI library 的型別匯出設計時，也能套用同一套分析方法。
-
----
-
 ## 1. 本章定位
 
 本章分析的是 View UI Plus 在 TypeScript 型別層面的 public component registry，也就是：
@@ -68,7 +50,7 @@ import { Button, Table, Modal, Message } from 'view-ui-plus';
 
 `.d.ts` 是 TypeScript declaration file，也就是型別宣告檔。它通常不包含真正的 runtime 實作，而是描述 JavaScript 模組對 TypeScript 使用者呈現出來的型別形狀。
 
-例如原始筆記中提到的 `types/button.d.ts` 可能會提供類似以下的宣告形狀：
+`types/button.d.ts` 可能會提供類似以下的宣告形狀：
 
 ```ts
 export declare const Button: DefineComponent<...>
@@ -110,8 +92,6 @@ import { MessageConfig } from 'view-ui-plus'
 
 ### 3.1 `types/viewuiplus.components.d.ts` 在型別入口中的位置
 
-原始筆記中整理出的型別入口關係如下：
-
 ```txt
 types/index.d.ts
   -> export * from './viewuiplus.components'
@@ -133,8 +113,6 @@ types/button.d.ts
 也就是說，`types/viewuiplus.components.d.ts` 站在一個中繼層的位置。它不直接寫完所有 component 的完整型別，而是負責把各個 component declaration module 收斂成一個 package-level 的 public type registry。
 
 ### 3.2 Runtime registry 的對應位置
-
-原始筆記也整理出 runtime 側的對應關係：
 
 ```txt
 src/index.js
@@ -194,7 +172,7 @@ Vue plugin install
 
 ### 4.1 `viewuiplus.components.d.ts` 的基本形狀
 
-原始筆記中列出的 `types/viewuiplus.components.d.ts` 大致長得像下面這樣：
+`types/viewuiplus.components.d.ts` 大致長得像下面這樣：
 
 ```ts
 export { Button, ButtonGroup } from './button'
@@ -223,7 +201,7 @@ export { Title, Text, Paragraph, Link, CopyConfig, EditConfig, EllipsisConfig } 
 
 ### 4.2 Registry 不負責 props 細節，而是負責 public export map
 
-原始筆記中已經指出：`types/viewuiplus.components.d.ts` 不描述每個 component 的 props 細節，而是把所有單一元件 declaration 集中轉匯出。
+`types/viewuiplus.components.d.ts` 不描述每個 component 的 props 細節，而是把所有單一元件 declaration 集中轉匯出。
 
 這個判斷很重要，因為它決定了你閱讀這份檔案時的重點。你不需要期待在這裡看到 `Button` 的 `type`、`size`、`disabled` 等 props，也不需要期待在這裡理解 `Table` 的 column render 設計。這些細節應該回到各自的 declaration module 閱讀。
 
@@ -239,7 +217,7 @@ export { Title, Text, Paragraph, Link, CopyConfig, EditConfig, EllipsisConfig } 
 
 ### 4.3 Runtime registry 與 Type registry 的同步關係
 
-原始筆記把 runtime 與 type registry 對照成兩條平行 registry，這是本章最重要的核心觀念之一。
+runtime 與 type registry 對照成兩條平行 registry，這是本章最重要的核心觀念之一。
 
 runtime 側：
 
@@ -272,7 +250,7 @@ types/viewuiplus.components.d.ts
 
 ### 4.4 Registry 中不只 component，也有 public helper types
 
-原始筆記中特別指出，`viewuiplus.components.d.ts` 不只 export component，也 export 一些 configuration / instance-like declarations，例如：
+`viewuiplus.components.d.ts` 不只 export component，也 export 一些 configuration / instance-like declarations，例如：
 
 | Export | 來源 | 角色 |
 | --- | --- | --- |
@@ -303,7 +281,7 @@ types/viewuiplus.components.d.ts
 
 ### 4.5 Component Grouping：registry 也是元件族譜
 
-原始筆記中整理出，有些 declaration 會從同一個檔案匯出多個相關 component：
+有些 declaration 會從同一個檔案匯出多個相關 component：
 
 ```ts
 export { Button, ButtonGroup } from './button'
@@ -332,7 +310,7 @@ export { Tabs, TabPane } from './tabs'
 
 ### 4.6 Global Component Alias 與 Type Registry 不是同一層 surface
 
-原始筆記提到，`src/index.js` 的 install 流程中有一個 `ViewUI` map，會額外註冊一些 `i` 前綴別名：
+`src/index.js` 的 install 流程中有一個 `ViewUI` map，會額外註冊一些 `i` 前綴別名：
 
 ```js
 const ViewUI = {
@@ -371,7 +349,7 @@ const ViewUI = {
 
 ### 4.7 新增 Component 時的同步點
 
-原始筆記用新增 `Foo` component 作為例子，整理出至少需要檢查的同步點：
+`Foo` component 作為例子，整理出至少需要檢查的同步點：
 
 1. runtime component 是否在 `src/components/index.js` export。
 2. type declaration 是否有 `types/foo.d.ts`。
@@ -396,7 +374,7 @@ const ViewUI = {
 
 ### 4.8 v1.3.20 中可以觀察到的 Registry Gap
 
-原始筆記指出，把 `src/components/index.js` 和 `types/viewuiplus.components.d.ts` 對照後，可以看到兩類差異。
+`src/components/index.js` 和 `types/viewuiplus.components.d.ts` 對照後，可以看到兩類差異。
 
 第一類是 runtime 有 named export，但 type registry 沒有明確轉出：
 
@@ -510,7 +488,7 @@ TreeChildConfig
 import { Button } from 'view-ui-plus';
 ```
 
-從 runtime 角度看，`Button` 必須能從套件的 JavaScript 入口被找到。原始筆記中指出 runtime 對應來源大致是：
+從 runtime 角度看，`Button` 必須能從套件的 JavaScript 入口被找到。
 
 ```txt
 src/index.js
@@ -564,7 +542,7 @@ import type { TableColumnConfig } from 'view-ui-plus';
 </template>
 ```
 
-這個能力不是由 `types/viewuiplus.components.d.ts` 決定的，而是由 `src/index.js` 中的 plugin install 與 `ViewUI` map 決定的。原始筆記提到 `ViewUI` map 額外加入了：
+這個能力不是由 `types/viewuiplus.components.d.ts` 決定的，而是由 `src/index.js` 中的 plugin install 與 `ViewUI` map 決定的。
 
 ```js
 iButton: components.Button

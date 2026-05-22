@@ -1,23 +1,5 @@
 # Component Props Contract：從 Runtime Props 到 `DefineComponent`
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經抓到 `06-type-system/` 中非常重要的一個切入點：View UI Plus 的元件在 runtime 多數透過 Vue Options API 宣告 `props`，但對 TypeScript 使用者暴露出來的型別契約，主要寫在 `types/*.d.ts` 的 `DefineComponent<{ ... }>` 裡。因此，要理解 props 型別，不能只看 Vue SFC，也不能只看 declaration file，而要把 runtime source 與 type surface 放在一起比對。
-
-不過，若要將這份筆記放進長期維護的 `06-type-system/` 目錄，原始版本還可以再補強幾個部分。
-
-第一，原始筆記已有 `Button` 的 runtime / type 對照，但它比較像「觀察紀錄」。本章需要把這些觀察整理成一套可重複使用的閱讀方法，讓後續分析 `Input`、`Table`、`Form` 或其他元件時，也能照同一個框架判斷型別契約是否精準。
-
-第二，原始筆記已經提到 `kebab-case`、validator、default value、mixin props 與弱型別 props，但每一塊還可以補上更清楚的心智模型。例如 `validator` 和 literal union 的關係，不只是「有沒有對齊」，而是牽涉到 TypeScript 是否能提前攔截非法值；`default` 則不一定屬於 type contract，而是 runtime 行為的一部分。
-
-第三，原始筆記提到 `DefineComponent<{ ... }>` 裡同時包含 props 與 listener props，例如 `onClick`。這是後續 `emits` 型別筆記的重要銜接點。本章應明確界定：本章先專注於 props，listener props 只先標註其存在，完整事件型別會留到下一章處理。
-
-第四，原始筆記指出 `Button` 使用 `mixinsLink`、`mixinsForm`，並且 `to`、`replace`、`target`、`append` 這類 props 來自 mixin。這裡需要補充一個重要閱讀原則：元件的 public props 不一定都寫在元件本身的 `props` 區塊中，mixin、全域設定與內部轉接邏輯都可能影響元件對外可用的 props。
-
-第五，部分資訊仍需要後續確認。例如 `mixinsForm` 對 `Button` 的實際影響、其他元件是否也採同樣的 declaration 風格、以及 `shape?: string` 這類寬鬆型別是否是歷史相容、維護成本或文件設計取捨。本章可以先建立閱讀方法，但不應假裝已完整驗證所有元件。
-
----
-
 ## 1. 本章定位
 
 本章是 `06-type-system/` 目錄中的 props 型別專章，用來說明 View UI Plus v1.3.20 如何把 runtime props 轉換成 TypeScript 使用者看到的 props contract。
@@ -103,7 +85,7 @@ export declare const Button: DefineComponent<{
 
 這種寫法的重點不是要完整展示 Vue `DefineComponent` 的所有泛型能力，而是用第一個 object 參數描述使用者可以傳入元件的外部屬性。對閱讀 View UI Plus 型別來說，這個 object 可以先理解成「元件的 public type surface」。
 
-不過要注意，這個 object 不一定只包含 props。原始筆記已指出，`Button` 的 declaration 中也有 `onClick?: (event?: any) => any`。這類 `onXxx` 欄位比較接近事件 listener props，應該放到 `emits` 型別章節繼續分析。本章會先把它視為「出現在同一個 object 裡，但暫時不展開的事件相關欄位」。
+不過要注意，這個 object 不一定只包含 props。`Button` 的 declaration 中也有 `onClick?: (event?: any) => any`。這類 `onXxx` 欄位比較接近事件 listener props，應該放到 `emits` 型別章節繼續分析。本章會先把它視為「出現在同一個 object 裡，但暫時不展開的事件相關欄位」。
 
 ---
 
@@ -211,7 +193,7 @@ Global default / fallback
 
 ### 4.1 `types/button.d.ts` 的基本形狀
 
-以原始筆記中的 `types/button.d.ts` 為例，`Button` declaration 大致如下：
+以 `types/button.d.ts` 為例，`Button` declaration 大致如下：
 
 ```ts
 import type { DefineComponent } from 'vue';
@@ -372,7 +354,7 @@ shape?: string;
 
 ### 4.5 Default value 不一定屬於 type contract
 
-`Button.size` 是理解 default 與 type contract 差異的好例子。原始筆記指出，runtime default 會讀取全域設定：
+`Button.size` 是理解 default 與 type contract 差異的好例子。runtime default 會讀取全域設定：
 
 ```js
 default () {
@@ -406,13 +388,13 @@ size?: '' | 'large' | 'small' | 'default';
 
 ### 4.6 Mixin props 也屬於元件的 public props
 
-原始筆記指出，`Button` runtime 使用：
+`Button` runtime 使用：
 
 ```js
 mixins: [ mixinsLink, mixinsForm ]
 ```
 
-這表示 `Button` 的 props 不一定全部直接寫在 `button.vue` 裡。像 `to`、`replace`、`target`、`append` 這些 props，原始筆記判斷它們來自 `mixins/link.js`，但它們仍然出現在 `types/button.d.ts` 中：
+這表示 `Button` 的 props 不一定全部直接寫在 `button.vue` 裡。
 
 ```ts
 to?: string | object;
@@ -444,8 +426,6 @@ append?: boolean;
 3. 再看 declaration 是否把 mixin props 展開
 4. 最後判斷 type surface 是否完整反映 public props
 ```
-
-關於 `mixinsForm` 的實際 props 或行為，原始筆記沒有提供完整內容，因此本章只標註它是 `Button` runtime mixin 之一。此處需要後續補充：應回到 `src/mixins/form` 或實際專案 source，確認它是否提供 props、方法、表單上下文注入，或只是提供共用行為。
 
 ---
 

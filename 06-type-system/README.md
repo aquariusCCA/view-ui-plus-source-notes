@@ -1,19 +1,5 @@
 # Type System：View UI Plus TypeScript 型別系統閱讀指南
 
-## 0. 原始 README 問題分析
-
-這份原始 README 已經具備良好的目錄雛形，能快速交代 `06-type-system/` 目錄的用途、View UI Plus v1.3.20 的 source baseline、12 篇筆記索引，以及建議閱讀順序。不過，如果把它當成長期知識庫的入口，仍有幾個可以補強的地方。
-
-第一，原始 README 偏向「索引型目錄」，能告訴讀者有哪些筆記，卻還沒有充分說明「為什麼要這樣讀」。例如它列出 `types/index.d.ts`、`types/viewuiplus.components.d.ts`、`types/*.d.ts`、`src/components/**` 等位置，但初學者可能還不清楚這些檔案在型別系統中分別扮演什麼角色。
-
-第二，原始 README 已經提出核心心智模型：`src/**/*.vue / src/**/*.js` 代表 runtime behavior，而 `types/*.d.ts` 代表 TypeScript public contract。但這個模型可以進一步展開，說明為什麼兩邊需要對照閱讀，以及單看其中一邊會造成什麼誤判。
-
-第三，原始 README 的筆記索引已經列出 12 篇筆記，但每篇筆記之間的關係還可以更明確。例如 `01` 到 `06` 是建立型別地圖與基礎契約，`07` 到 `09` 是複雜元件與泛型改良機會，`10` 到 `12` 則是總結、檢查清單與小型實作練習。若能把這些分組說清楚，讀者會更容易知道自己目前讀到哪一層。
-
-第四，這份 README 是整個 `06-type-system/` 目錄的入口，因此它不應只像檔案列表，而應該像「導讀章」。它需要幫讀者建立閱讀目標、閱讀方法、判斷標準與後續使用方式。
-
----
-
 ## 1. 本區定位
 
 `06-type-system/` 用來整理 View UI Plus 的 TypeScript 型別設計。這裡的重點不是研究 View UI Plus 內部是否全部使用 TypeScript 寫成，而是研究它如何把 Vue SFC / JavaScript Options API 寫成的 runtime 行為，整理成 TypeScript 使用者看得到的 public contract。

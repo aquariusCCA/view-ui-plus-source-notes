@@ -1,23 +1,5 @@
 # Mini Reimplementation Labs：用小型仿作練習 View UI Plus 型別設計
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經具備很好的實戰方向：它不是只整理 View UI Plus 的 `.d.ts` 檔案，而是把前面讀到的型別設計拆成多個小型 lab，讓讀者可以透過仿作練習，把「看得懂型別」轉成「能設計型別」。
-
-不過，若要放進 `06-type-system/` 作為長期維護的教材型筆記，原始版本還有幾個可以補強的地方。
-
-第一，原始內容偏向練習清單。它列出了 `MiniButton`、`MiniInput`、`MiniPlugin`、`MiniMessage`、`MiniTable`、`MiniForm` 等練習，但每個 lab 背後要訓練的型別設計能力還可以再說明得更清楚。例如 `MiniButton` 不只是 props union 練習，也是在練習「runtime prop 命名」與「public declaration 命名」之間的對齊問題。
-
-第二，原始筆記已經有 runtime API、type 練習與檢查點，但缺少一條完整的學習流程。讀者如果第一次看，可能知道要寫哪些型別，卻不一定知道為什麼要先寫 runtime API 形狀，再寫 TypeScript interface，最後再檢查使用者體驗。
-
-第三，原始筆記對「型別設計的取捨」說明較少。例如 `MiniTableColumn<TRecord = any>` 為什麼要保留 default generic？`MiniForm` 為什麼先只支援一層 `keyof TModel`，不直接處理巢狀 path？這些都涉及元件庫型別設計中很重要的相容性與維護成本。
-
-第四，原始筆記中的程式碼很適合作為練習題，但若要變成教材型筆記，應該補上每個 lab 的「訓練目標」、「設計理由」、「驗證方式」與「常見誤區」。這樣未來複習時，不只知道程式碼怎麼寫，也能知道每種型別設計對應到 View UI Plus 的哪一類 public contract。
-
-因此，本章會保留原始筆記的核心 lab，但補強成一套可操作的型別設計練習流程。
-
----
-
 ## 1. 本章定位
 
 本章是 `06-type-system/` 目錄中的實作練習章節，主題是「用小型仿作練習 View UI Plus 的 TypeScript 型別設計」。

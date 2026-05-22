@@ -1,23 +1,5 @@
 # Type Reading Checklist：閱讀單一元件型別的檢查清單
 
-## 0. 原始筆記問題分析
-
-這篇原始筆記已經具備很好的「實戰檢查表」雛形，能提醒讀者在閱讀 View UI Plus 單一元件型別時，不要只看 `types/<component>.d.ts`，而要同時對照 runtime source、type declaration、export registry、plugin 與 global properties。這個方向非常適合放在 `06-type-system/` 目錄下，作為閱讀每個元件型別的標準作業流程。
-
-不過，原始筆記目前仍偏向速查清單，對初次閱讀 View UI Plus 型別系統的人來說，還有幾個可以補強的地方。
-
-第一，原始筆記已列出檢查順序，但對「為什麼要這樣檢查」說明較少。例如為什麼讀 props 要看 runtime validator，為什麼讀 emits 要搜尋 `$emit`，為什麼 service-style API 要另外看 `src/components/<name>/index.js`，這些背後都牽涉到 View UI Plus 的 runtime 與 `.d.ts` 分離問題。
-
-第二，原始筆記有列出檔案位置，但還可以補充每個檔案在型別系統中的角色。對原始碼閱讀來說，知道路徑只是第一步，更重要的是知道這個檔案代表的是「實作來源」、「型別契約」、「匯出入口」、「全域安裝」還是「Options API 上的 this 屬性」。
-
-第三，原始筆記有 props、emits、slots、instance methods、service API、泛型價值等 checklist，但各面向之間的關係還可以更明確。這些不是互相獨立的表格，而是共同用來判斷一個元件的型別契約精準到哪一層：是 props-level、event-level、slot-level、instance-level，還是 data-flow-level。
-
-第四，原始筆記有提到 `any`、`Function`、`object`，但需要補成一套判斷方式。弱型別不一定代表錯誤，有時是為了維持相容性或降低維護成本；但如果資料會跨越 props、events、slots 與 callbacks，就可能變成值得改良的型別缺口。
-
-第五，原始筆記的「最終判斷表」很實用，但可以再補上狀態分級與填寫方法，讓它不只是表格，而是真正能在閱讀元件時落地使用的紀錄模板。
-
----
-
 ## 1. 本章定位
 
 本章是 View UI Plus 型別系統閱讀的「單一元件檢查流程」筆記，適合放在 `06-type-system/` 目錄下。這個目錄的主題是 View UI Plus 的 TypeScript 型別設計，包含 props、emits、instance、public API 與泛型；而本章的功能，是把這些主題整理成一套可重複使用的閱讀方法。
@@ -223,7 +205,7 @@ props 是最容易開始閱讀的部分，但也最容易只停留在表面。�
 | prop 是否來自 mixin？ | 不漏掉 shared props | 只看本元件會漏掉共用 props |
 | prop 是否是 `any` / `object` / `Function`？ | 標記弱契約 | callback、data、rules 可能缺少結構型別 |
 
-以原始筆記中的 `Button.htmlType` 為例：
+以 `Button.htmlType` 為例：
 
 ```txt
 Button.htmlType
@@ -314,7 +296,7 @@ update:modelValue event
 
 ### 4.7 Slots Checklist：先分清楚 slot 名稱提示與 scoped slot props
 
-slots 型別也是常見弱點。原始筆記中提到的 declaration 形式如下：
+slots 型別也是常見弱點。declaration 形式如下：
 
 ```ts
 'v-slots'?: {

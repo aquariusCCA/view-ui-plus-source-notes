@@ -1,23 +1,5 @@
 # Generic Design Opportunities：View UI Plus 型別系統中可以泛型化的改良點
 
-## 0. 原始筆記問題分析
-
-原始筆記已經抓到本章最重要的主軸：本篇不是在描述 `View UI Plus v1.3.20` 已經完成的型別設計，而是在整理「如果要用現代 TypeScript 改良，哪些位置最值得導入泛型」。這個定位非常關鍵，因為它可以避免把「現況觀察」和「改良設計」混在一起。
-
-不過，原始筆記仍有幾個可以補強的地方。
-
-第一，原始筆記已列出 `Table`、`Form`、`Select`、`Upload`、`Tree` 等適合泛型化的案例，但每個案例之間的共通心智模型還可以再說得更清楚。這些元件之所以適合泛型化，不只是因為它們目前使用了 `any`、`Function`、`object`，而是因為它們都有「使用者傳入的資料形狀會一路流向 props、callback、event、slot 或 config」的特性。
-
-第二，原始筆記已有不少改良型別範例，但容易被讀成「直接改成這樣就好」。實際上，泛型設計會牽涉 public API 相容性、Vue template 推導限制、舊有 JavaScript 彈性、錯誤訊息複雜度與 declaration 維護成本。因此需要額外補上「改良策略」與「何時不要泛型化」。
-
-第三，原始筆記提到 `Select` 的 `multiple` 會造成型別複雜，但尚未完整說明原因。這類 value-driven component 的難點在於：同一個元件會因為 `multiple`、`label-in-value`、`option value` 型別不同而改變 `modelValue` 和 `on-change` payload 的型別。這是泛型設計中很常見的取捨點。
-
-第四，原始筆記有表格，但還可以進一步整理成「泛型化優先順序表」、「資料流對齊表」與「設計成本表」，幫助後續複習時快速判斷哪些元件值得優先研究。
-
-第五，原始筆記中的程式碼片段屬於「改良方向」，不是 `View UI Plus v1.3.20` 原始 declaration。這點需要在各節反覆標註，避免讀者誤以為這些 interface 已存在於目前版本中。
-
----
-
 ## 1. 本章定位
 
 本章屬於 `06-type-system/` 目錄中的「型別設計改良分析」筆記。它不是單純整理 `types/*.d.ts` 的現況，也不是逐行解釋某個元件的 props，而是站在 TypeScript 型別設計的角度，觀察 `View UI Plus v1.3.20` 哪些 public type surface 最適合透過泛型進一步強化。
@@ -34,7 +16,7 @@
 - `Upload` 的 file object 如果帶有自定義 metadata，success/error/progress callback 就應該共享同一個 file shape。
 - `Tree` 的 node 是遞迴資料結構，select/check/render callback 就應該保留 node 的自定義欄位。
 
-需要先強調：本章的程式碼範例是「改良方向」與「設計練習」，不是宣稱 `View UI Plus v1.3.20` 已經這樣設計。從原始筆記可知，目前 v1.3.20 的 `.d.ts` 在資料型元件上仍大量使用 `any`、`Function`、`object`。這些寬鬆型別降低了維護成本，也提高了使用彈性；但代價是 TypeScript 無法精準追蹤使用者資料在元件 API 中的流動。
+需要先強調：本章的程式碼範例是「改良方向」與「設計練習」，不是宣稱 `View UI Plus v1.3.20` 已經這樣設計。這些寬鬆型別降低了維護成本，也提高了使用彈性；但代價是 TypeScript 無法精準追蹤使用者資料在元件 API 中的流動。
 
 本章不會完整實作一套可發布的新版 declaration，也不會處理所有 Vue template generic inference 的細節。這些內容適合留到後續的「泛型元件設計實作」、「Vue template 型別推導限制」與「UI library declaration 相容性策略」筆記中深入討論。
 
@@ -152,9 +134,9 @@ type UserTableColumn = TableColumn<User>;
 
 ## 3. 整體概覽
 
-本章可以用一張總表理解。
+本章可以用一張總表理解。前四欄描述「哪一類元件適合泛型化」，最後一欄描述目前型別比較寬鬆的位置，也就是為什麼這類元件值得優先檢查。
 
-| 類型 | 元件例子 | 主要資料形狀 | 泛型化目標 | 原始筆記觀察 |
+| 類型 | 元件例子 | 主要資料形狀 | 泛型化目標 | 目前型別缺口 |
 | --- | --- | --- | --- | --- |
 | Data-driven component | `Table` | row data | 讓 `data`、`columns`、`render`、event 共用 `TRecord` | 目前常見 `any[]`、`Function` |
 | Form-driven component | `Form`、`FormItem` | form model | 讓 `model`、`rules`、`prop`、validate event 對齊 `TModel` | 目前常見 `object`、`string` |
@@ -203,7 +185,7 @@ User
 
 ### 4.2 `Table` 泛型：讓 row data 串起 columns、render 與 events
 
-原始筆記指出，`Table` 目前常見的型別是：
+`Table` 目前常見的型別是：
 
 ```ts
 data?: any[];
@@ -288,7 +270,7 @@ render?: (h: unknown, params: {
 
 ### 4.3 `Form` 泛型：讓 model、rules、prop 與 validate event 對齊
 
-原始筆記指出，`Form` 目前主要使用：
+`Form` 目前主要使用：
 
 ```ts
 model?: object;
@@ -375,13 +357,13 @@ type FieldPath<TModel> = keyof TModel & string;
 
 就只能處理第一層 key，不能處理深層 path。要支援巢狀 path，就需要更複雜的 template literal types 與遞迴型別，甚至還要考慮 array path。這會讓型別難度和錯誤訊息大幅提高。
 
-另外，`View UI Plus` 的表單驗證可能與 `async-validator` 的 rule schema 有關。原始筆記也提醒，不應手寫猜測完整 schema。比較穩健的做法是引用官方型別，或建立一個和 runtime 行為相容的 subset，而不是憑空設計一個看似完整但和實際驗證器不一致的 `FormRule`。
+另外，`View UI Plus` 的表單驗證可能與 `async-validator` 的 rule schema 有關。不應手寫猜測完整 schema。比較穩健的做法是引用官方型別，或建立一個和 runtime 行為相容的 subset，而不是憑空設計一個看似完整但和實際驗證器不一致的 `FormRule`。
 
 ### 4.4 `Select` / `TreeSelect` value 泛型：讓 option value 與 modelValue 對齊
 
 `Select`、`TreeSelect` 這類元件的核心資料不是 row，也不是 model，而是 value。
 
-原始筆記提到，目前 Select 類型可能出現比較寬鬆的 model value，例如 `''`、`string | number | any[]` 等。這種寫法能支援很多情境，但 TypeScript 不知道 option 的 `value`、`modelValue` 和 `on-change` payload 是否一致。
+目前 Select 類型可能出現比較寬鬆的 model value，例如 `''`、`string | number | any[]` 等。這種寫法能支援很多情境，但 TypeScript 不知道 option 的 `value`、`modelValue` 和 `on-change` payload 是否一致。
 
 可以先定義基本 value：
 
@@ -572,7 +554,7 @@ type ButtonSize = 'large' | 'small' | 'default';
 
 ### 4.8 泛型設計的成本與改良策略
 
-原始筆記正確指出：泛型不是免費的。它會帶來 declaration 維護成本、錯誤訊息複雜度、舊 API 相容性問題，以及 Vue template 推導限制。
+泛型不是免費的。它會帶來 declaration 維護成本、錯誤訊息複雜度、舊 API 相容性問題，以及 Vue template 推導限制。
 
 可以把成本整理成幾個層面。
 

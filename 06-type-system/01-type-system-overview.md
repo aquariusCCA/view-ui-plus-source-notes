@@ -1,31 +1,5 @@
 # Type System Overview：從 Runtime Source 到 TypeScript Declaration
 
-## 0. 原始筆記問題分析
-
-這份原始筆記屬於 `06-type-system/` 目錄下的入口型筆記，主要性質是「原始碼閱讀筆記」與「架構分析筆記」的混合。它已經整理出 View UI Plus v1.3.20 型別系統的幾個關鍵入口，例如 `package.json`、`types/index.d.ts`、`types/viewuiplus.components.d.ts`、`types/*.d.ts` 與 `src/components/**`，也已經意識到 runtime source 與 type surface 需要對照閱讀。
-
-目前筆記的核心方向是正確的，但若要作為長期學習用的教材型筆記，還可以補強以下幾點：
-
-1. **整體結構偏向地圖型速查**  
-   原始筆記已經列出重要檔案與路徑，但對於「為什麼 TypeScript 要從這些檔案開始理解套件」以及「每一層型別檔案在整個型別系統中扮演什麼角色」還可以補得更完整。
-
-2. **runtime surface 與 type surface 的差異可以再教學化**  
-   原始筆記已經指出 runtime source 與 `.d.ts` declaration files 可能不同步，但還可以進一步說明：runtime surface 是「實際執行時存在的能力」，type surface 是「TypeScript 編譯期可見的合約」。兩者不一致時，會影響 IDE 提示、型別檢查、TSX 使用與元件封裝。
-
-3. **Component Declaration 的形狀需要拆成 props、events、slots、instance 四個面向理解**  
-   原始筆記已經用 `DefineComponent<{ ... }>` 說明 props、listener props、slot hints 與 weak contract，但還可以補上這種寫法和 Vue 使用者實際使用元件時的關係。
-
-4. **型別強度表可以補上閱讀判斷方式**  
-   原始筆記有整理 literal union、primitive union、object、Function、any 等型別強度，但還可以進一步說明：閱讀型別時不只是看「有沒有型別」，而是要判斷這個型別能不能提供足夠的約束力。
-
-5. **後續章節銜接可以再明確**  
-   由於這篇是 `06-type-system/` 的入口筆記，因此除了說明本章內容，也應該明確指出後續可以拆成 props、emits、instance、public API、component registry、service API 與泛型改良等筆記。
-
-6. **資訊不足處需要標註**  
-   原始筆記沒有提供完整的 `types/index.d.ts`、`types/viewuiplus.components.d.ts` 或各元件 `.d.ts` 原始碼，因此本筆記只根據目前已提供的筆記內容進行整理。若要做更深入的精準分析，後續仍需要打開實際原始碼逐檔確認。
-
----
-
 ## 1. 本章定位
 
 本章是 `06-type-system/` 目錄的入口地圖，用來建立閱讀 View UI Plus TypeScript 型別系統時的基本心智模型。
@@ -180,7 +154,7 @@ TypeScript 使用者安裝 `view-ui-plus` 後，編譯器會先根據 `package.j
 
 ### 4.1 `package.json`：TypeScript 如何找到型別入口
 
-在原始筆記中，`package.json` 的型別入口是：
+`package.json` 的型別入口是：
 
 ```json
 {
@@ -198,7 +172,7 @@ TypeScript 使用者安裝 `view-ui-plus` 後，編譯器會先根據 `package.j
 
 `types/index.d.ts` 可以視為 View UI Plus 對 TypeScript 使用者提供的總入口。
 
-根據原始筆記，它至少包含或關聯以下內容：
+它至少包含或關聯以下內容：
 
 ```txt
 types/index.d.ts
@@ -225,7 +199,7 @@ types/index.d.ts
 
 `types/viewuiplus.components.d.ts` 可以理解成 component type registry，也就是元件型別的集中匯出表。
 
-原始筆記中的例子如下：
+例子如下：
 
 ```txt
 types/viewuiplus.components.d.ts
@@ -243,7 +217,7 @@ types/viewuiplus.components.d.ts
 
 單一元件的 declaration file 通常會描述這個元件的 props、listener props、slots，以及部分額外型別。
 
-原始筆記以 `Button` 為例：
+`Button` 為例：
 
 ```ts
 import type { DefineComponent } from 'vue';
@@ -320,7 +294,7 @@ type surface 的閱讀重點是確認「型別合約」。例如：
 
 ### 4.7 `Input` 範例：從 runtime emits 對照 declaration listener props
 
-以 `Input` 為例，原始筆記提到 runtime 在 `src/components/input/input.vue` 中宣告：
+以 `Input` 為例，runtime 在 `src/components/input/input.vue` 中宣告：
 
 ```js
 emits: [
@@ -354,7 +328,7 @@ onOnClear?: (event?: any) => any;
 
 第二，runtime event `on-change` 在 declaration 中可能對應成 listener prop `onOnChange`。這種名稱看起來有點不直覺，是因為事件本身已經叫做 `on-change`，再轉成 listener prop 形式時，又被加上 `on` 前綴，於是形成 `onOnChange`。
 
-第三，runtime 有 `update:modelValue`，但原始筆記指出多數 `.d.ts` 沒有明確看到 `onUpdate:modelValue` 這類 listener declaration。這代表使用者在 Vue template 中使用 `v-model` 可能能正常運作，但在 TSX 或更精準的型別檢查情境下，事件型別可能不夠完整。
+第三，runtime 有 `update:modelValue`，這代表使用者在 Vue template 中使用 `v-model` 可能能正常運作，但在 TSX 或更精準的型別檢查情境下，事件型別可能不夠完整。
 
 第四，事件 payload 多數被寫成 `event?: any`。這代表 declaration 只表達「這個事件存在」，但沒有精準描述事件參數。例如它沒有明確告訴你 `onOnChange` 的參數到底是 DOM Event、value，還是其他格式。
 
@@ -466,7 +440,7 @@ View UI Plus 的 `.d.ts` 中可以看到不同強度的型別寫法。
 
 第二步，進入 `types/input.d.ts`，觀察它用 `DefineComponent<{ ... }>` 描述了哪些 props、listener props 與 slots。此時要特別注意 `model-value`、`onOnChange`、`onOnSearch`、`onOnClear` 這類欄位。
 
-第三步，回到 `src/components/input/input.vue`，檢查 runtime props 與 emits。原始筆記提到 runtime emits 包含：
+第三步，回到 `src/components/input/input.vue`，檢查 runtime props 與 emits。
 
 ```js
 emits: [

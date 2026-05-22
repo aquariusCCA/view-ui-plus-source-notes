@@ -1,25 +1,5 @@
 # Global Plugin Types：`install`、`$VIEWUI` 與 `ComponentCustomProperties`
 
-## 0. 原始筆記問題分析
-
-這篇原始筆記已經抓到 View UI Plus plugin 型別系統中最重要的幾個入口：`src/index.js`、`types/index.d.ts`、`install`、`$VIEWUI`、`ComponentCustomProperties`，以及 `$Message`、`$Modal` 這類 global instance properties。整體方向正確，而且已經開始對照 runtime surface 與 type surface。
-
-不過如果要放進 `06-type-system/` 作為長期學習筆記，還可以再補強幾個面向。
-
-第一，原始筆記已列出 `types/index.d.ts` 的三個責任，但還可以更明確說明它為什麼是 package 層級的 type entry，以及它和前面章節提到的 component declaration、props、emits、instance API 之間的關係。
-
-第二，`install` 的 runtime 流程已有程式碼片段，但可以再補成「安裝流程」來理解：先處理語系，再註冊 components，再註冊 directives，最後掛載 global properties。這樣讀者會更清楚 `app.use(ViewUIPlus, options)` 實際改變了 Vue app 的哪些位置。
-
-第三，`ViewUIPlusGlobalOptions` 與 `ViewUIPlusInstallOptions` 的差異值得再教學化。原始筆記已指出 `locale`、`i18n` 是 install 階段專用能力，但還可以補充它們與 `$VIEWUI` display config 的界線，避免把所有 plugin options 都誤認為 component runtime 會讀取的全域設定。
-
-第四，原始筆記指出 `$Message: any` 是弱契約，這是很重要的觀察。可以再補充「any 不是沒有作用，而是只解決存在性，不解決方法級別型別安全」這個判斷框架，讓讀者知道為什麼它是可用但不精準的型別設計。
-
-第五，`Named Export Gap` 是這篇筆記最有價值的維護觀察之一。可以再把它延伸成 plugin 型別維護清單：每次 `src/index.js` 新增 export、global property 或 install option 時，應該同步檢查哪些 declaration。
-
-本篇資訊不足之處主要在於：目前只根據提供的 `types/index.d.ts` 片段與 `src/index.js` 片段進行分析，尚未完整檢查所有 service object 的實際 method signature，例如 `$Message`、`$Modal`、`$Notice`、`$Spin` 的精準 options 型別。因此涉及完整 API shape 的部分，本文會標註為「需要後續確認」。
-
----
-
 ## 1. 本章定位
 
 本章是 `06-type-system/` 中的 plugin 層級型別筆記，主題是 View UI Plus 如何把 runtime plugin 行為轉成 TypeScript 可以理解的 declaration contract。
@@ -169,7 +149,7 @@ types/index.d.ts
 
 `types/index.d.ts` 是 View UI Plus 型別系統的入口檔。使用者安裝套件後，TypeScript 會從 package 指定的型別入口開始理解這個 package 對外提供什麼。
 
-原始筆記整理出的 `types/index.d.ts` 大致包含下列結構：
+`types/index.d.ts` 大致包含下列結構：
 
 ```ts
 import type { App } from 'vue';
@@ -213,7 +193,7 @@ export const install: (app: App, options?: ViewUIPlusInstallOptions) => void;
 
 ### 4.2 Runtime `install` 實際做了什麼
 
-`src/index.js` 的 `install` 是 runtime 行為的核心。原始筆記中的片段如下：
+`src/index.js` 的 `install` 是 runtime 行為的核心。
 
 ```js
 export const install = function(app, opts = {}) {
@@ -254,7 +234,7 @@ export const install: (app: App, options?: ViewUIPlusInstallOptions) => void;
 
 ### 4.3 `ViewUIPlusGlobalOptions` 與 `$VIEWUI`
 
-`ViewUIPlusGlobalOptions` 描述的是全域設定物件的形狀。原始筆記列出的片段如下：
+`ViewUIPlusGlobalOptions` 描述的是全域設定物件的形狀。
 
 ```ts
 interface ViewUIPlusGlobalOptions {
@@ -297,8 +277,6 @@ app.config.globalProperties.$VIEWUI = {
 | runtime stored value | plugin 實際存進 `$VIEWUI` 的值 | `size: opts.size || ''` |
 | runtime default / fallback | 沒傳時如何補值 | `capture` 預設為 `true` |
 | component read behavior | 元件如何讀取全域設定 | 例如 Button `size` default 讀 `$VIEWUI.size` |
-
-原始筆記也指出一個值得注意的 gap：runtime `$VIEWUI` 裡有 `capture`，但目前提供的 `ViewUIPlusGlobalOptions` 片段中沒有看到 `capture`。如果完整 declaration 確實沒有 `capture`，代表使用者可能能在 runtime 傳入並使用 `capture`，但 TypeScript 不知道這個 option。這就是 plugin type contract 的維護風險。
 
 這裡需要後續確認：應回到完整 `types/index.d.ts` 檢查 `ViewUIPlusGlobalOptions` 是否真的完全沒有 `capture`；也要回到 `src/index.js` 確認 `$VIEWUI.capture` 的完整使用場景。
 
@@ -370,7 +348,7 @@ View UI Plus 在 `ComponentCustomProperties` 中補了多個 `$...` properties�
 
 ### 4.6 `$Message: any` 是「存在性契約」，不是「精準 API 契約」
 
-原始筆記用 `$Message` 說明 `any` 的弱契約問題，這是很好的案例。
+`$Message` 說明 `any` 的弱契約問題，這是很好的案例。
 
 ```ts
 $Message: any;
@@ -419,7 +397,7 @@ interface MessageApi {
 $Message: MessageApi;
 ```
 
-不過這屬於型別改良方向，不是目前原始筆記觀察到的 v1.3.20 declaration 主流風格。實際要改良時，還需要回到 `src/components/message/index.js` 與 `types/message.d.ts` 確認完整 options、回傳值與方法行為。
+實際要改良時，還需要回到 `src/components/message/index.js` 與 `types/message.d.ts` 確認完整 options、回傳值與方法行為。
 
 ### 4.7 Service Object 與 Component Instance 要分開看
 
@@ -457,7 +435,7 @@ Message.success('Saved');
 
 ### 4.8 Named Export Gap：runtime export 不一定有完整 declaration
 
-原始筆記指出 `src/index.js` runtime 也可能 export：
+`src/index.js` runtime 也可能 export：
 
 ```js
 export const version = pkg.version;
@@ -466,8 +444,6 @@ export const i18n = localeFile.i18n;
 export const lang = (code) => { ... };
 export default API;
 ```
-
-但從原始筆記提供的 `types/index.d.ts` 片段來看，主要明確宣告的是 `install` 與 component exports。`version`、`locale`、`i18n`、`lang`、default API object 的完整 type surface 並沒有在這個片段中清楚呈現。
 
 這就是 package-level type contract 常見的維護風險：runtime export 已經存在，但 declaration 沒有同步補上，導致 TypeScript 使用者 import 時可能缺少型別提示或直接報錯。
 

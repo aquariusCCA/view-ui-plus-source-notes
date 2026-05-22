@@ -1,23 +1,5 @@
 # Overlay and Imperative API Types：`Modal`、`Message`、`Notice` 的命令式契約
 
-## 0. 原始筆記問題分析
-
-這篇原始筆記已經抓到一個很重要的主軸：`Message`、`Modal`、`Notice` 這類浮層能力，不能只用一般元件的 `props` / `emits` 角度理解，因為它們同時具有「元件」與「命令式服務」的使用方式。
-
-不過，原始筆記目前仍有幾個可以補強的地方。
-
-第一，原始筆記已經列出 `Message.success()`、`Modal.confirm()`、`this.$Message.info()`、`this.$Modal.remove()` 等使用方式，但還可以再補充這些 API 為什麼會形成不同於一般元件的型別設計問題。一般元件的型別重點通常是 template props、事件與 slot；命令式 API 的型別重點則是 method names、options object、callbacks、return value 與 plugin 注入後的全域實例型別。
-
-第二，原始筆記已經指出 `Message` 的 runtime 是 service object，但 `types/message.d.ts` 卻把 `Message` 宣告成 `DefineComponent<{ ... }>`。這是本章最重要的 runtime/type shape gap，適合進一步整理成「runtime 形狀」、「type surface 形狀」、「缺少的契約」三層來理解。
-
-第三，原始筆記對 `Modal` 的分析已經指出它同時是 template component 與 imperative service，但仍可以再補強 `ModalProps`、`ModalOptions`、`ModalApi` 三者應該分開設計的原因。因為這三者雖然欄位名稱可能重疊，例如 `title`、`content`、`onOk`，但它們服務的使用場景與型別責任並不相同。
-
-第四，原始筆記提到 `Notice`，但主要程式碼與型別範例集中在 `Message` 與 `Modal`。因此本篇優化版會將 `Notice` 放在同一類型的命令式浮層 API 中討論，但凡是原始筆記沒有提供的細節，都會標註為「此處需要後續確認」，避免把未讀過的原始碼當成已知事實。
-
-第五，原始筆記已經有不少表格，但大多偏向重點整理。優化後會補上更多「閱讀方式」與「判斷準則」，讓這篇筆記不只是速查表，而是能幫助你之後閱讀其他 UI library 命令式 API 型別設計的分析模板。
-
----
-
 ## 1. 本章定位
 
 本章存放於 `06-type-system/` 目錄，屬於 View UI Plus TypeScript 型別設計筆記的一部分。這個目錄主要整理 `props`、`emits`、`instance`、`public API` 與泛型等型別設計議題。
@@ -258,7 +240,7 @@ Message.success('Saved');
 
 ### 4.2 `Message` 的 runtime API：它比較像 service object
 
-原始筆記指出，`src/components/message/index.js` 對外提供的 default export 類似以下形狀：
+`src/components/message/index.js` 對外提供的 default export 類似以下形狀：
 
 ```js
 export default {
@@ -276,7 +258,7 @@ export default {
 
 從這個結構可以看出，`Message` 對使用者暴露的主要能力不是 template props，而是一組 method。每個 method 代表一種 message 類型，例如 `success`、`warning`、`error`。
 
-原始筆記也指出，內部 `notice(...)` 最後會回傳一個手動關閉函式：
+內部 `notice(...)` 最後會回傳一個手動關閉函式：
 
 ```js
 return function () {
@@ -315,7 +297,7 @@ interface MessageApi {
 
 ### 4.3 `Message` 的 type surface：目前較像 options / props，不像完整 API
 
-原始筆記中的 `types/message.d.ts` 片段如下：
+`types/message.d.ts` 片段如下：
 
 ```ts
 export declare const Message: DefineComponent<{
@@ -391,7 +373,7 @@ Modal.confirm({
 });
 ```
 
-原始筆記指出，`src/components/modal/index.js` 會對 runtime `Modal` 加上多個方法：
+`src/components/modal/index.js` 會對 runtime `Modal` 加上多個方法：
 
 ```js
 Modal.info = function (props = {}) { ... };
@@ -448,7 +430,7 @@ interface ModalApi {
 
 ### 4.5 `Modal` 的 type surface：`Modal` 與 `ModalInstance` 分別描述不同層次
 
-原始筆記中的 `types/modal.d.ts` 有兩個 declaration：
+`types/modal.d.ts` 有兩個 declaration：
 
 ```ts
 export declare const Modal: DefineComponent<{
@@ -503,8 +485,6 @@ Modal service methods
 
 ### 4.6 `Notice` 的位置：同屬命令式浮層 API，但細節需要後續確認
 
-原始筆記的主標題包含 `Notice`，並且在 `globalProperties` 與 service type 檢查清單中都有提到：
-
 ```js
 app.config.globalProperties.$Notice = components.Notice;
 ```
@@ -517,7 +497,7 @@ $Notice: any;
 
 這表示 `Notice` 在整體設計上應該和 `Message`、`Modal` 一樣，屬於 plugin 全域注入的一部分，也需要被視為命令式或 service-style API 來檢查。
 
-不過，原始筆記沒有提供 `src/components/notice/index.js` 的 runtime method 細節，也沒有提供 `types/notice.d.ts` 的完整 declaration。基於不編造未提供資訊的原則，這裡只能先建立閱讀方向：
+這裡只能先建立閱讀方向：
 
 1. 後續應確認 `Notice` runtime 是否也提供 `info`、`success`、`warning`、`error`、`open`、`config`、`destroy` 等方法。
 2. 後續應確認 `NoticeConfig` 是否只描述全域設定，還是也涉及單次 notice options。
@@ -530,7 +510,7 @@ $Notice: any;
 
 ### 4.7 `globalProperties` 的弱型別：`any` 只表示存在，不表示安全
 
-原始筆記指出，`src/index.js` install 會把 `Message`、`Notice`、`Modal` 掛到 Vue app 的 `globalProperties`：
+`src/index.js` install 會把 `Message`、`Notice`、`Modal` 掛到 Vue app 的 `globalProperties`：
 
 ```js
 app.config.globalProperties.$Message = components.Message;
@@ -642,14 +622,25 @@ interface MessageApi {
 
 ### 5.2 `Message` 型別現況與改良方向
 
+`Message` 的型別落差可以用一句話理解：runtime 暴露的是一組 service methods，但目前 declaration 比較像在描述單次 message 的 options / props。
+
+因此閱讀時不要先問「`Message` 有哪些 props」，而是先拆成四個問題：
+
+1. `Message` 這個物件有哪些公開方法？
+2. 這些方法接受字串簡寫，還是接受 options object？
+3. 顯示 message 之後，方法是否會回傳手動關閉函式？
+4. plugin 注入後的 `this.$Message` 是否和 named import 的 `Message` 共用同一套 API 型別？
+
 | 項目 | Runtime 觀察 | 目前 type surface | 改良方向 |
 | --- | --- | --- | --- |
-| `Message.success` | method 存在 | 未以 `MessageApi` 明確描述 | `success(options): MessageClose` |
-| `Message.config` | method 存在 | 有 `MessageConfig`，但沒有連到 method | `config(options: MessageConfig): void` |
-| `Message.destroy` | method 存在 | 未明確描述 | `destroy(): void` |
-| options | 支援 options object；是否支援更多欄位需依 source 確認 | `content`、`render`、`duration`、`onClose` 等 | 抽成 `MessageOptions` |
-| return value | 原始筆記指出會回傳 close function | 未明確描述 | `type MessageClose = () => void` |
-| `$Message` | plugin global property | `any` | `$Message: MessageApi` |
+| `Message.success` 等顯示方法 | `info`、`success`、`warning`、`error`、`loading` 都是 service method | `Message` 主要被宣告成 `DefineComponent`，沒有完整列出 method contract | 抽出 `MessageApi`，描述每個 method |
+| method 參數 | 單次呼叫可傳入 message options，也可能支援字串簡寫 | `content`、`render`、`duration`、`onClose` 等欄位有被描述，但沒有和 method 參數明確連起來 | 抽成 `MessageOptions`，再用 `string | MessageOptions` 作為 method 參數 |
+| `Message.config` | 用來調整全域 message 設定 | 有 `MessageConfig`，但沒有清楚表達它是 `config()` 的參數 | `config(options: MessageConfig): void` |
+| `Message.destroy` | 用來清除 message instance | 未明確描述 method | `destroy(): void` |
+| return value | 顯示方法會回傳手動關閉函式 | 未明確描述 return type | `type MessageClose = () => void` |
+| `$Message` | plugin 會掛到 `globalProperties` | `ComponentCustomProperties` 中是 `any` | `$Message: MessageApi` |
+
+換句話說，`MessageOptions`、`MessageConfig`、`MessageClose` 和 `MessageApi` 不應該混成同一個型別。它們分別負責「單次訊息內容」、「全域設定」、「呼叫後的控制能力」與「整個 service object 的方法集合」。這樣讀者才看得出目前型別缺口在哪裡，也看得出改良方向不是單純補幾個欄位，而是補完整的 service API contract。
 
 ---
 
@@ -839,7 +830,7 @@ this.$Modal.confrim({
 
 `Message`、`Notice`、`Modal` 這類浮層 API 是理解 View UI Plus 型別系統的重要案例，因為它們不像 `Button` 或 `Input` 那樣只透過 template component 使用。它們經常以 service-style method 的形式出現，例如 `Message.success()`、`Modal.confirm()`、`this.$Message.info()`、`this.$Modal.remove()`。
 
-這類 API 的型別設計不能只停留在 `DefineComponent<Props>`。`DefineComponent` 可以描述 template component，但無法完整表達 service object 的 method names、options object、callbacks、return value 與 plugin global property。以原始筆記觀察到的 `Message` 為例，runtime 上存在 `success`、`config`、`destroy` 等方法，而且 `Message.success()` 會回傳 close function；但 `types/message.d.ts` 比較像在描述 message options / props，沒有完整描述 `MessageApi`。
+這類 API 的型別設計不能只停留在 `DefineComponent<Props>`。`DefineComponent` 可以描述 template component，但無法完整表達 service object 的 method names、options object、callbacks、return value 與 plugin global property。
 
 `Modal` 則展示另一個典型問題：它同時是 template component 與 imperative service。`<Modal v-model="visible" />` 使用的是 component props；`Modal.confirm({ ... })` 使用的是 service options；`Modal.info`、`Modal.success`、`Modal.remove` 則屬於 service api methods。這三層如果混在一起，型別文件會難以維護，使用者也容易誤解 API。
 
@@ -868,7 +859,7 @@ globalProperties type
 ## 10. 自我檢查問題
 
 1. 為什麼 `Message`、`Notice`、`Modal` 這類浮層 API 不能只用一般 component props 的角度理解？
-2. 原始筆記中，`Message.success()` runtime 回傳什麼？這個回傳值在型別上應該如何描述？
+2. `Message.success()` runtime 回傳什麼？這個回傳值在型別上應該如何描述？
 3. `MessageConfig` 和完整的 `MessageApi` 有什麼差別？
 4. 為什麼 `types/message.d.ts` 中的 `Message: DefineComponent<{ ... }>` 無法完整描述 runtime 上的 `Message.success()`、`Message.config()`、`Message.destroy()`？
 5. `Modal` 為什麼同時具有 component 與 imperative service 的角色？

@@ -1,22 +1,5 @@
 # Emits and v-model Types：事件、`update:modelValue` 與 Listener Props
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經具備很好的原始碼閱讀基礎，尤其已經抓到 View UI Plus v1.3.20 在事件型別上的核心特徵：runtime 端使用 Options API 的 `emits` 與 `$emit(...)`，而 type surface 端則主要在 `types/*.d.ts` 中用 listener props 形式描述事件，例如 `onOnChange?: (event?: any) => any`。
-
-不過，如果要把它放進 `06-type-system/` 目錄，作為長期學習 View UI Plus TypeScript 型別設計的教材型筆記，仍有幾個地方可以再補強：
-
-1. 原始筆記已列出 `Input`、`Modal` 的 emits 與 declaration 對照，但「為什麼要這樣對照」可以再說得更完整。
-2. `onOnChange` 的命名來源已經有說明，但可以進一步整理成一套穩定的轉換規則，方便之後閱讀其他元件。
-3. `v-model` 的 runtime 與 type surface 落差已經指出，但需要補上 `modelValue`、`model-value`、`update:modelValue`、`onUpdate:modelValue` 分別處於哪個層次。
-4. event payload 的弱型別問題已經提到，但可以再從「型別契約強度」角度說明：有 listener type 不代表 payload 精準。
-5. 原始筆記已有閱讀流程，但可以補成更完整的原始碼閱讀路線，包含初次閱讀、深入閱讀與改良型別時的檢查順序。
-6. `Modal` 的 `on-hidden` 是否有 declaration 對應，原始筆記已正確標註需要逐項確認。這類不確定點應保留，不應假裝已確認。
-
-因此，本章優化後會把原始內容重構成一篇「事件型別契約閱讀方法」筆記，而不是只整理 `Input` 與 `Modal` 的幾個事件。
-
----
-
 ## 1. 本章定位
 
 本章是 `06-type-system/` 目錄中的事件型別專章，主題是 View UI Plus 的 `emits`、`v-model` 與 listener props 型別設計。
