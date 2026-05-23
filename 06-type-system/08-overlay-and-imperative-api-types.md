@@ -169,12 +169,12 @@ this.$Message
 第一層：Runtime Service Object
   -> src/components/message/index.js
   -> src/components/modal/index.js
-  -> src/components/notice/index.js（此處需要後續確認）
+  -> src/components/notice/index.js
 
 第二層：Component / Options Declaration
   -> types/message.d.ts
   -> types/modal.d.ts
-  -> types/notice.d.ts（此處需要後續確認）
+  -> types/notice.d.ts
 
 第三層：Package Public Export
   -> src/components/index.js
