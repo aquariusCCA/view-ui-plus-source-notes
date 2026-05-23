@@ -1,0 +1,8 @@
+- Typography
+- Title
+- Text
+- Paragraph
+- Link
+- Ellipsis
+- WordCount
+- Numeral

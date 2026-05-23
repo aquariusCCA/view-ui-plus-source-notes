@@ -25,16 +25,21 @@
 | `04-plugin-system/` | Vue plugin 安裝流程、全局註冊、配置注入與插件化設計。 |
 | `05-shared-logic/` | View UI Plus 沒有獨立 composables/hooks 層；本區整理 `src/mixins/`、`src/utils/` 的共用邏輯、復用方式與事件/狀態封裝。 |
 | `06-type-system/` | TypeScript 型別設計，包含 props、emits、instance、public API 與泛型。 |
-| `07-components/` | 通用元件分類、元件源碼閱讀、props 設計、插槽設計與元件模式。 |
-| `08-overlay-system/` | Modal、Drawer、Tooltip、Dropdown、Popper 等浮層系統的設計與實作。 |
-| `09-form-system/` | Form、FormItem、驗證流程、資料流、欄位狀態與錯誤提示機制。 |
-| `10-imperative-api/` | Message、Notice、Modal.confirm 等命令式 API 的建立、掛載與銷毀流程。 |
-| `11-directives/` | Vue directives 的設計、生命週期、事件綁定與實際使用場景。 |
-| `12-style-system/` | 樣式系統、主題設計、CSS 變數、class 命名、尺寸與狀態樣式。 |
-| `13-testing/` | 組件庫測試策略、單元測試、互動測試、邊界案例與測試筆記。 |
-| `14-build-release/` | 打包流程、按需載入、型別輸出、發布流程與版本管理。 |
-| `15-imitation/` | 仿作 View UI Plus 的核心機制與元件，用實作驗證理解。 |
-| `16-enterprise-wrappers/` | 企業級二次封裝思路，例如統一 API、業務元件、設計規範與封裝邊界。 |
+| `07-basic-components/` | 基礎 UI 元件，例如按鈕、圖標、標籤、徽章、頭像等，通常是其他複雜元件的最小組成單位。 |
+| `08-layout-and-containers/` | 負責頁面結構、區塊排列與內容容器，例如 Grid、Layout、Card、Collapse、Space 等。 |
+| `09-navigation-components/` | 負責頁面跳轉、層級導覽與位置提示，例如 Menu、Breadcrumb、Tabs、Page、Steps、Anchor 等。 |
+| `10-form-and-input-components/` | 負責使用者輸入、資料選擇、表單驗證與資料提交，例如 Input、Select、DatePicker、Upload、Form 等。 |
+| `11-data-display-components/` | 負責資料呈現、列表展示、表格展示、狀態視覺化，例如 Table、Tree、List、Timeline、Image、Skeleton 等。 |
+| `12-feedback-and-overlays/` | 負責操作回饋、提示訊息、彈出層與載入狀態，例如 Alert、Message、Modal、Drawer、Tooltip、Spin 等。 |
+| `13-business-components/` | 偏業務場景封裝的高階元件，例如 Login、Auth、Captcha、Email、Mobile、Password、Submit 等。 |
+| `14-typography-and-text/` | 負責文字排版、標題、段落、省略、字數統計與數字格式化，例如 Typography、Title、Text、Paragraph、Ellipsis 等。 |
+| `15-utility-components-and-global-services/` | 負責工具型能力與全局服務，例如 Copy、Scroll、Time、Locale、i18n、Message、Modal、LoadingBar 等全局 API。 |
+| `16-directives/` | Vue directives 的設計、生命週期、事件綁定與實際使用場景。 |
+| `17-style-system/` | 樣式系統、主題設計、CSS 變數、class 命名、尺寸與狀態樣式。 |
+| `18-testing/` | 組件庫測試策略、單元測試、互動測試、邊界案例與測試筆記。 |
+| `19-build-release/` | 打包流程、按需載入、型別輸出、發布流程與版本管理。 |
+| `20-imitation/` | 仿作 View UI Plus 的核心機制與元件，用實作驗證理解。 |
+| `21-enterprise-wrappers/` | 企業級二次封裝思路，例如統一 API、業務元件、設計規範與封裝邊界。 |
 | `99-prompts/` | 用於源碼閱讀、筆記整理、仿作實作、重構分析的提示詞集合。 |
 | `99-prompts/system/` | 系統規則提示詞，存放穩定的 AI 角色設定與總體規則，例如語言、教學風格與輸出原則。 |
 | `99-prompts/workflows/` | 工作流程提示詞，存放完整生成流程，例如依主題/模組來源範圍生成對應的 `02-notes/` 筆記，或從 `02-notes/` 生成練習與複習材料。 |
