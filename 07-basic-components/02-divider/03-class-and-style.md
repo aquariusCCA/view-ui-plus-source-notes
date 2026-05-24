@@ -1,25 +1,5 @@
 # Divider Class And Style：從 class 組合理解 Less 視覺規則
 
-## 0. 筆記類型判斷與原始筆記問題分析
-
-這份筆記屬於 **原始碼閱讀筆記** 與 **樣式對照筆記** 的混合型內容，主軸是閱讀 `View UI Plus` 中 `Divider` 分隔元件的樣式來源：`src/styles/components/divider.less`。
-
-原始筆記已經掌握到一個很重要的方向：`Divider` 不能只看 `divider.vue`，還必須對照 `divider.less`。原因是 `Divider` 的 runtime 邏輯很短，真正決定畫面長相的部分，大多藏在 `ivu-divider-*` class 與 Less selector 的組合裡。
-
-不過，若要把這份筆記整理成適合長期複習的教材，還需要補強幾個面向：
-
-| 問題 | 說明 | 重構方向 |
-| --- | --- | --- |
-| 容易停留在 selector 速查 | 原始筆記列出了不少 selector，但初學者可能還不知道為什麼它們要這樣組合 | 補上「runtime class → Less selector → CSS 視覺效果」的閱讀模型 |
-| class 與視覺結果的關係還可以更清楚 | `horizontal`、`vertical`、`with-text`、`dashed`、`plain` 不是互斥關係，而是會疊加 | 用 class matrix 與情境拆解說明疊加規則 |
-| 帶文字分隔線的 CSS 技術需要補背景 | `display: table`、`:before`、`:after` 對初學者不一定直覺 | 補上為什麼不用根節點背景畫線，而要改用 pseudo-elements |
-| `size` 與 `plain` 的作用範圍容易被誤解 | 它們不是改變所有線條，而是主要影響帶文字分隔線的文字樣式與間距 | 明確標註 selector 命中前提 |
-| 可以補出閱讀路線 | 目前內容偏重結果整理 | 加入從 runtime class 回查 Less selector 的實際閱讀方法 |
-
-本章重構後的目標，是讓你不只是記住 `Divider` 有哪些 class，而是能理解：**元件庫如何透過 class contract，把 Vue runtime 狀態交給 Less 樣式系統處理。**
-
----
-
 ## 1. 本章定位
 
 本章專門閱讀 `Divider` 的 class 與 style source，核心檔案是：
@@ -482,7 +462,7 @@ ivu-divider-with-text-center / left / right
 | 字級 | `@font-size-large` | `@font-size-base` |
 | 上下 margin | `16px 0` | `8px 0` |
 
-對普通不帶文字的水平線來說，原始筆記提供的 selector 不顯示 `small` 有同等明顯的尺寸效果。因此閱讀時要避免把 `size` 過度理解成全域尺寸控制。
+對普通不帶文字的水平線來說，selector 不顯示 `small` 有同等明顯的尺寸效果。因此閱讀時要避免把 `size` 過度理解成全域尺寸控制。
 
 ---
 

@@ -1,23 +1,5 @@
 # Divider 原始碼閱讀總覽：從結構型元件理解 props、slot 與樣式系統
 
-## 0. 原始筆記問題分析
-
-原本的 `README.md` 已經清楚指出本目錄聚焦 View UI Plus 的 `Divider` 分隔元件，也整理出 runtime、type declaration、example、style、registry 與 install 等主要閱讀入口。它的優點是能快速讓讀者知道「要看哪些檔案」以及「這個元件大致要理解什麼」。
-
-不過，作為一份放在筆記目錄最前面的總覽型 README，它還可以再補強幾個面向。
-
-第一，原本筆記偏向目錄導覽，對「為什麼 `Divider` 適合作為結構型元件的閱讀範例」說明還可以更完整。`Divider` 雖然程式碼短，但它剛好串起 props、default slot、computed class、DOM 結構與 Less selector，這對學習元件庫原始碼非常有價值。
-
-第二，原本筆記已經列出 source baseline，但還可以把每個入口檔放進更明確的閱讀任務中。讀者不只要知道檔案路徑，也要知道進入該檔案時要觀察什麼、不要被哪些細節分散注意力。
-
-第三，原本筆記有 Notes Index，但各篇筆記之間的知識依賴關係還可以更清楚。例如 `01-source-map.md` 是建立全局地圖，`02-props-slot-and-structure.md` 是理解 runtime 轉換，`03-class-and-style.md` 則是對照 class 與 Less 視覺規則。這三篇不是並列速查，而是有明確閱讀順序。
-
-第四，原本的 Self Check 問題方向正確，但可以擴充成「學完本目錄後應該具備哪些判斷能力」。這樣 README 不只是入口，也能作為學習完成後的驗收清單。
-
-本次重構會將這份 README 改寫成一份「Divider 原始碼閱讀導讀」，讓它同時具備目錄索引、學習定位、閱讀路線與複習檢查的功能。
-
----
-
 ## 1. 本目錄定位
 
 本目錄聚焦 View UI Plus 的 `Divider` 分隔元件。`Divider` 是一個基礎元件，表面上只是在畫一條分隔線，但它很適合用來觀察元件庫如何把簡單 API 轉換成穩定的 DOM 結構與可維護的樣式規則。

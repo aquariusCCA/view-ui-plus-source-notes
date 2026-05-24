@@ -1,32 +1,5 @@
 # Divider Props、Slot 與 DOM 結構：從輸入條件到畫面骨架
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經掌握了 `Divider` 的主要閱讀方向：它的核心不在事件處理，而在於 `props`、default slot、computed class 與 DOM 結構之間的對應關係。原始內容也已經指出 `Divider` 是一個低互動、偏結構型的元件，這個判斷是正確的。
-
-不過，如果要把它整理成適合長期複習的教材型筆記，還可以再補強幾個面向。
-
-第一，原始筆記雖然列出 `type`、`orientation`、`dashed`、`size`、`plain` 的功能，但仍偏向 API 說明。對第一次閱讀元件原始碼的人來說，更重要的是理解這些 props 如何進入 computed，最後如何變成 `ivu-divider-*` class。
-
-第二，default slot 的影響需要被放大說明。`Divider` 是否有 default slot，並不只是「有沒有文字」的差別，而是會直接改變 template 是否產生內層 `span`，也會改變根節點是否出現 `with-text` 相關 class。這是本章最重要的 runtime 分岔點。
-
-第三，`orientation` 容易被誤解成控制水平或垂直方向。實際上，水平或垂直由 `type` 控制；`orientation` 控制的是「帶文字分隔線」中文字相對於線條的位置。因此，`orientation` 必須放在 slot 情境下理解。
-
-第四，原始筆記已經提到 `types/divider.d.ts` 與 runtime validator 對 `size` 的差異，但可以再補充它對閱讀元件庫的啟發：閱讀元件時不能只看型別宣告，也不能只看 runtime source；兩者需要交叉驗證，才能確認真正的 public API 邊界。
-
-因此，本章會將原始內容重構成一條更清楚的閱讀線：
-
-```txt
-public props
-  -> default slot 判斷
-  -> computed class
-  -> template output
-  -> DOM 結構情境
-  -> style source 的下一步閱讀
-```
-
----
-
 ## 1. 筆記類型與本章定位
 
 本章屬於 **原始碼閱讀筆記**，主題是 `View UI Plus` 的 `Divider` 分隔線元件。它聚焦在 `src/components/divider/divider.vue` 的 runtime 實作，目標不是逐行分析 Less 樣式，而是先建立 `Divider` 的「結構輸出模型」。
@@ -339,7 +312,7 @@ ivu-divider-default
 ivu-divider-small
 ```
 
-雖然 `size` 是尺寸控制，但具體影響哪些 CSS 屬性，需要到 `divider.less` 中確認。根據原始筆記脈絡，`small` 主要體現在帶文字分隔線的字級與 margin。
+雖然 `size` 是尺寸控制，但具體影響哪些 CSS 屬性，需要到 `divider.less` 中確認。`small` 主要體現在帶文字分隔線的字級與 margin。
 
 ### 6.4 文字 class
 
@@ -445,7 +418,7 @@ ivu-divider-with-text
 ivu-divider-with-text-center
 ```
 
-最後，`divider.less` 會根據這些 class 畫出文字左右兩側的線段。根據原始筆記脈絡，帶文字線通常會透過 pseudo-elements，例如 `:before` 與 `:after`，處理左右線段。
+最後，`divider.less` 會根據這些 class 畫出文字左右兩側的線段。帶文字線通常會透過 pseudo-elements，例如 `:before` 與 `:after`，處理左右線段。
 
 ### 8.3 帶文字且文字靠左
 
@@ -539,7 +512,7 @@ ivu-divider-with-text-left
 </div>
 ```
 
-`plain` 的命名容易讓人以為它是另一種線條模式，但從 runtime 來看，它只是加上 `ivu-divider-plain` class。根據原始筆記說明，它主要讓帶文字分隔線的文字變成普通正文樣式。
+`plain` 的命名容易讓人以為它是另一種線條模式，但從 runtime 來看，它只是加上 `ivu-divider-plain` class。它主要讓帶文字分隔線的文字變成普通正文樣式。
 
 ### 8.7 垂直分隔線
 
@@ -588,7 +561,7 @@ type 決定線的方向；orientation 決定文字在水平線上的位置。
 
 ## 10. Runtime 與 Type Declaration 的交叉閱讀
 
-原始筆記中提到一個很值得注意的地方：`types/divider.d.ts` 中 `size` 的型別是：
+`types/divider.d.ts` 中 `size` 的型別是：
 
 ```ts
 size?: string;

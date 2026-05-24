@@ -1,69 +1,5 @@
 # View UI Plus Divider 元件原始碼閱讀筆記：Source Map
 
-## 0. 原始筆記問題分析與筆記類型判斷
-
-### 0.1 筆記類型判斷
-
-這份筆記的主要類型是**原始碼閱讀筆記**，輔助類型是 **API / 設定筆記**。
-
-原因是原始內容的核心不是介紹 `Divider` 的畫面效果而已，而是在整理「要讀懂 `Divider` 元件，需要從哪些檔案切入」。筆記中已經明確列出 runtime component、type declaration、style source、example、component registry 與 plugin install 等入口，這些都屬於原始碼閱讀時會使用的 source map。
-
-不過，`Divider` 同時也是元件庫的 public component，因此閱讀時不能只停留在「檔案在哪裡」，還需要理解：
-
-- 使用者可以透過哪些 props 操作它。
-- default slot 是否會改變渲染結構。
-- runtime 產生的 class 如何交給 Less 樣式處理。
-- 元件如何被匯出與全域註冊，進入 View UI Plus 的 public surface。
-
-因此，本篇會以「原始碼閱讀路線」為主軸，並在適當位置補上 public API、使用情境與樣式行為。
-
----
-
-### 0.2 原始筆記目前的優點
-
-原始筆記已經具備一份 source map 的基礎結構，尤其已經整理出以下關鍵資訊：
-
-1. `Divider` 的主要 runtime 檔案是 `src/components/divider/divider.vue`。
-2. public type declaration 位於 `types/divider.d.ts`。
-3. 官方範例位於 `examples/routers/divider.vue`。
-4. 樣式規則位於 `src/styles/components/divider.less`。
-5. component registry 與 plugin install 需要分別回到 `src/components/index.js` 與 `src/index.js` 確認。
-6. `Divider` 的視覺行為不能只看 `.vue`，必須對照 Less。
-7. default slot 會影響是否產生帶文字的分隔線結構。
-8. 帶文字分隔線的左右線段，主要來自 CSS pseudo-elements。
-
-這些資訊非常適合作為後續深入閱讀的骨架。
-
----
-
-### 0.3 原始筆記需要補強的地方
-
-原始筆記雖然已經列出不少入口，但仍有幾個地方可以再教材化。
-
-| 需要補強的地方 | 問題說明 | 重構方向 |
-| --- | --- | --- |
-| 檔案清單偏索引型 | 讀者知道要看哪些檔案，但不一定知道為什麼要看 | 把每個檔案放回「元件對外行為」與「原始碼閱讀流程」中說明 |
-| runtime 與 style 的關係還可更清楚 | `divider.vue` 只產生 DOM 與 class，真正畫線的是 Less | 補上 props / slot / class / Less 的轉換鏈 |
-| public API 的定位可再加強 | props 不只是內部變數，而是元件對使用者的契約 | 從 `types/divider.d.ts` 說明 public contract |
-| 範例檔的價值可再強化 | example 不只是展示畫面，也反映元件作者預期的使用情境 | 把官方範例整理成使用場景表 |
-| registry / install 容易被忽略 | 初學者常只看元件本體，忽略元件如何被公開 | 補上 public surface 的概念 |
-| 可確認資訊與待確認資訊需要分開 | 原始筆記沒有提供完整 source code | 對未完整列出的 default、validator、Less 變數來源標註需要後續確認 |
-
----
-
-### 0.4 本篇的資訊邊界
-
-本篇依據原始筆記提供的資訊進行重構，不假裝已完整逐行閱讀所有 View UI Plus 原始碼。因此，以下內容會保守處理：
-
-- 不任意補上原始筆記沒有明確列出的 props default value。
-- 不任意補上 `divider.vue` 中完整 script 實作。
-- 不任意推測 Less 變數的來源與實際色值。
-- 不任意宣稱 `src/index.js` 的註冊細節，除非後續回原始碼確認。
-
-本篇的目標是建立閱讀地圖與理解框架，而不是取代完整源碼逐行分析。
-
----
-
 ## 1. 本章定位：這份 Source Map 要解決什麼問題
 
 `Divider` 是 View UI Plus 中用來呈現分隔線的元件。它看起來很簡單，但在元件庫原始碼閱讀中，簡單元件反而很適合用來練習「從 public API 追到 runtime，再追到樣式系統」的閱讀方法。
@@ -162,7 +98,7 @@ props / slot
 
 `divider.vue` 是最重要的 runtime 檔案，但它不是完整答案。
 
-原因是 `Divider` 的視覺複雜度主要藏在樣式層。根據原始筆記，普通水平線、垂直線、虛線與帶文字分隔線並不是全部用同一種 CSS 技術完成：
+原因是 `Divider` 的視覺複雜度主要藏在樣式層。普通水平線、垂直線、虛線與帶文字分隔線並不是全部用同一種 CSS 技術完成：
 
 | 類型 | runtime 主要負責 | style 主要負責 |
 | --- | --- | --- |
@@ -182,7 +118,7 @@ props / slot
 
 `src/components/divider/divider.vue` 是 `Divider` 的 runtime component。它的任務不是直接用 JavaScript 畫線，而是根據使用者傳入的 props 與 slot 狀態，產生對應的 DOM 結構與 class。
 
-根據原始筆記，`Divider` 的 template 可以簡化理解為：
+`Divider` 的 template 可以簡化理解為：
 
 ```vue
 <div :class="classes">
@@ -231,7 +167,7 @@ props / slot
 
 ### 4.3 `classes` 與 `slotClasses` 的閱讀方式
 
-原始筆記中提到 `divider.vue` 會組合 `classes` 與 `slotClasses`。
+`divider.vue` 會組合 `classes` 與 `slotClasses`。
 
 可以這樣理解：
 
@@ -282,7 +218,7 @@ props / slot
 
 ### 5.2 Divider 的 props 整理
 
-根據原始筆記，`Divider` 對外公開五個 props：
+`Divider` 對外公開五個 props：
 
 | Prop | Type | 用途 | 閱讀重點 |
 | --- | --- | --- | --- |
@@ -292,7 +228,7 @@ props / slot
 | `plain` | `boolean` | 控制帶文字時的文字樣式 | 主要影響文字視覺，不是改變分隔線方向 |
 | `size` | `string` | 控制尺寸 | 註解說明可選 `small` 或 `default`，runtime validator 實際範圍需回 source 確認 |
 
-這裡要注意，原始筆記指出 `size` 在型別上是 `string`，但 runtime validator 實際只接受 `small` 與 `default`。這是一個很好的閱讀切入點，因為它提醒我們：
+這裡要注意，`size` 在型別上是 `string`，但 runtime validator 實際只接受 `small` 與 `default`。這是一個很好的閱讀切入點，因為它提醒我們：
 
 > Type declaration、runtime validator 與官方文件三者不一定永遠完全等價，閱讀元件庫時要互相對照。
 
@@ -340,7 +276,7 @@ props / slot
 
 ### 6.2 主要範例情境整理
 
-根據原始筆記，官方範例集中展示以下情境：
+官方範例集中展示以下情境：
 
 | 情境 | 範例寫法 | 這個範例想展示什麼 |
 | --- | --- | --- |
@@ -390,7 +326,7 @@ props / slot
 `Divider` 的 runtime source 很短，容易讓人誤以為元件很簡單。  
 但真正的視覺行為大多在 `src/styles/components/divider.less` 中完成。
 
-根據原始筆記，`Divider` 至少包含以下樣式類型：
+`Divider` 至少包含以下樣式類型：
 
 | 樣式類型 | 主要 CSS 思路 |
 | --- | --- |
@@ -416,7 +352,7 @@ props / slot
 ```
 
 這種畫面通常不會只靠一條背景線完成，而是會把左右兩段線拆開。  
-原始筆記指出，`Divider` 的帶文字分隔線會透過 `:before` 與 `:after` 產生左右兩段線。
+`Divider` 的帶文字分隔線會透過 `:before` 與 `:after` 產生左右兩段線。
 
 可以用以下概念理解：
 
@@ -446,8 +382,6 @@ root divider
 | `ivu-divider-dashed` | `dashed` 為 true | 使用虛線 |
 | `ivu-divider-plain` | `plain` 為 true | 文字使用普通樣式 |
 | 與 `small` 相關的 class | `size="small"` | 影響文字或間距尺寸 |
-
-> 注意：上表根據原始筆記提到的 class 方向整理。實際 class 名稱與組合方式仍應以 `divider.vue` 與 `divider.less` 原始碼為準。
 
 ---
 
@@ -583,13 +517,11 @@ root divider
 
 ### 9.4 資訊不足與後續確認清單
 
-原始筆記已經建立主要方向，但若要寫成完整逐行源碼解析，還需要回原始碼確認以下內容：
-
 | 待確認項目 | 為什麼需要確認 |
 | --- | --- |
 | `type` 的 default value | 需要確認預設是否為 `horizontal` |
 | `orientation` 的 default value | 需要確認預設是否為 `center` |
-| `size` 的 validator 實作 | 原始筆記提到 validator 接受 `small` 與 `default`，但仍建議回源碼確認 |
+| `size` 的 validator 實作 | validator 接受 `small` 與 `default`，但仍建議回源碼確認 |
 | `plain` 的實際 class 組合 | 需要確認 plain 是加在 root 還是 inner text，或兩者都有 |
 | `prefixCls` 或 class prefix 來源 | 需要確認 class 名稱是否由常數組合產生 |
 | Less 變數來源 | 需要確認顏色、字級、間距來自哪些全域樣式變數 |
