@@ -1,23 +1,5 @@
 # Button / ButtonGroup Public Props Contract：從 Runtime Props 到 TypeScript 對外契約
 
-## 0. 原始筆記問題分析
-
-這份原始筆記的主題非常明確：它不是在介紹 `Button` 怎麼渲染，也不是在分析點擊事件如何觸發跳轉，而是在整理 `Button` / `ButtonGroup` 對外暴露的 **public props contract**。換句話說，本章要回答的是：使用者在 template 或 JSX / TSX 中到底可以傳哪些 props？這些 props 是從哪個檔案來的？runtime source 與 `types/button.d.ts` 是否完全一致？
-
-原始筆記已經整理出許多重要資訊，例如 `Button` 自身 props、`mixins/link.js` 帶來的 navigation props、`ButtonGroup` 的 `size` / `shape` / `vertical`，以及 `htmlType` 對應到 public prop `html-type` 這類命名轉換。不過，若要把它放進長期知識庫，還可以再補強以下幾個面向。
-
-第一，原始筆記雖然列出了 props 來源，但還可以更明確地說明「為什麼 props contract 不能只看 `button.vue`」。對元件庫來說，public API 可能分散在 component 本身、mixin、型別宣告與文件範例中。只看單一檔案，很容易漏掉使用者實際可以傳入的能力。
-
-第二，原始筆記已經指出 runtime 與 declaration 的落差，例如 `Button.shape` 在 declaration 中比 runtime 寬、`ButtonGroup.shape` 在 declaration 中比 runtime 窄，但還可以補上判讀方法：遇到這種差異時，應該分辨「runtime 真正接受什麼」與「TypeScript 編譯時允許什麼」。
-
-第三，`html-type` / `htmlType`、`custom-icon` / `customIcon` 的命名轉換是 Vue 元件庫閱讀中的常見陷阱。這一點值得獨立成一節，因為之後閱讀其他元件時也會反覆遇到。
-
-第四，原始筆記把 `onClick?: (event?: any) => any` 放在事件 listener contract 中，這是很重要的觀察。但初學者可能會誤會 `onClick` 是普通 prop，因此需要補上 Vue component declaration 中 listener 型別的語意。
-
-第五，這份筆記後續可以拆成更細的專題，例如：`Button` render 與 class mapping、link navigation 流程、`Form` disabled 狀態如何影響子元件、以及 `ButtonGroup` 如何透過 Less selector 影響子按鈕樣式。
-
----
-
 ## 1. 本章定位
 
 本章是一篇 **public API 對照筆記**，專門整理 `View UI Plus` 中 `Button` 與 `ButtonGroup` 的 props contract。
@@ -124,7 +106,7 @@ customIcon
 <Button html-type="submit" custom-icon="my-icon" />
 ```
 
-因此，原始筆記中特別整理了兩組對照：
+因此，特別整理了兩組對照：
 
 ```txt
 Public template / type:  html-type
@@ -176,7 +158,7 @@ Instance access:         this.customIcon
 | Runtime validator | 在執行期間驗證或限制 props 值 | 只有程式執行時才會生效，且 validator 嚴格度取決於元件實作。 |
 | Type declaration | 在開發階段提供型別提示與型別檢查 | 可能比 runtime 寬，也可能比 runtime 窄，取決於 declaration 是否精準維護。 |
 
-在本章原始筆記中，最典型的例子是 `shape`。
+在本章最典型的例子是 `shape`。
 
 `Button.shape` 的 runtime validator 只接受：
 
@@ -228,13 +210,13 @@ circle-outline
 
 理解 `ButtonGroup` 時，要特別注意它和 `Button` 的分工。`ButtonGroup` 本身不是「管理一組 Button 狀態的控制器」，它更像是一個樣式容器。它透過父層 class 讓 Less selector 影響子按鈕的排列、邊框與圓角。
 
-因此，`ButtonGroup.size` 並不是透過 provide / inject 或 props forwarding 主動改寫每個子 `Button` 的 `size` prop。原始筆記指出，group size 主要是透過父層 class 影響子按鈕樣式。這一點對後續閱讀 `button.less` 很重要，否則會誤以為 `button-group.vue` 應該要主動遍歷 slot children。
+因此，`ButtonGroup.size` 並不是透過 provide / inject 或 props forwarding 主動改寫每個子 `Button` 的 `size` prop。group size 主要是透過父層 class 影響子按鈕樣式。這一點對後續閱讀 `button.less` 很重要，否則會誤以為 `button-group.vue` 應該要主動遍歷 slot children。
 
 ---
 
 ## 9. 全域 Size Fallback：Type Contract 與 Runtime Default 要分開看
 
-`Button` 與 `ButtonGroup` 的 `size` default 都會讀全域設定。原始筆記整理的 runtime 邏輯如下：
+`Button` 與 `ButtonGroup` 的 `size` default 都會讀全域設定。runtime 邏輯如下：
 
 ```js
 const global = getCurrentInstance().appContext.config.globalProperties;
@@ -282,7 +264,7 @@ onClick?: (event?: any) => any;
 
 在型別宣告或 JSX / TSX 語境中，事件可能會被表達成類似 `onClick` 的 listener prop。因此，`types/button.d.ts` 出現 `onClick?: (event?: any) => any`，代表 TypeScript 使用者可以監聽 click 事件。
 
-原始筆記也指出，這裡的 `event` 型別是 `any`，精準度不高。從 runtime 行為來看，click handler 會把 DOM click event emit 出去，因此實務上可以把它理解為原生 click event；但因為 declaration 沒有寫成 `MouseEvent`，所以型別層面並沒有提供更精準的事件物件提示。
+這裡的 `event` 型別是 `any`，精準度不高。從 runtime 行為來看，click handler 會把 DOM click event emit 出去，因此實務上可以把它理解為原生 click event；但因為 declaration 沒有寫成 `MouseEvent`，所以型別層面並沒有提供更精準的事件物件提示。
 
 閱讀時可以這樣記：
 
@@ -303,9 +285,9 @@ onClick?: (event?: any) => any;
 | `button.vue` 沒看到 `to`，所以 `Button` 不支援跳轉 | `to` 來自 `mixins/link.js`，只要 mixin 被混入，就應視為 `Button` 的 public prop。 |
 | `.d.ts` 寫 `'html-type'`，runtime props 應該也叫 `html-type` | runtime 使用 `htmlType`，public template / type 層面可使用 kebab-case `html-type`。 |
 | `shape?: string` 代表任何 shape 都是合理值 | TypeScript declaration 比 runtime 寬；runtime validator 仍然只接受特定值。 |
-| `ButtonGroup.shape` 沒寫 `circle-outline`，所以 runtime 不支援 | 原始筆記指出 runtime validator 支援 `circle-outline`，這裡是 declaration 沒完整表達 runtime。 |
+| `ButtonGroup.shape` 沒寫 `circle-outline`，所以 runtime 不支援 | runtime validator 支援 `circle-outline`，這裡是 declaration 沒完整表達 runtime。 |
 | `size` 的 default 邏輯應該寫進 type union | type union 描述可傳值；全域 fallback 屬於 runtime default 行為。 |
-| `ButtonGroup.size` 會直接改每個子 Button 的 `size` prop | 原始筆記指出它主要透過父層 class 與 Less selector 影響子按鈕樣式。 |
+| `ButtonGroup.size` 會直接改每個子 Button 的 `size` prop | 它主要透過父層 class 與 Less selector 影響子按鈕樣式。 |
 | `onClick` 是普通 prop | `onClick` 在 declaration 中主要表示 click listener contract。 |
 
 ---

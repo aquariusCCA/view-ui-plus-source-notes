@@ -1,25 +1,5 @@
 # ButtonGroup And Style System：群組容器如何透過樣式系統影響子按鈕
 
-## 0. 原始筆記問題分析
-
-這份原始筆記屬於「原始碼閱讀筆記」與「樣式系統分析筆記」的混合型筆記。它的主題不是單純介紹 `ButtonGroup` 怎麼使用，而是要說清楚 `ButtonGroup` 這個元件在 View UI Plus 裡如何和 `Button`、`button.less`、`styles/mixins/button.less` 共同完成群組按鈕的視覺效果。
-
-原始筆記已經抓到非常重要的核心：`ButtonGroup` 本身的 runtime 很薄，它不是透過 JavaScript 主動管理子元件，而是透過父層 class 讓 less selector 影響子 `Button`。這個判斷非常關鍵，因為閱讀 UI 元件庫時，初學者常會誤以為「元件效果」一定是由 component runtime 完成，但在基礎組件庫裡，很多視覺協作其實是由 CSS / Less 規則完成。
-
-不過，原始筆記仍有幾個可以補強的地方。
-
-第一，雖然已經指出 `ButtonGroup` runtime 很薄，但還可以更明確地區分「runtime 責任」與「style 責任」。這樣讀者才不會在 `button-group.vue` 裡找不到複雜邏輯時誤判為「這個元件沒內容」。
-
-第二，原始筆記已經列出 `size`、`shape`、`vertical` 會轉成 group class，但還可以進一步說明這些 class 在樣式系統中扮演的角色：它們不是資料狀態，而是給 less selector 使用的「樣式上下文」。
-
-第三，橫向 group、縱向 group、primary button 特殊邊框等內容，原本已經有重點，但仍可以補成更循序的閱讀流程：先理解父子 selector，再理解邊框合併，最後理解圓角修正與 type-specific 規則。
-
-第四，原始筆記提到官方 example，但還可以補上「如何用 example 反推 source 行為」的閱讀方法。對初次閱讀元件庫原始碼的人來說，example 不只是展示用法，也可以用來驗證 runtime class 與 style selector 是否真的形成對應。
-
-第五，這份筆記適合在最後補上「閱讀路線」與「後續拆分方向」，讓它能長期放入個人知識庫，並能銜接前面關於 props contract、render mapping、state events 的筆記。
-
----
-
 ## 1. 本章定位
 
 本章專門分析 View UI Plus 中 `ButtonGroup` 與 `Button` 樣式系統的協作方式。
@@ -188,7 +168,7 @@ classes () {
 </div>
 ```
 
-它不會把 `size="large"` 自動傳給每一個子 `Button`。真正讓子按鈕在視覺上變大的，是 less 中針對父層 group class 的子代選擇器，例如原始筆記提到的概念規則：
+它不會把 `size="large"` 自動傳給每一個子 `Button`。真正讓子按鈕在視覺上變大的，是 less 中針對父層 group class 的子代選擇器，例如概念規則：
 
 ```less
 &-large {
@@ -246,7 +226,7 @@ classes () {
 
 ### 7.1 子按鈕 float left
 
-橫向 group 會讓直接子層的 `.ivu-btn` 進入水平排列，例如原始筆記指出的規則概念：
+橫向 group 會讓直接子層的 `.ivu-btn` 進入水平排列，例如規則概念：
 
 ```less
 > .@{btnClassName} {
@@ -312,7 +292,7 @@ classes () {
   -> 左上 / 左下圓角歸零
 ```
 
-這些規則通常會透過 CSS selector 判斷 `:first-child`、`:last-child`、`:not(:first-child)`、`:not(:last-child)` 之類的情境。原始筆記沒有提供完整 selector，因此這裡只保留概念層級，不展開未確認的具體實作細節。
+這些規則通常會透過 CSS selector 判斷 `:first-child`、`:last-child`、`:not(:first-child)`、`:not(:last-child)` 之類的情境。
 
 ---
 
@@ -346,7 +326,7 @@ ivu-btn-group-vertical
 
 ### 8.1 子按鈕改成 block 排列
 
-原始筆記指出，vertical group 的子按鈕會套用類似：
+vertical group 的子按鈕會套用類似：
 
 ```less
 > .@{btnClassName} {
@@ -435,13 +415,13 @@ margin-left: 0px;
 
 這也是為什麼 `ButtonGroup` 的 `shape` 不能只從 `button-group.vue` 看出效果。`button-group.vue` 只會產生 `ivu-btn-group-circle`，真正的首尾圓角修正仍然要回到 less 的 group mixin 與相關 selector。
 
-原始筆記沒有提供完整的 `circle` selector 細節，因此這裡只建立閱讀方向：當你看到 `ivu-btn-group-circle` 時，要去追 `button.less` 或 `styles/mixins/button.less` 中和 group circle 有關的規則，而不是期待 runtime 有特殊邏輯。
+當你看到 `ivu-btn-group-circle` 時，要去追 `button.less` 或 `styles/mixins/button.less` 中和 group circle 有關的規則，而不是期待 runtime 有特殊邏輯。
 
 ---
 
 ## 10. Primary button 在 group 中的特殊邊框
 
-群組按鈕不只要處理「一般 button」的邊框合併，也要處理不同 `type` 的視覺狀態。原始筆記特別提到，`button.less` 對 `ivu-btn-primary` 在 group 裡有額外處理。
+群組按鈕不只要處理「一般 button」的邊框合併，也要處理不同 `type` 的視覺狀態。`button.less` 對 `ivu-btn-primary` 在 group 裡有額外處理。
 
 橫向 group 中，primary button 的相鄰邊框會使用：
 
@@ -511,7 +491,7 @@ group parent class
 
 `examples/routers/button.vue` 不只是示範給使用者看的文件頁，它也很適合拿來反推元件設計意圖。
 
-原始筆記指出，官方 example 中的 group 場景大致包含：
+官方 example 中的 group 場景大致包含：
 
 | 場景 | 觀察重點 |
 | --- | --- |
@@ -634,7 +614,7 @@ example props
 
 ## 15. 資訊不足與後續確認
 
-這份筆記目前以原始筆記提供的內容為基礎，沒有逐行展開完整 less source，因此以下細節建議後續在閱讀原始碼時再補充：
+這份筆記目前沒有逐行展開完整 less source，因此以下細節建議後續在閱讀原始碼時再補充：
 
 1. `.btn-group(@btnClassName)` 的完整 selector 結構。
 2. `.btn-group-vertical(@btnClassName)` 的完整 selector 結構。
@@ -699,4 +679,4 @@ example props
 
 ### 18.4 ButtonGroup 與 Accessibility
 
-後續可以補一篇無障礙閱讀筆記，檢查 `ButtonGroup` 是否需要補充 ARIA role、keyboard navigation、disabled anchor 的語意差異等。這部分原始筆記尚未提供足夠資訊，因此不能在本章直接推論。
+後續可以補一篇無障礙閱讀筆記，檢查 `ButtonGroup` 是否需要補充 ARIA role、keyboard navigation、disabled anchor 的語意差異等。

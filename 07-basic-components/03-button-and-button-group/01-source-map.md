@@ -1,21 +1,5 @@
 # Button / ButtonGroup Source Map：閱讀入口與責任分工
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經具備很好的 source map 雛形，能指出 `Button`、`ButtonGroup`、style、type、example、test 等重要入口，也已經提醒讀者不要只看單一 `.vue` 檔案。不過，如果要把它放進長期維護的個人知識庫，還可以再補強幾個面向。
-
-首先，原始筆記比較像「已經讀過原始碼之後整理出的重點摘要」。它能快速告訴讀者每個檔案的角色，但對第一次閱讀 View UI Plus 原始碼的人來說，還需要更多背景說明：為什麼一個看似簡單的 `Button` 元件，會同時牽涉 runtime、mixin、Less 樣式、TypeScript 宣告、example 與 unit test。
-
-其次，`Button` 與 `ButtonGroup` 的責任差異值得展開說明。`Button` 是一個真正承擔互動語意的元件，會處理 props、computed、render output、click 行為與 link/form 行為；`ButtonGroup` 則是非常薄的容器元件，它的主要價值不是複雜邏輯，而是透過父層 class 讓 Less selector 影響子按鈕的排列、邊框與圓角。
-
-第三，原始筆記已經提到 `mixins/link.js` 與 `mixins/form.js`，但還可以更明確說明「mixin 會擴充元件 public API」這件事。閱讀元件庫時，如果只在 `button.vue` 裡搜尋 props，很容易漏掉由 mixin 注入的 `to`、`replace`、`target`、`append`、`itemDisabled` 等能力。
-
-最後，原始筆記中的表格已經很有價值，但可以進一步轉化成「閱讀策略」。也就是不只列出檔案在哪裡，還要說明初學者應該先看哪個檔案、每個階段要驗證什麼問題、哪些內容應該延伸成後續獨立筆記。
-
-> 筆記類型判斷：本篇主要屬於「原始碼閱讀筆記」，同時帶有「架構分析筆記」特徵。重構重點會放在元件來源地圖、模組責任分工、閱讀順序與常見誤解，而不是逐行解析完整原始碼。
-
----
-
 ## 1. 本章定位
 
 本章是一篇針對 View UI Plus `Button` 與 `ButtonGroup` 的 source map 筆記。它的目的不是馬上深入每一個 props 的細節，也不是逐行講解 `render` function，而是先建立一張完整的閱讀地圖。
@@ -98,7 +82,7 @@
 
 `button.vue` 是 `Button` 元件的主要 runtime 入口。所謂 runtime，指的是元件在執行期間真正會參與渲染、計算 class、處理事件與輸出 DOM 的部分。
 
-根據原始筆記，`button.vue` 主要負責三件事。
+`button.vue` 主要負責三件事。
 
 第一，它宣告按鈕自己的 props，例如：
 
@@ -123,7 +107,7 @@
 
 這一層是閱讀 `Button` 時非常關鍵的部分。元件使用者傳入的是語意化 props，但最終渲染到 DOM 時需要變成 class、tag、attribute、事件與子節點。computed 的角色就是負責把「元件語意」轉成「渲染資料」。
 
-第三，它在 render function 中決定實際輸出內容。根據原始筆記，`Button` 會決定輸出 `<button>` 或 `<a>`，並組合 loading icon、普通 icon 與 default slot。
+第三，它在 render function 中決定實際輸出內容。`Button` 會決定輸出 `<button>` 或 `<a>`，並組合 loading icon、普通 icon 與 default slot。
 
 這代表 `Button` 並不是固定輸出原生 `<button>`。當它帶有 link 相關能力時，可能會輸出 `<a>`。這也是為什麼後續必須閱讀 `mixins/link.js`，否則只看 `button.vue` 時會看到 `this.to`、`this.linkUrl`、`this.handleCheckClick()` 等內容，卻不知道它們真正來源。
 
@@ -137,7 +121,7 @@
 
 ### 4.2 `htmlType` 的角色
 
-原始筆記提到 unit test 會驗證 `<button>` 搭配 `htmlType` 時，只有 button tag 才應輸出原生 `type` attribute。
+unit test 會驗證 `<button>` 搭配 `htmlType` 時，只有 button tag 才應輸出原生 `type` attribute。
 
 這點很值得注意，因為元件層的 `type` 與原生 button 的 `type` 不是同一件事。
 
@@ -152,7 +136,7 @@
 
 ## 5. ButtonGroup runtime：薄容器與樣式驅動設計
 
-`button-group.vue` 是 `ButtonGroup` 的 runtime 入口，但它與 `button.vue` 的複雜度完全不同。根據原始筆記，`ButtonGroup` 的輸出非常薄，核心結構如下：
+`button-group.vue` 是 `ButtonGroup` 的 runtime 入口，但它與 `button.vue` 的複雜度完全不同。`ButtonGroup` 的輸出非常薄，核心結構如下：
 
 ```vue
 <div :class="classes">
@@ -167,7 +151,7 @@
 1. 根據自身 props 計算出父層 `classes`。
 2. 透過 default slot 接收內部的 `Button` 子元素。
 
-原始筆記特別指出，`ButtonGroup` 不會主動遍歷子按鈕，也不會把 `size` 或 `shape` 透過 provide/inject 傳給子按鈕。這點非常重要，因為它代表 `ButtonGroup` 的效果主要不是靠 JavaScript 資料傳遞完成，而是靠 Less 中的父子 selector 完成。
+`ButtonGroup` 不會主動遍歷子按鈕，也不會把 `size` 或 `shape` 透過 provide/inject 傳給子按鈕。這點非常重要，因為它代表 `ButtonGroup` 的效果主要不是靠 JavaScript 資料傳遞完成，而是靠 Less 中的父子 selector 完成。
 
 ### 5.1 為什麼 ButtonGroup 不一定需要 provide/inject？
 
@@ -199,7 +183,7 @@
 
 ## 6. Mixin 責任分工：Button 的隱性能力來源
 
-原始筆記指出，`Button` 混入了兩組 mixin：
+`Button` 混入了兩組 mixin：
 
 ```js
 mixins: [ mixinsLink, mixinsForm ]
@@ -216,7 +200,7 @@ mixins: [ mixinsLink, mixinsForm ]
 
 `mixins/link.js` 提供的是 navigation 相關能力。對使用者來說，這代表 `Button` 不只是普通按鈕，也可以像連結一樣使用。
 
-根據原始筆記，link mixin 提供：
+link mixin 提供：
 
 - `to`
 - `replace`
@@ -227,20 +211,20 @@ mixins: [ mixinsLink, mixinsForm ]
 
 這些內容通常與 router navigation 或 URL navigation 有關。例如 `to` 可以用來表示目標位置，`replace` 可能對應 router replace 語意，`target` 可能對應 `<a>` 的開啟方式，`append` 則可能與路由拼接行為有關。
 
-> 注意：本章只根據原始筆記建立 source map，不逐行展開 `mixins/link.js` 的完整實作細節。若要確認每個欄位的完整行為，應在後續獨立筆記中閱讀 `src/mixins/link.js`。
+> 注意：本章不逐行展開 `mixins/link.js` 的完整實作細節。若要確認每個欄位的完整行為，應在後續獨立筆記中閱讀 `src/mixins/link.js`。
 
-閱讀 link 行為時，要特別注意 `Button` 的 tag output。原始筆記提到 unit test 會驗證：有 `to` 時，`Button` 應渲染成 `<a>`；沒有 `to` 時，`Button` 應渲染成 `<button>`。這代表 link mixin 不只是多提供幾個 props，而是會影響最終 DOM 語意。
+閱讀 link 行為時，要特別注意 `Button` 的 tag output。unit test 會驗證：有 `to` 時，`Button` 應渲染成 `<a>`；沒有 `to` 時，`Button` 應渲染成 `<button>`。這代表 link mixin 不只是多提供幾個 props，而是會影響最終 DOM 語意。
 
 ### 6.2 Form mixin：讓 Button 受到表單上下文影響
 
-`mixins/form.js` 的角色是讓 `Button` 能與上層 `Form` 或 `FormItem` 互動。原始筆記指出，它提供：
+`mixins/form.js` 的角色是讓 `Button` 能與上層 `Form` 或 `FormItem` 互動。它提供：
 
 - `FormInstance`
 - `FormItemInstance`
 - `itemDisabled`
 - `handleFormItemChange()`
 
-其中最值得注意的是 `itemDisabled`。原始筆記明確提到，`Button` 不只讀自己的 `disabled` prop，也會讀上層 `FormInstance.disabled`。
+其中最值得注意的是 `itemDisabled`。`Button` 不只讀自己的 `disabled` prop，也會讀上層 `FormInstance.disabled`。
 
 這代表 `disabled` 的語意不是單一來源，而是可能由兩個層次共同決定：
 
@@ -255,7 +239,7 @@ mixins: [ mixinsLink, mixinsForm ]
 
 ## 7. Style 責任分工：ButtonGroup 的真正重點在 Less
 
-`button.less` 是 `Button` / `ButtonGroup` 的樣式入口。它負責把不同 class 對應到具體視覺狀態。原始筆記列出了一批重要 class，例如：
+`button.less` 是 `Button` / `ButtonGroup` 的樣式入口。它負責把不同 class 對應到具體視覺狀態。
 
 ```txt
 ivu-btn
@@ -283,7 +267,7 @@ ivu-btn-group-vertical
 
 ### 7.1 `styles/mixins/button.less` 的角色
 
-原始筆記指出，很多底層樣式規則其實在 `styles/mixins/button.less` 中。
+很多底層樣式規則其實在 `styles/mixins/button.less` 中。
 
 | Style mixin | 責任 | 閱讀重點 |
 | --- | --- | --- |
@@ -335,7 +319,7 @@ ivu-btn-group-vertical
 types/viewuiplus.components.d.ts
 ```
 
-原始筆記指出，它會透過以下方式匯出型別：
+它會透過以下方式匯出型別：
 
 ```ts
 export { Button, ButtonGroup } from './button'
@@ -355,7 +339,7 @@ export { Button, ButtonGroup } from './button'
 
 除了 runtime、style 與 type 之外，source map 還需要理解元件如何被匯出給使用者。
 
-原始筆記列出了四個與入口相關的檔案：
+四個與入口相關的檔案：
 
 | 檔案 | 角色 |
 | --- | --- |
@@ -373,9 +357,9 @@ export { Button, ButtonGroup } from './button'
 
 `src/components/button/index.js` 與 `src/components/button-group/index.js` 比較接近單元件入口；`src/components/index.js` 則是集中匯出所有元件；`src/index.js` 則通常負責整個 library 的安裝流程。
 
-原始筆記也提到 `src/index.js` 提供 `iButton` alias。這代表在閱讀元件註冊流程時，除了標準元件名稱，也要注意是否存在相容舊命名、避免原生命名衝突或維持歷史 API 的 alias。
+`src/index.js` 提供 `iButton` alias。這代表在閱讀元件註冊流程時，除了標準元件名稱，也要注意是否存在相容舊命名、避免原生命名衝突或維持歷史 API 的 alias。
 
-> 注意：本章只根據原始筆記指出 `iButton` alias 的存在，不進一步推測它的歷史原因。若要確認 alias 的完整設計背景，需要補讀 `src/index.js` 與相關 release / migration 資料。
+> 注意：本章不進一步推測 `iButton` alias 存在的歷史原因。若要確認 alias 的完整設計背景，需要補讀 `src/index.js` 與相關 release / migration 資料。
 
 ---
 
@@ -389,7 +373,7 @@ test 是「哪些行為不能壞」。它通常不會涵蓋所有情境，但被
 
 ### 10.1 Example：用官方範例反推主線能力
 
-原始筆記指出，`examples/routers/button.vue` 展示了以下組合：
+`examples/routers/button.vue` 展示了以下組合：
 
 - `type`
 - `disabled`
@@ -415,7 +399,7 @@ test 是「哪些行為不能壞」。它通常不會涵蓋所有情境，但被
 
 ### 10.2 Test：確認被保護的核心行為
 
-原始筆記指出，`test/unit/specs/button.spec.js` 主要驗證以下行為：
+`test/unit/specs/button.spec.js` 主要驗證以下行為：
 
 | 測試情境 | 驗證重點 | 對閱讀者的意義 |
 | --- | --- | --- |

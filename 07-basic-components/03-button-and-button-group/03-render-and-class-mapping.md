@@ -1,49 +1,5 @@
 # Button Render And Class Mapping：從 props 到 DOM 輸出
 
-## 0. 原始筆記問題分析
-
-這份原始筆記屬於 **原始碼閱讀筆記**，更精確地說，是針對 `Button` 元件 runtime render 邏輯的 source reading note。它的主題不是介紹 `Button` 有哪些 props，也不是說明樣式細節，而是要回答一個更底層的問題：
-
-> 使用者在 template 裡寫下 `<Button>` 之後，`button.vue` 如何根據 props、slot 與 computed，最後產生真正的 DOM 輸出？
-
-原始筆記已經抓到非常重要的閱讀方向：`Button` 並不是以一般 template 寫成，而是使用 render function；因此閱讀時不能只用「看 HTML 結構」的方式理解，而要把 render function 拆成幾條資料轉換線來看。
-
-不過，原始筆記仍有幾個可以補強的地方。
-
-### 0.1 原始筆記目前已經做得好的地方
-
-原始筆記已經明確指出，`Button` 的 render 邏輯可以拆成三條主線：
-
-```txt
-to / htmlType
-  -> tagName / tagProps
-
-loading / icon / customIcon / slot
-  -> children
-
-type / size / shape / long / loading / icon-only / ghost
-  -> classes
-```
-
-這個拆法很適合初次閱讀 `Button` 原始碼的人，因為它避免一開始就陷入 render function 的細節，而是先建立「輸入如何轉成輸出」的整體地圖。
-
-### 0.2 需要補強的地方
-
-原始筆記雖然已經列出 `tag`、`tagProps`、`children`、`classes` 的規則，但如果要作為長期複習用的教材型筆記，仍需要補上以下內容：
-
-| 需要補強的面向 | 原因 |
-| --- | --- |
-| render function 的閱讀方式 | 初學者可能熟悉 template，但不一定熟悉 `h()` 與 vnode 組裝方式。 |
-| `Button` 為什麼有時輸出 `<button>`、有時輸出 `<a>` | 這是操作按鈕與連結按鈕共用同一套 API 的核心設計。 |
-| `htmlType` 與 `type` 的區別 | `type` 是 View UI Plus 的按鈕類型；`htmlType` 才是原生 `<button type="...">`。 |
-| loading、icon、customIcon、slot 的優先順序 | 這會直接影響實際 DOM children 與視覺狀態。 |
-| `ivu-btn-default` 的語意 | 它是 `type="default"` 產生的 class，不是 `size="default"` 產生的 class。 |
-| `ButtonGroup` 在本章中的位置 | 這份原始筆記主要討論 `Button` render，`ButtonGroup` 只適合在本章作補充定位，完整 group 樣式仍需回到 style 筆記。 |
-
-因此，本章會保留原始筆記的核心判斷，並把它改寫成更適合長期學習的教材型筆記。
-
----
-
 ## 1. 本章定位
 
 本章專門分析 `src/components/button/button.vue` 中的 **render output mapping**，也就是 `Button` 如何把 props、slot 與 computed 結果轉成 DOM。
@@ -117,7 +73,7 @@ return h(tag, {
 
 `Button` 的 render function 最後會呼叫 `h()` 建立 vnode。對於熟悉 Vue template 的人來說，可以把它理解成「用 JavaScript 寫 template」。
 
-原始筆記整理出的核心結構如下：
+整理出的核心結構如下：
 
 ```js
 return h(tag, {
@@ -164,7 +120,7 @@ disabled: this.itemDisabled
 
 `Button` 的第一個重要 render 決策是：最後要輸出哪一種原生標籤。
 
-原始筆記指出，`Button` 會透過 `isHrefPattern` 判斷是否進入 link button 模式：
+`Button` 會透過 `isHrefPattern` 判斷是否進入 link button 模式：
 
 ```js
 isHrefPattern () {
@@ -216,7 +172,7 @@ isHrefPattern () {
 
 決定 tag 之後，下一步是決定該 tag 應該帶哪些 attributes。
 
-原始筆記整理出的 `tagProps` 邏輯如下：
+整理出的 `tagProps` 邏輯如下：
 
 ```js
 if (isHrefPattern) {
@@ -304,7 +260,7 @@ html-type="submit"
 </a>
 ```
 
-原始筆記也指出，`button.spec.js` 有測試這個差異：當 `Button` 是 `<button>` 時，`htmlType="reset"` 會輸出 `type="reset"`；當它因 `to` 變成 `<a>` 時，就不應該輸出原生 `type` attribute。
+`button.spec.js` 有測試這個差異：當 `Button` 是 `<button>` 時，`htmlType="reset"` 會輸出 `type="reset"`；當它因 `to` 變成 `<a>` 時，就不應該輸出原生 `type` attribute。
 
 ---
 
@@ -403,7 +359,7 @@ h('span', {
 </button>
 ```
 
-這層 `span` 很重要，因為樣式可以利用它處理 icon 與文字之間的距離，例如原始筆記提到的 less 規則：
+這層 `span` 很重要，因為樣式可以利用它處理 icon 與文字之間的距離，例如 less 規則：
 
 ```less
 & > .ivu-icon + span,
@@ -418,7 +374,7 @@ h('span', {
 
 ## 7. Class 映射規則：props 如何變成 `ivu-btn-*`
 
-`Button` 的 class 由 `classes` computed 統一產生。原始筆記整理出的結構如下：
+`Button` 的 class 由 `classes` computed 統一產生。整理出的結構如下：
 
 ```js
 [
@@ -781,7 +737,7 @@ default slot
 
 ### 8.6 ButtonGroup 在本章中的補充定位
 
-雖然本系列主題是 `Button` 與 `ButtonGroup`，但這份原始筆記主要聚焦在 `Button` 的 render mapping。`ButtonGroup` 在本章只適合做簡短補充。
+雖然本系列主題是 `Button` 與 `ButtonGroup`，但這份主要聚焦在 `Button` 的 render mapping。`ButtonGroup` 在本章只適合做簡短補充。
 
 從前面的 source map 可知，`ButtonGroup` 的 runtime 結構相對薄，主要是輸出一個包住子按鈕的 wrapper，並根據自身 props 產生 group class。它不像 `Button` 一樣有複雜的 tag 分流、children 組裝或 link 行為。
 
@@ -797,8 +753,6 @@ ButtonGroup 的重點不在複雜 render children，
 - `button-group.vue`：確認 wrapper 與 group class。
 - `button.less`：確認 group class 如何影響子按鈕邊框、圓角、排列方向。
 - `styles/mixins/button.less`：確認橫向與縱向 group 的 mixin 規則。
-
-此處原始筆記沒有提供完整 `ButtonGroup` class computed 程式碼，因此本章不主動編造細節，僅保留它在 render mapping 脈絡中的位置。
 
 ---
 

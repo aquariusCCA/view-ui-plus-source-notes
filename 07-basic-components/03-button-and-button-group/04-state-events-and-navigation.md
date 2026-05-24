@@ -1,23 +1,5 @@
 # Button State Events And Navigation：loading、disabled、click 與跳轉流程
 
-## 0. 原始筆記問題分析
-
-這份原始筆記的主題是 `View UI Plus` 中 `Button` 的互動行為，重點放在 `loading`、`disabled`、`click` 與 link navigation。原始內容已經抓到正確方向：`Button` 的互動邏輯不是單純由 `button.vue` 一個檔案完成，而是由 component runtime、`mixins/link.js`、`mixins/form.js` 與樣式系統共同組成。
-
-不過，若把這些資訊只當成零散重點來記，初學者很容易遇到幾個問題。
-
-第一，會把 `loading` 和 `disabled` 混在一起。兩者都會讓按鈕看起來「不可操作」，但它們的來源、語意與實作方式不同。`loading` 主要是一種「正在處理中」的狀態，會影響 class、icon 與樣式層的 pointer 行為；`disabled` 則是「不可使用」的狀態，還會受到上層 `Form` 的 disabled 狀態影響。
-
-第二，會忽略 click handler 的執行順序。`Button` 點擊時不是只 `$emit('click')`，也不是只處理跳轉，而是先 emit click，再把 link navigation 交給 `mixins/link.js`。這個順序會影響使用者在 link button 上監聽 click 時的理解。
-
-第三，會低估 `mixins/link.js` 的重要性。只看 `button.vue`，會看到 `handleCheckClick()`、`linkUrl`、`to`、`target` 等名稱，但這些能力實際上來自 link mixin。若沒有追到 mixin，就無法完整理解 `Button` 為什麼可以同時扮演原生按鈕與連結按鈕。
-
-第四，會把 `<button disabled>` 和 `<a disabled>` 視為完全相同。這在 HTML 語意上是不精準的。`<button>` 有原生 disabled 行為，但 `<a>` 並沒有標準的 disabled 屬性語意，因此 link button 的 disabled 行為需要特別分開看。
-
-因此，本章會把原始筆記重構成一份「互動流程型」筆記：先建立整體地圖，再分別解析 loading、disabled、click、navigation，最後用流程表與情境範例把它們串回完整使用場景。
-
----
-
 ## 1. 本章定位
 
 本章是一篇 `Button` / `ButtonGroup` 系列中的「狀態與事件流程」筆記，專門分析 `Button` 在互動時如何處理狀態、事件與跳轉。
@@ -186,13 +168,11 @@ loading 為 true
   -> 文字仍然可以保留
 ```
 
-這也是為什麼原始筆記會特別指出「loading 會壓過普通 icon」。
-
 ---
 
 ### 4.4 loading 對樣式與互動的影響
 
-原始筆記指出 `button.less` 中 loading 相關樣式大致如下：
+`button.less` 中 loading 相關樣式大致如下：
 
 ```less
 &&-loading {
@@ -221,7 +201,7 @@ loading 為 true
 
 ### 4.5 loading 與測試的關係
 
-原始筆記指出 `button.spec.js` 有驗證 loading 行為：click 後外部把 `loading` 改成 true，下一個 tick 中應該出現 `ivu-btn-loading`，並且只渲染一個 `ios-loading` icon。
+`button.spec.js` 有驗證 loading 行為：click 後外部把 `loading` 改成 true，下一個 tick 中應該出現 `ivu-btn-loading`，並且只渲染一個 `ios-loading` icon。
 
 這代表測試保護的是「外部狀態變化後，Button render 是否正確反映 loading」。
 
@@ -255,7 +235,7 @@ this.disabled
 disabled: this.itemDisabled
 ```
 
-`itemDisabled` 來自 `mixins/form.js`。原始筆記整理的邏輯如下：
+`itemDisabled` 來自 `mixins/form.js`。整理的邏輯如下：
 
 ```js
 itemDisabled () {
@@ -313,7 +293,7 @@ itemDisabled () {
 
 但對 `<a>` 來說，`disabled` 不是標準 anchor 禁用能力。即使 View UI Plus 把 disabled 相關 class 或 attribute 套到 `<a class="ivu-btn">` 上，也不能把它完全等同於原生 `<button disabled>`。
 
-原始筆記也指出：runtime click handler 本身沒有額外寫：
+runtime click handler 本身沒有額外寫：
 
 ```js
 if (this.itemDisabled) return;
@@ -384,8 +364,6 @@ DOM click
 | `target="_blank"` | 仍然會先 emit click。 |
 
 這讓使用者可以做統計、埋點、表單檢查或其他業務邏輯。
-
-不過，原始筆記沒有提供外部 click handler 是否能阻止後續 navigation 的完整細節，因此這裡不要推論成「使用者一定可以透過 emit handler 阻止跳轉」。能否阻止，仍要看外部對原生 event 的操作，以及 `handleCheckClick()` 後續如何使用該 event。
 
 ---
 
@@ -475,7 +453,7 @@ to
 
 ### 8.2 linkUrl 的判斷規則
 
-原始筆記整理的規則如下：
+整理的規則如下：
 
 ```txt
 to 不是 string
@@ -508,7 +486,7 @@ to 是 absolute URL，包含 //
 </Button>
 ```
 
-原始筆記指出，對非 string `to` 來說，`linkUrl` 可能是 `null`。這不代表它不能跳轉，而是 render 階段不一定直接生成 href；實際 navigation 會在 click 時交給 router 相關邏輯處理。
+對非 string `to` 來說，`linkUrl` 可能是 `null`。這不代表它不能跳轉，而是 render 階段不一定直接生成 href；實際 navigation 會在 click 時交給 router 相關邏輯處理。
 
 ---
 
@@ -516,7 +494,7 @@ to 是 absolute URL，包含 //
 
 ### 9.1 核心流程
 
-原始筆記將 `handleCheckClick()` 的核心流程整理成：
+`handleCheckClick()` 的核心流程整理成：
 
 ```txt
 如果沒有 to
@@ -562,7 +540,7 @@ to 是 absolute URL，包含 //
 
 `handleClick(new_window)` 來自 `mixins/link.js`，負責實際執行跳轉。
 
-原始筆記整理的分支如下：
+整理的分支如下：
 
 | 條件 | 行為 |
 | --- | --- |
@@ -606,7 +584,7 @@ to 是 absolute URL，包含 //
 
 ### 10.3 absolute URL 與內部路由的差異
 
-原始筆記提到，如果有 router 且 `to` 是 absolute URL，會使用：
+如果有 router 且 `to` 是 absolute URL，會使用：
 
 ```js
 window.location.href = this.to
@@ -630,7 +608,7 @@ window.location.href = this.to
 
 ### 11.1 兩種新視窗入口
 
-原始筆記指出，有兩種情境會走新視窗邏輯。
+有兩種情境會走新視窗邏輯。
 
 第一種是明確設定 `target="_blank"`：
 
@@ -782,7 +760,7 @@ Button 自己 disabled 不是 true
 
 ## 13. 官方測試對應
 
-原始筆記指出，`button.spec.js` 和本章有關的測試主要保護以下行為。
+`button.spec.js` 和本章有關的測試主要保護以下行為。
 
 | 測試 | 對應理解 |
 | --- | --- |
@@ -793,7 +771,7 @@ Button 自己 disabled 不是 true
 
 這些測試覆蓋了 `Button` 最核心、最容易壞掉的行為：tag 切換、原生 type attribute、loading render。
 
-不過，原始筆記也提醒：測試沒有完整覆蓋所有 navigation 分支，例如：
+不過，測試沒有完整覆蓋所有 navigation 分支，例如：
 
 - route object。
 - `target="_blank"`。
@@ -814,7 +792,7 @@ Button 自己 disabled 不是 true
 | `Button` click 只負責 `$emit` | click 會先 emit，再交給 link mixin 檢查 navigation。 |
 | 有 `to` 時仍然是 `<button>` | 有 `to` 時會渲染成 `<a>`。 |
 | `htmlType` 對 link button 也有效 | `htmlType` 只在非 link button 時輸出成原生 `type` attribute。 |
-| route object 一定會直接生成 href | 原始筆記指出非 string `to` 的 `linkUrl` 可能是 `null`，click 時再走 router。 |
+| route object 一定會直接生成 href | 非 string `to` 的 `linkUrl` 可能是 `null`，click 時再走 router。 |
 | `target="_blank"` 和 Ctrl / Cmd click 是兩套完全無關的邏輯 | 兩者最後都可能導向 `handleOpenTo()`。 |
 | `replace` 對所有跳轉方式都有效 | `replace` 主要影響 router navigation 的 `replace()` / `push()` 選擇。 |
 | `<a disabled>` 等同 `<button disabled>` | `<a>` 沒有標準 disabled 語意，不能完全等同。 |
@@ -924,11 +902,11 @@ Button 自己 disabled 不是 true
 
 ### 18.3 `Button` 的可及性檢查
 
-本章只依照原始筆記描述 runtime 與樣式行為，尚未完整檢查 accessibility。後續可以針對 link button、disabled anchor、loading 狀態是否需要 `aria-disabled`、`aria-busy` 等方向做專門分析。
+後續可以針對 link button、disabled anchor、loading 狀態是否需要 `aria-disabled`、`aria-busy` 等方向做專門分析。
 
 ### 18.4 Router navigation 測試補強
 
-原始筆記指出現有測試沒有完整覆蓋 route object、`target="_blank"`、Ctrl / Cmd click 等分支。後續可以練習為這些情境補 unit tests，將閱讀原始碼轉化為測試設計能力。
+現有測試沒有完整覆蓋 route object、`target="_blank"`、Ctrl / Cmd click 等分支。後續可以練習為這些情境補 unit tests，將閱讀原始碼轉化為測試設計能力。
 
 ### 18.5 與其他元件的互動模式比較
 
