@@ -1,43 +1,5 @@
 # Avatar / AvatarList 原始碼閱讀總覽：從單一頭像到列表聚合
 
-## 0. 原始筆記問題分析
-
-原始 `README.md` 已經具備很好的目錄導讀作用：它清楚指出本目錄聚焦 `View UI Plus` 的 `Avatar` 與 `AvatarList`，並且已經列出 runtime、style、type declaration、example、registry 與 install 等閱讀入口。原始筆記也已經抓到這組元件最容易誤判的幾個重點：圖片錯誤不會自動 fallback、`Avatar` runtime 支援數字尺寸、`AvatarList` 的 `.d.ts` 和 runtime props 不一致。
-
-不過，作為一份可以長期維護的教材型 README，它還可以再補強幾個方向。
-
-第一，原始筆記比較像「閱讀索引」，但還沒有把 `Avatar` 與 `AvatarList` 在元件系統中的角色講成完整心智模型。讀者知道要看哪些檔案，但未必能先理解為什麼要照這個順序看。
-
-第二，原始筆記已經列出兩條轉換鏈：
-
-```txt
-props / default slot
-  -> src / icon / text branch
-  -> class / inline size style
-  -> image error emit
-  -> text width measurement and scale
-```
-
-以及：
-
-```txt
-list / max / tooltip / slots
-  -> currentList slice
-  -> Avatar + optional Tooltip
-  -> extra / excess avatar
-  -> avatar-list.less overlap layout
-```
-
-但這兩條鏈還可以補成更明確的「閱讀主線」，讓讀者知道哪些細節屬於單一頭像，哪些細節屬於列表聚合。
-
-第三，原始筆記已經有 `Notes Index`，但可以再補上「初次閱讀路線」、「深入閱讀路線」與「可暫時跳過的內容」，讓讀者在讀原始碼時不會一開始就陷入所有細節。
-
-第四，原始筆記有列出自我檢查題，但題目還可以拆成概念理解、流程理解、原始碼閱讀與實務應用，讓複習效果更好。
-
-第五，原始筆記沒有提供實際原始碼行號或完整 source 片段。因此，本篇會保留原本整理出的檔案與行為關係，但不會編造未提供的原始碼細節；若要做逐行導讀，仍需要後續補充對應 source 片段或行號。
-
----
-
 ## 1. 本章定位
 
 本章是 `Avatar / AvatarList` 筆記包的總覽導讀，也是整組原始碼閱讀的入口 README。
@@ -188,7 +150,7 @@ list / max / tooltip / slots
 
 ### 4.1 先讀 source baseline，建立檔案地圖
 
-原始筆記以本地保存的 `View UI Plus v1.3.20` 原始碼作為閱讀基準。這一點很重要，因為元件庫版本不同時，runtime props、Less token、type declaration 或 example 都可能變動。
+`View UI Plus v1.3.20` 原始碼作為閱讀基準。這一點很重要，因為元件庫版本不同時，runtime props、Less token、type declaration 或 example 都可能變動。
 
 本目錄的 source baseline 可以整理如下：
 

@@ -1,21 +1,5 @@
 # View UI Plus `Avatar`：尺寸、樣式與文字縮放原始碼閱讀筆記
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經掌握了 `Avatar` 視覺系統的核心：`size` 並不是單純轉成一個 CSS class，而是同時牽涉 `classes`、`styles`、`childrenStyle`、`setScale()`、生命週期與 `avatar.less`。也就是說，`Avatar` 的尺寸與樣式不是只靠 CSS，也不是只靠 JavaScript，而是由 runtime 與 Less 樣式共同完成。
-
-原始筆記中最有價值的觀察，是把尺寸行為拆成三條路徑：
-
-1. `small`、`default`、`large` 這類預設尺寸，走 class 與 `avatar.less`。
-2. 數字尺寸或非預設尺寸，走 runtime inline style。
-3. default slot 文字頭像，需要在 DOM 渲染後測量寬度，再決定是否縮放。
-
-這三條路徑如果沒有先拆開，很容易誤解為「`size` 只是 class 名稱」或「文字縮放是純 CSS 完成」。實際上，`Avatar` 這個元件很適合用來學習元件庫中的典型設計：**穩定規格交給 CSS token 與 Less mixin，動態輸入與 DOM 測量交給 runtime computed style 與 lifecycle**。
-
-本次重構會將原始筆記整理成一篇教材型 source reading 筆記。重點不是背 API，而是理解 `Avatar` 的視覺系統如何從 props、computed、template、Less、DOM measurement 串起來。
-
----
-
 ## 1. 本章定位
 
 本章是一篇「原始碼閱讀 + 視覺系統分析」筆記，主題是 `View UI Plus` 的 `Avatar` 元件如何處理尺寸、形狀、圖片、icon 與文字縮放。
@@ -366,7 +350,7 @@ setScale () {
 }
 ```
 
-這裡的 `avatarWidth - 8` 代表保留左右空間。原始筆記指出 source 註解有提到左右各保留 `4px`，避免文字貼邊。
+這裡的 `avatarWidth - 8` 代表保留左右空間。source 註解有提到左右各保留 `4px`，避免文字貼邊。
 
 整理成公式：
 

@@ -1,21 +1,5 @@
 # Avatar Public Contract And Content Priority：從 Props 到內容分支
 
-## 0. 原始筆記問題分析
-
-這份原始筆記的主題已經相當明確：它想整理 `Avatar` 元件的 public contract，也就是使用者可以透過哪些 props、slot 與事件來控制頭像內容。原始筆記也已經抓到這個元件最重要的閱讀重點：`src`、`icon`、`customIcon` 與 default slot 並不是平行顯示，而是依照 template branch 形成固定的內容優先序。
-
-不過，若要把這份筆記放進長期學習用的個人知識庫，還可以再補強幾個面向。
-
-第一，原始筆記雖然列出了 props 與 branch，但還需要更明確地建立「public contract」的閱讀框架。閱讀元件庫時，不能只看 `props` 表格，而要同時對照 runtime source、template、emit、type declaration 與官方 example。這樣才能知道某個 API 到底只是型別上存在，還是真正在 runtime 中被使用。
-
-第二，原始筆記提到圖片錯誤不會自動 fallback，但這個觀念值得獨立強化。因為很多使用者看到 `src + icon + slot` 會直覺以為它們形成一套「圖片失敗後改用 icon，再失敗後改用文字」的降級鏈。但從目前筆記摘錄的 template 與 `handleError()` 來看，`Avatar` 只是根據初始輸入選擇渲染分支，圖片錯誤時只 emit `on-error`，不負責改變內容來源。
-
-第三，原始筆記已經指出 `size` 的 runtime contract 和 `.d.ts` 存在落差，但還可以補上「這種落差對使用者與元件庫維護者各自代表什麼」。對使用者來說，這會影響 TypeScript 使用體驗；對元件庫維護者來說，這是 runtime 行為和型別聲明需要同步維護的例子。
-
-第四，原始筆記目前偏向 source note，已經很精準，但還可以進一步改寫成教學型章節：先說明 `Avatar` 是什麼，再建立 public contract 的閱讀方法，最後把 template branch、事件邊界、class 狀態與型別落差串成一個完整心智模型。
-
----
-
 ## 1. 本章定位
 
 本章是一篇 `View UI Plus` 的 `Avatar` 元件 public contract 閱讀筆記，重點是理解「使用者傳入的 props / slot / event 如何對應到元件內部的渲染分支與行為邊界」。
@@ -134,7 +118,7 @@ runtime props
 
 ### 4.1 Runtime props：`Avatar` 對外接收什麼？
 
-根據原始筆記整理，`avatar.vue` 自身宣告的 props 主要有五個：
+`avatar.vue` 自身宣告的 props 主要有五個：
 
 | Runtime prop | Runtime 限制 / default | Type declaration | 閱讀重點 |
 | --- | --- | --- | --- |
@@ -175,7 +159,7 @@ default slot 雖然不是 prop，但它也是內容來源之一。不過 slot �
 
 ### 4.3 Template branch：三段互斥內容分支
 
-原始筆記摘錄的 template 如下：
+template 如下：
 
 ```vue
 <span :class="classes" :style="styles">
@@ -247,7 +231,7 @@ handleError (e) {
 
 ### 4.6 官方 example 展示的控制邊界
 
-原始筆記整理到官方 example 的錯誤處理模式：
+官方 example 的錯誤處理模式：
 
 ```vue
 <Avatar :src="src" size="large" @on-error="handleError" />
@@ -309,7 +293,7 @@ Icon component
 
 ### 4.8 Class 與內容狀態：branch 決定內容，class 決定樣式語意
 
-原始筆記整理到 `classes` computed 大致產生以下 class：
+`classes` computed 大致產生以下 class：
 
 ```js
 [
@@ -348,7 +332,7 @@ class computed 回答的是：
 
 ### 4.9 Type declaration 落差：`size` 是最值得記錄的地方
 
-原始筆記指出 `types/avatar.d.ts` 對 `Avatar` 的描述大致完整，但 `size` 有重要落差。
+`types/avatar.d.ts` 對 `Avatar` 的描述大致完整，但 `size` 有重要落差。
 
 runtime 中 `size` 支援 `String` 或 `Number`：
 

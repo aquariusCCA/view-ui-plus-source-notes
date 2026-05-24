@@ -1,23 +1,5 @@
 # View UI Plus `Avatar` / `AvatarList` 原始碼閱讀筆記：從單一展示元件到列表聚合元件
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經不是完全零散的紀錄，它已經抓到 `Avatar` / `AvatarList` 這組元件的核心閱讀入口，例如 runtime、style、type、example、registry、install 與 consumer。也就是說，原始筆記已經具備 source map 的雛形，適合作為後續深入閱讀原始碼的第一張地圖。
-
-不過，如果要把它放進長期知識庫，原始筆記還可以再補強幾個地方。
-
-第一，原始筆記雖然列出很多檔案路徑，但還需要更明確說明「為什麼要分成這些層」：runtime 決定元件行為，style 決定視覺呈現，type declaration 描述對外型別，example 驗證使用方式，registry / install 決定元件如何被框架整體註冊。這些檔案不是平行的清單，而是一個元件庫元件從內部實作走到外部使用的完整鏈路。
-
-第二，原始筆記已經指出 `Avatar` 與 `AvatarList` 的責任分工，但還可以補成更清楚的心智模型：`Avatar` 是單一展示原子，負責「一個頭像怎麼顯示」；`AvatarList` 是列表聚合元件，負責「一組頭像怎麼排列、裁切、提示與補充」。如果沒有先建立這個分層，讀者很容易把兩個元件混在一起看，導致不知道哪些行為應該在 `Avatar` 找，哪些行為應該在 `AvatarList` 找。
-
-第三，原始筆記提到 `.d.ts` 與 runtime 有落差，這是非常重要的元件庫閱讀觀念。這部分應該被拉高成一個獨立觀念：在閱讀 UI library 時，型別檔只能代表「作者對外宣告的 TypeScript contract」，不一定等於實際 runtime 行為。尤其在舊版、歷史包袱較多或型別後補的元件庫中，`.d.ts` 可能落後於實作。
-
-第四，原始筆記已有閱讀順序，但還可以拆成「第一次閱讀路線」與「深入閱讀路線」。第一次閱讀應先建立 API 與行為印象，深入閱讀再追 computed、樣式、slot、事件、型別落差與 consumer。
-
-第五，目前筆記尚未提供 `avatar.vue`、`avatar-list.vue`、`.less` 與 `.d.ts` 的完整原始碼內容，因此本章可以建立閱讀地圖與責任模型，但不應假裝已經逐行分析所有 computed、watcher、CSS selector 或型別細節。這些部分會在後續獨立筆記中補上。
-
----
-
 ## 1. 本章定位
 
 本章是一篇 **View UI Plus `Avatar` / `AvatarList` 原始碼閱讀地圖**，目的不是直接完成逐行源碼解析，而是先幫你建立「閱讀這組元件時應該怎麼切入」的整體框架。
@@ -65,7 +47,7 @@
 
 `avatar.vue` 與 `avatar-list.vue` 是 runtime source，也就是元件在瀏覽器執行時真正會採用的行為。`types/avatar.d.ts` 與 `types/avatar-list.d.ts` 則是 TypeScript 型別宣告，用來描述外部使用者在編譯階段看到的 props、事件與元件型別。
 
-理想情況下，runtime 與 `.d.ts` 應該一致。但原始筆記已經指出，這組元件存在明顯落差：`Avatar` 的 runtime `size` 支援 `String | Number`，example 也展示數字尺寸，但 `types/avatar.d.ts` 只寫了 `'large' | 'small' | 'default'`；`AvatarList` 的 `.d.ts` 更像是複製了 `Avatar` 的部分 props，沒有完整反映 runtime props。
+理想情況下，runtime 與 `.d.ts` 應該一致。這組元件存在明顯落差：`Avatar` 的 runtime `size` 支援 `String | Number`，example 也展示數字尺寸，但 `types/avatar.d.ts` 只寫了 `'large' | 'small' | 'default'`；`AvatarList` 的 `.d.ts` 更像是複製了 `Avatar` 的部分 props，沒有完整反映 runtime props。
 
 所以這裡要建立一個重要習慣：
 
@@ -137,7 +119,7 @@
 
 `avatar.vue` 是 `Avatar` 的核心。從元件庫作者的角度來看，`Avatar` 的設計目標是提供一個簡單、可複用、可組合的「單一頭像展示元件」。它不應該知道自己被放在通知、列表、使用者卡片或其他業務場景中；它只需要專心處理一顆頭像如何顯示。
 
-原始筆記中列出的 public props 是：
+public props 是：
 
 ```txt
 shape / size / src / icon / customIcon
@@ -180,13 +162,13 @@ shape / size / src / icon / customIcon
 - 有限枚舉值交給 class，方便主題樣式統一管理。
 - 動態數值交給 inline style，因為 CSS class 不可能預先覆蓋所有尺寸。
 
-`childrenStyle` 與 `setScale()` 則處理另一個細節：文字頭像可能太長。如果頭像裡放的是一個字，通常不需要縮放；但如果 slot 文字寬度超過 avatar 容器，元件就需要讀取 DOM 寬度並計算縮放比例。原始筆記指出 `setScale()` 會讀取 slot 文字寬度與 avatar 寬度，必要時縮放文字。
+`childrenStyle` 與 `setScale()` 則處理另一個細節：文字頭像可能太長。如果頭像裡放的是一個字，通常不需要縮放；但如果 slot 文字寬度超過 avatar 容器，元件就需要讀取 DOM 寬度並計算縮放比例。`setScale()` 會讀取 slot 文字寬度與 avatar 寬度，必要時縮放文字。
 
 這也是為什麼 `Avatar` 會在 `mounted()`、`updated()` 與 `size` watcher 中重新計算。因為文字寬度與容器寬度都不是純資料層能完全知道的事情，它們依賴實際 DOM 渲染結果。
 
 ### 4.3 `Avatar` 的圖片錯誤事件
 
-`Avatar` 還負責圖片載入錯誤事件。原始筆記中記錄 `handleError()` 會在圖片載入失敗時 emit `on-error`。
+`Avatar` 還負責圖片載入錯誤事件。`handleError()` 會在圖片載入失敗時 emit `on-error`。
 
 這個設計代表 `Avatar` 不直接決定圖片失敗後要改成什麼內容，而是把錯誤事件交給外部使用者。這是元件庫常見的責任邊界：基礎元件提供事件，讓使用者或上層元件決定後續策略。
 
@@ -196,7 +178,7 @@ shape / size / src / icon / customIcon
 
 `avatar-list.vue` 是 `AvatarList` 的核心。它與 `Avatar` 的關係不是繼承，也不是替代，而是組合。`AvatarList` 根據 `list` 產生多個 `Avatar`，並在外層加上列表場景需要的控制邏輯。
 
-原始筆記中列出的 `AvatarList` props 是：
+`AvatarList` props 是：
 
 ```txt
 list / shape / size / excessStyle / max / tooltip / placement / transfer
@@ -215,7 +197,7 @@ list / shape / size / excessStyle / max / tooltip / placement / transfer
 
 ### 4.5 `currentList`、Tooltip 與子 `Avatar` 的組合關係
 
-原始筆記將 `AvatarList` 的渲染流程整理成以下形式：
+`AvatarList` 的渲染流程整理成以下形式：
 
 ```txt
 currentList
@@ -232,11 +214,11 @@ currentList
 
 第三層是 `Avatar` 與 `Tooltip` 的組合。如果 `tooltip` 開啟，而且該項目有 `item.tip`，就用 `Tooltip` 包住 `Avatar`；否則直接渲染 `Avatar`。
 
-原始筆記特別指出，每個列表項只會把 `item.src` 傳給子 `Avatar`，並把 `AvatarList` 自己的 `size`、`shape` 傳下去；`item.tip` 只用在 `Tooltip`。這個細節很重要，因為它說明 `AvatarList` 的 list item 資料格式並不是任意對應 `Avatar` 全部 props，而是目前筆記中觀察到的欄位用途比較集中：圖片來源給 `Avatar`，提示文字給 `Tooltip`。
+每個列表項只會把 `item.src` 傳給子 `Avatar`，並把 `AvatarList` 自己的 `size`、`shape` 傳下去；`item.tip` 只用在 `Tooltip`。這個細節很重要，因為它說明 `AvatarList` 的 list item 資料格式並不是任意對應 `Avatar` 全部 props，而是目前筆記中觀察到的欄位用途比較集中：圖片來源給 `Avatar`，提示文字給 `Tooltip`。
 
 ### 4.6 `extra` / `excess`：額外頭像與超出數量提示
 
-`AvatarList` 的第三個核心是額外頭像的規則。原始筆記將規則整理為：
+`AvatarList` 的第三個核心是額外頭像的規則。
 
 ```txt
 有 #extra
@@ -258,7 +240,7 @@ else if list.length > max
 | `extra` slot | 使用者提供 `#extra` | 自訂尾端內容 | 不依賴 |
 | `excess` avatar | 沒有 `#extra` 且 `list.length > max` | 超出數量提示 | 依賴 |
 
-閱讀這段時要特別避免一個誤解：不要把 `extra` 當成「超出數量提示的自訂內容」。從原始筆記的描述來看，`extra` 的優先序更高，而且不依賴是否超出 `max`。
+閱讀這段時要特別避免一個誤解：不要把 `extra` 當成「超出數量提示的自訂內容」。`extra` 的優先序更高，而且不依賴是否超出 `max`。
 
 ### 4.7 Style：單一頭像樣式與列表重疊樣式分開管理
 
@@ -291,7 +273,7 @@ else if list.length > max
 
 ### 4.8 Type 與 Public Export：對外合約與實際行為要交叉驗證
 
-`types/avatar.d.ts` 描述 `Avatar` 的 `shape`、`size`、`src`、`icon`、`custom-icon` 與 `onOnError`。不過原始筆記指出，這裡有一個明顯落差：runtime 的 `size` 是 `String | Number`，官方 example 也展示了 `size="64"` 與 `size="42"`，但 `.d.ts` 只寫：
+`types/avatar.d.ts` 描述 `Avatar` 的 `shape`、`size`、`src`、`icon`、`custom-icon` 與 `onOnError`。這裡有一個明顯落差：runtime 的 `size` 是 `String | Number`，官方 example 也展示了 `size="64"` 與 `size="42"`，但 `.d.ts` 只寫：
 
 ```txt
 size?: 'large' | 'small' | 'default'
@@ -299,7 +281,7 @@ size?: 'large' | 'small' | 'default'
 
 這表示如果 TypeScript 使用者依照型別檔，可能會以為 `size` 只能傳三種字串；但 runtime 與 example 卻顯示它還可以支援數字尺寸。這是一個典型的「型別宣告落後於 runtime 能力」案例。
 
-`types/avatar-list.d.ts` 的落差更大。根據原始筆記，runtime props 包含：
+`types/avatar-list.d.ts` 的落差更大。runtime props 包含：
 
 ```txt
 list / max / excessStyle / tooltip / placement / transfer
@@ -337,7 +319,7 @@ export { AvatarList } from './avatar-list'
 
 ### 4.9 Consumer：從使用者視角驗證 `Avatar` 的定位
 
-除了官方 example，原始筆記也指出可以看兩個直接 consumer：`NotificationItem` 與 `ListItemMeta`。
+除了官方 example，可以看兩個直接 consumer：`NotificationItem` 與 `ListItemMeta`。
 
 | Consumer | 位置 | 閱讀價值 |
 | --- | --- | --- |
@@ -512,8 +494,8 @@ consumer 的閱讀價值在於，它可以驗證元件在元件庫內部如何�
 | 只看 `avatar.vue`，以為已經理解整個 `Avatar` 元件。 | 單一 `.vue` 檔確實是 runtime 核心，但元件庫還包含 style、type、example、registry 與 install。 | 要把 runtime、style、type、example、consumer 與 export 鏈路一起看。 |
 | 把 `AvatarList` 當成 `Avatar` 的加強版。 | 兩者名稱相近，而且 `AvatarList` 內部會產生 `Avatar`。 | `Avatar` 是單一展示原子，`AvatarList` 是資料驅動的列表聚合元件。 |
 | 以為 `src`、`icon`、slot 可以同時顯示。 | 從 API 名稱看起來都像內容來源。 | template branch 是互斥的，優先序是 `src` > `icon/customIcon` > default slot。 |
-| 以為 `size` 只能是 `.d.ts` 寫的三種字串。 | TypeScript 使用者很容易把 `.d.ts` 當成唯一真相。 | 原始筆記指出 runtime 支援 `String | Number`，example 也展示數字尺寸，需以 runtime 與 example 交叉驗證。 |
-| 以為 `AvatarList` 的 `.d.ts` 是可靠 contract。 | 型別檔通常被視為 public API 來源。 | 原始筆記指出 `types/avatar-list.d.ts` 與 runtime props 有明顯落差，不能單獨依賴。 |
+| 以為 `size` 只能是 `.d.ts` 寫的三種字串。 | TypeScript 使用者很容易把 `.d.ts` 當成唯一真相。 | runtime 支援 `String | Number`，example 也展示數字尺寸，需以 runtime 與 example 交叉驗證。 |
+| 以為 `AvatarList` 的 `.d.ts` 是可靠 contract。 | 型別檔通常被視為 public API 來源。 | `types/avatar-list.d.ts` 與 runtime props 有明顯落差，不能單獨依賴。 |
 | 以為 `extra` 是超出數量提示的自訂版本。 | `extra` 與 excess 都出現在列表尾端，視覺位置相近。 | `extra` 優先序高於 excess，且不依賴是否超出 `max`。 |
 | 一開始就研究 CSS 細節。 | 樣式檔看起來比較具體，容易直接鑽進去。 | 應先理解 runtime 產生哪些 class，再回頭看 Less 如何接住這些 class。 |
 
@@ -563,13 +545,3 @@ consumer 的閱讀價值在於，它可以驗證元件在元件庫內部如何�
 | 元件庫閱讀方法論 | 將本章方法抽象成適用於其他 View UI Plus 元件的閱讀流程。 | 通用學習指南。 |
 
 ---
-
-## 12. 品質檢查
-
-本次重構已依照教材型筆記方向處理，重點如下：
-
-- 已保留原始筆記中的核心資訊：runtime、style、type、example、registry、install、consumer、閱讀順序與型別落差。
-- 已將原本偏 source map 的內容補成段落式教學，說明「為什麼要這樣讀」與「這些檔案之間有什麼關係」。
-- 已針對多個檔案、API、模組與概念補充表格，方便後續回查。
-- 已明確標註本章不做逐行 source code 分析，避免假裝掌握未提供的完整原始碼細節。
-- 已加入情境流程、常見誤區、自我檢查問題與後續延伸方向，方便長期複習與拆分筆記。

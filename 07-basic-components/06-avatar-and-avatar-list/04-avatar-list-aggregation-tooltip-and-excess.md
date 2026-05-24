@@ -1,21 +1,5 @@
 # AvatarList Aggregation Tooltip And Excess：列表聚合、提示與超出項
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經抓到 `AvatarList` 的幾個關鍵閱讀點：它會根據 `list` 產生多個 `Avatar`、會依條件包裹 `Tooltip`、會根據 `max` 顯示超出數量，並且 `types/avatar-list.d.ts` 和 runtime source 存在明顯落差。
-
-不過，如果要把它整理成適合長期學習的教材型筆記，還需要進一步補強幾個層次。
-
-第一，原始筆記雖然列出了 props，但還可以更明確地說明 `AvatarList` 的元件定位。它不是「讓使用者放入任意 Avatar 子節點的容器」，而是「根據資料陣列主動產生頭像列表的聚合元件」。這個定位會影響我們如何理解 `list`、`currentList`、`Tooltip`、`extra`、`excess` 之間的關係。
-
-第二，`max`、`currentList`、`extra`、`excess` 的互動需要用流程來理解。若只看單一 computed 或單一 template branch，很容易誤以為 `extra` 只在超出 `max` 時才出現，或誤以為 `excess` 一定會出現在列表尾端。實際上，`extra` 的優先序高於 `excess`，而且只要使用者提供 `#extra` slot，它就會顯示。
-
-第三，`Tooltip` 的角色需要獨立說明。它不是 `AvatarList` 每個 item 的必然結構，而是由 `tooltip && item.tip` 共同決定的可選包裹層。這代表 DOM 結構會依資料與 prop 而變化。
-
-第四，`types/avatar-list.d.ts` 的落差不應只當成附註，而應該明確整理成「runtime contract 與 typed contract 不一致」的閱讀案例。對學習元件庫原始碼的人來說，這是一個很典型的提醒：閱讀元件行為不能只看 `.d.ts`，必須回到 `.vue` runtime source。
-
----
-
 ## 1. 本章定位
 
 本章是一篇 **`AvatarList` 原始碼閱讀筆記**，主題是分析 `AvatarList` 如何把資料陣列轉成一組重疊排列的頭像列表，並在必要時加入提示文字與超出數量顯示。
