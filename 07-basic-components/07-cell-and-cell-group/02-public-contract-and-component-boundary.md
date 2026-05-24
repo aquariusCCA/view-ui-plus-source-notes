@@ -1,23 +1,5 @@
 # View UI Plus Cell / CellGroup：Public Contract 與 Component Boundary 教材型筆記
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經掌握了 `Cell`、`CellItem`、`CellGroup` 三者的核心分工，也已經把 runtime props、link mixin props、slots、`.d.ts`、`provide / inject` 與 state boundary 都列出來。也就是說，它已經不是單純的路徑清單，而是一份有明確觀察重點的原始碼閱讀筆記。
-
-不過，如果要把它放進長期知識庫，仍然有幾個地方可以再加強。
-
-第一，原始筆記對「public contract」與「component boundary」的定義仍偏向結論式。它指出 `CellGroup` 是 public container、`Cell` 是 public item、`CellItem` 是 internal layout，但還可以再補充：為什麼元件庫需要區分 public component 與 internal component？為什麼這種邊界會影響使用者能不能依賴某個元件？
-
-第二，props、slots、event、type declaration 的關係雖然已經用表格列出，但仍需要建立一個更完整的心智模型。`Cell` 的對外能力不是只來自 `cell.vue`，而是由自身 props、mixin props、slot forwarding、group event 與 type declaration 一起組成。這是閱讀 Vue 元件庫原始碼時很重要的能力。
-
-第三，原始筆記已經指出 `disabled` 和 `selected` 只是視覺輸入，不負責內部狀態控制，但這個觀念很容易被初學者忽略。因此需要把它放到「狀態邊界」中更完整地說明：這類元件是 controlled by outside 的展示型 item，而不是內建 selection manager。
-
-第四，`Cell` 脫離 `CellGroup` 使用時的 inject 風險已經被指出，但需要進一步補成 runtime 假設：這代表元件作者預期 `Cell` 被放在 `CellGroup` 裡使用，而不是完全獨立的 standalone item。
-
-第五，原始筆記提到 `03-click-link-and-provide-inject-flow.md` 會深入 click 和 router navigation，因此本章應該嚴格控制邊界，不要過度展開 click 時序與 link 實作，避免和後續章節重複。
-
----
-
 ## 1. 本章定位
 
 本章是一篇 **public contract 與 component boundary 對照筆記**，目標是幫助你理解 `View UI Plus` 的 `Cell / CellGroup` 元件到底對外承諾了什麼，又把哪些細節藏在內部實作中。
@@ -228,7 +210,7 @@ mixins: [ mixinsLink, globalConfig ]
 
 ### 4.4 `Cell` Slots：props 是 fallback，slots 是自訂內容
 
-`Cell` 的 slots 大多會轉發給 `CellItem`。原始筆記整理得很清楚：default、`icon`、`label`、`extra` 會進入 `CellItem`，只有 `arrow` 留在 `Cell` 自己處理。
+`Cell` 的 slots 大多會轉發給 `CellItem`。default、`icon`、`label`、`extra` 會進入 `CellItem`，只有 `arrow` 留在 `Cell` 自己處理。
 
 | Slot | 對應 fallback prop | Runtime 位置 | 閱讀重點 |
 | --- | --- | --- | --- |
@@ -297,7 +279,7 @@ slot forwarding 的核心結構如下：
 
 1. 它只被 `Cell` 用來組織內部 DOM。
 2. 它沒有列入 public contract summary。
-3. 原始筆記指出它沒有在對外 export 中成為使用者可直接使用的元件。
+3. 它沒有在對外 export 中成為使用者可直接使用的元件。
 
 因此，學習原始碼時可以理解它；但實作專案時，不應該把它當成 View UI Plus 對外承諾的穩定 API。
 
@@ -336,7 +318,7 @@ handleClickItem (event, new_window) {
 
 第二，`CellItem` 不參與這個通訊。它只是展示結構，不 inject、不 emit、不知道 group 存在。
 
-原始筆記也指出：這裡沒有 fallback，也沒有 optional inject。也就是說，從 runtime 角度看，`Cell` 預期放在 `CellGroup` 之內。如果脫離 `CellGroup` 使用並觸發 click，就有 `this.CellGroupInstance.handleClick` 的風險。
+這裡沒有 fallback，也沒有 optional inject。也就是說，從 runtime 角度看，`Cell` 預期放在 `CellGroup` 之內。如果脫離 `CellGroup` 使用並觸發 click，就有 `this.CellGroupInstance.handleClick` 的風險。
 
 這個觀察非常重要，因為它提醒我們：元件是否能單獨使用，不能只看它是不是 public component，還要看 runtime 是否假設某個父層存在。
 
@@ -344,7 +326,7 @@ handleClickItem (event, new_window) {
 
 ### 4.7 State Boundary：`selected` 與 `disabled` 不是狀態管理
 
-`Cell` 有 `selected` 和 `disabled`，但這不代表它內建選取狀態或禁用行為。原始筆記指出這兩個 prop 的 runtime 行為如下：
+`Cell` 有 `selected` 和 `disabled`，但這不代表它內建選取狀態或禁用行為。這兩個 prop 的 runtime 行為如下：
 
 | Prop | Runtime 行為 | 不做的事 |
 | --- | --- | --- |
@@ -370,7 +352,7 @@ handleClickItem (event, new_window) {
 </CellGroup>
 ```
 
-如果使用者要做到 disabled 時完全不可點擊，也需要在外部 handler 中判斷，或確認實際 runtime 是否提供其他阻止機制。本章只根據原始筆記提供的資訊說明：`disabled` 在這裡主要是 class 與視覺狀態，不應被誤讀成完整行為封鎖。
+如果使用者要做到 disabled 時完全不可點擊，也需要在外部 handler 中判斷，或確認實際 runtime 是否提供其他阻止機制。`disabled` 在這裡主要是 class 與視覺狀態，不應被誤讀成完整行為封鎖。
 
 ---
 
@@ -383,7 +365,7 @@ handleClickItem (event, new_window) {
 - `CellGroup` 有哪些 listener。
 - 使用者在 TS / IDE 中能取得哪些提示。
 
-不過，type declaration 不一定百分之百精準描述 runtime 細節。原始筆記就指出：
+不過，type declaration 不一定百分之百精準描述 runtime 細節。
 
 ```txt
 CellGroup 的 .d.ts 使用 onOnClick?: (event?: any) => any
@@ -559,11 +541,11 @@ CellGroup 的 .d.ts 使用 onOnClick?: (event?: any) => any
 | --- | --- | --- |
 | 只看 `cell.vue` 的 props，就以為那是完整 API | 初學者常把 component 本身的 `props` 區塊等同於所有可用 props | `Cell` 還混入 `mixins/link.js`，所以 `to`、`replace`、`target`、`append` 也是 public props |
 | 以為 `CellItem` 可以直接拿來用 | 它是 `.vue` 檔案，而且有明確 template | 它是 internal layout，不是 public component，不應被使用者直接依賴 |
-| 以為 `disabled` 會阻止點擊 | 一般 UI 語意中 disabled 通常代表不可互動 | 原始筆記指出 runtime 只加 class，不阻止 click、emit 或 navigation |
+| 以為 `disabled` 會阻止點擊 | 一般 UI 語意中 disabled 通常代表不可互動 | runtime 只加 class，不阻止 click、emit 或 navigation |
 | 以為 `selected` 會自動管理選取狀態 | selected 看起來像 state | 它只加 class，不會在 click 後自動切換，也不通知 group |
 | 以為 slot 和 prop 會一起顯示 | prop 和 slot 都能描述同一區域內容 | 在這裡 prop 是 fallback，slot 會覆蓋對應顯示位置 |
 | 以為 `.d.ts` 一定精準描述 runtime payload | TypeScript declaration 看起來像正式 contract | `onOnClick?: (event?: any) => any` 沒有精準表達 runtime payload 是 `name`，仍要對照 source |
-| 以為 public component 一定能完全獨立使用 | `Cell` 有 public export，因此容易以為可 standalone | 原始筆記指出 click handler 期待 `CellGroupInstance`，脫離 `CellGroup` 使用會有風險 |
+| 以為 public component 一定能完全獨立使用 | `Cell` 有 public export，因此容易以為可 standalone | click handler 期待 `CellGroupInstance`，脫離 `CellGroup` 使用會有風險 |
 
 ---
 
@@ -592,7 +574,7 @@ CellGroup 的 .d.ts 使用 onOnClick?: (event?: any) => any
 7. `CellGroup` 的 `on-click` runtime payload 是什麼？`.d.ts` 是否精準描述了它？
 8. `selected` 在 runtime 中會做什麼？不會做什麼？
 9. `disabled` 在 runtime 中會做什麼？不會做什麼？
-10. 如果 `Cell` 脫離 `CellGroup` 使用並被點擊，根據原始筆記會有什麼風險？
+10. 如果 `Cell` 脫離 `CellGroup` 使用並被點擊，會有什麼風險？
 
 ---
 

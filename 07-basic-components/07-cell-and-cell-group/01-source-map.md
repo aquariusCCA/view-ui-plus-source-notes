@@ -1,23 +1,5 @@
 # View UI Plus Cell / CellGroup Source Map：閱讀入口、責任分工與心智模型
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經具備很好的 Source Map 雛形：它列出了 `cell.vue`、`cell-item.vue`、`cell-group.vue`、`cell.less`、`types/cell.d.ts`、example、component registry 與 plugin install 等來源，也已經指出 `Cell / CellGroup` 的完整行為不是單一檔案能看完，而是由 runtime、shared mixins、style、type declaration 與 example 共同組成。
-
-不過，若要把這份筆記變成適合長期學習的教材型筆記，還可以再補強幾個部分。
-
-第一，原始筆記偏向「已整理過的閱讀索引」，但還沒有充分說明為什麼要用這些檔案來建立元件理解。對第一次閱讀 View UI Plus 原始碼的人來說，只知道檔案路徑還不夠，還需要知道每個檔案位於元件生命週期中的哪一層：是對外 API、runtime 行為、內部排版、樣式、型別，還是全域註冊入口。
-
-第二，原始筆記已經指出 `Cell` 的行為分散在 `cell.vue`、`cell-item.vue`、`cell-group.vue`、`mixins/link.js`、`mixins/globalConfig.js`、`cell.less` 與 `.select-item()` mixin 中，但這些來源之間的「依賴關係」還可以說得更明確。尤其是 `CellGroup` 不是負責管理選取狀態，而是透過 `provide / inject` 建立父子通訊出口；`CellItem` 不是 public component，而是 `Cell` 的內部展示結構；`link.js` 與 `globalConfig.js` 則是讓 `Cell` 的 public contract 超出 `cell.vue` 本身的原因。
-
-第三，原始筆記已經有閱讀順序，但還可以拆成「初次閱讀路線」、「深入閱讀路線」與「可以暫時跳過的部分」。這樣讀者在第一次打開原始碼時，不會一開始就陷入 CSS selector、router navigation 或全域 install 細節。
-
-第四，原始筆記提到 `disabled` 在 example 中只改變 disabled class，沒有阻止 click 邏輯。這是一個重要的 runtime 邊界，但目前還缺少 `cell.vue` click handler 的完整逐行分析，因此本文會保留此結論，同時標註後續應該用獨立筆記確認實際點擊流程。
-
-因此，本次重構會把這份筆記整理成「教材型 Source Map」：先建立背景與心智模型，再逐步說明 `CellGroup`、`Cell`、`CellItem`、mixin、style、type 與 example 的責任分工，最後整理閱讀路線、常見誤區、自我檢查問題與後續延伸方向。
-
----
-
 ## 1. 本章定位
 
 本章是一篇 View UI Plus `Cell / CellGroup` 的原始碼閱讀地圖，也就是 Source Map 筆記。它的目標不是逐行分析每一段程式碼，而是先幫讀者建立一張完整的閱讀地圖：哪些檔案是入口、哪些檔案定義 runtime 行為、哪些檔案負責內部結構、哪些檔案補上樣式與型別契約，以及哪些範例可以作為使用情境的驗證來源。
@@ -72,7 +54,7 @@
 
 ### 2.4 `provide / inject` 是父子通訊的隱性通道
 
-`CellGroup` 與 `Cell` 之間不是靠顯式 prop 傳遞 click handler，而是透過 Vue 的 `provide / inject` 建立父子通訊。原始筆記指出 `CellGroup` 會 provide `CellGroupInstance`，讓子層 `Cell` 可以呼叫父層的 `handleClick(name)`，再由 `CellGroup` 對外 emit `on-click`。
+`CellGroup` 與 `Cell` 之間不是靠顯式 prop 傳遞 click handler，而是透過 Vue 的 `provide / inject` 建立父子通訊。`CellGroup` 會 provide `CellGroupInstance`，讓子層 `Cell` 可以呼叫父層的 `handleClick(name)`，再由 `CellGroup` 對外 emit `on-click`。
 
 這個設計代表 `CellGroup` 的主要責任不是控制每個 `Cell` 的 UI 狀態，而是提供一個 group-level event outlet。換句話說，`CellGroup` 是事件聚合者，不是狀態管理器。
 
@@ -174,13 +156,13 @@ methods: {
 
 第二層，`CellGroup` 提供 `handleClick(name)` 方法。當子項 `Cell` 被點擊時，可以把自己的 `name` 傳回父層，父層再對外 emit `on-click`。因此，使用者監聽的是 `CellGroup` 的 `on-click`，而不是每個 `Cell` 都自己對外 emit group-level event。
 
-這裡要特別注意：原始筆記指出 `CellGroup` 不負責改變子項 props，也不管理 selected 狀態。它的核心責任是把子項 click 聚合成 group event。這個觀念非常重要，因為它能幫你分清楚「事件回報」與「狀態管理」是兩件不同的事。
+這裡要特別注意：`CellGroup` 不負責改變子項 props，也不管理 selected 狀態。它的核心責任是把子項 click 聚合成 group event。這個觀念非常重要，因為它能幫你分清楚「事件回報」與「狀態管理」是兩件不同的事。
 
 ### 4.2 `Cell`：public item 的主要行為入口
 
 `Cell` 是使用者真正操作的列表項元件。它負責接收 public props / slots，決定自己是不是 link，決定是否顯示 arrow，並在點擊時同時處理 group click 與 navigation。
 
-原始筆記指出 `Cell` 同時混入：
+`Cell` 同時混入：
 
 ```js
 mixins: [ mixinsLink, globalConfig ]
@@ -214,7 +196,7 @@ mixins: [ mixinsLink, globalConfig ]
 
 ### 4.3 `CellItem`：只負責內部展示結構
 
-`CellItem` 是 `Cell` 的內部展示子元件。原始筆記指出它只宣告三個 props：
+`CellItem` 是 `Cell` 的內部展示子元件。它只宣告三個 props：
 
 ```text
 title / label / extra
@@ -244,21 +226,21 @@ title / label / extra
 
 對讀者來說，這裡的閱讀重點是：當你在 `cell.vue` 裡看到 `to` branch，不能只停留在 template。你還要打開 `mixins/link.js`，確認 `to` 的型別、`replace` 的作用、`target="_blank"` 的處理方式，以及是否支援 router、append、ctrl/meta click 等分支。
 
-本章不逐行分析 `mixins/link.js`，因為原始筆記只提供它的責任描述，沒有提供完整程式碼。後續可以獨立拆成「`Cell` link navigation 流程分析」筆記。
+本章不逐行分析 `mixins/link.js`，後續可以獨立拆成「`Cell` link navigation 流程分析」筆記。
 
 ### 4.5 `mixins/globalConfig.js` 與 `$VIEWUI.cell`：全域 arrow 設定來源
 
-原始筆記指出 `mixins/globalConfig.js` 會從 Vue app globalProperties 讀取 `$VIEWUI`，而 `src/index.js` 會建立 `$VIEWUI.cell` 的 arrow 預設設定。型別上，`types/index.d.ts` 也定義了 install options 裡的 `cell.arrow`、`cell.customArrow` 與 `cell.arrowSize`。
+`mixins/globalConfig.js` 會從 Vue app globalProperties 讀取 `$VIEWUI`，而 `src/index.js` 會建立 `$VIEWUI.cell` 的 arrow 預設設定。型別上，`types/index.d.ts` 也定義了 install options 裡的 `cell.arrow`、`cell.customArrow` 與 `cell.arrowSize`。
 
 這代表 `Cell` 的 arrow 行為不只受單一元件 props 影響，也可能受到全域設定影響。這類設計在元件庫中很常見：某些視覺或行為預設值可以在 plugin install 時統一配置，再由每個元件透過 global config 讀取。
 
 閱讀這一層時，不要只問「arrow 在哪裡渲染」，還要問三個問題。
 
-第一，預設 arrow 設定在哪裡建立？原始筆記指出是在 `src/index.js` 建立 `$VIEWUI.cell` 的 arrow 預設設定。
+第一，預設 arrow 設定在哪裡建立？是在 `src/index.js` 建立 `$VIEWUI.cell` 的 arrow 預設設定。
 
-第二，元件如何讀取全域設定？原始筆記指出是透過 `mixins/globalConfig.js` 從 Vue app globalProperties 讀取 `$VIEWUI`。
+第二，元件如何讀取全域設定？是透過 `mixins/globalConfig.js` 從 Vue app globalProperties 讀取 `$VIEWUI`。
 
-第三，型別層是否有對應 install options？原始筆記指出 `types/index.d.ts` 有 `cell.arrow`、`cell.customArrow`、`cell.arrowSize`。
+第三，型別層是否有對應 install options？`types/index.d.ts` 有 `cell.arrow`、`cell.customArrow`、`cell.arrowSize`。
 
 如果後續要做更深入分析，應該把 runtime 預設值、global config mixin、type declaration 三者對照起來，確認文件化契約與實際行為是否一致。
 
@@ -279,7 +261,7 @@ title / label / extra
 | `.ivu-cell-arrow` | 右側箭頭的 absolute positioning。 |
 | `.ivu-cell-selected` | selected 背景與 label / footer 色彩。 |
 
-但原始筆記特別指出，hover、disabled、selected 等 item 共用規則來自：
+但 hover、disabled、selected 等 item 共用規則來自：
 
 ```less
 .select-item(@cell-prefix-cls, @cell-prefix-cls);
@@ -345,7 +327,7 @@ Object.keys(ViewUI).forEach(key => {
 | `<Cell title="..." label="..." extra="...">` | props 直接填入 `CellItem` 對應區塊。 |
 | `<Cell to="/button">` | 有 link，會顯示 arrow 並走 link mixin。 |
 | `<Cell selected>` | 只改變 selected class 與樣式。 |
-| `<Cell disabled>` | 只改變 disabled class；原始筆記指出 example 沒有阻止 click 邏輯。 |
+| `<Cell disabled>` | 只改變 disabled class； example 沒有阻止 click 邏輯。 |
 | `<Cell target="_blank">` | 交給 link mixin 處理新視窗開啟。 |
 
 example 裡被註解的 `Badge`、`Icon`、`i-switch` slot 用法，也有閱讀價值。它們剛好對應 `#extra` 與 `#icon` 的擴充位置，可以幫助你理解 `CellItem` 為什麼要拆出 icon、main、footer 這些 DOM 區塊。
@@ -384,7 +366,7 @@ example 裡被註解的 `Badge`、`Icon`、`i-switch` slot 用法，也有閱讀
 | `title` | `cell.vue` / `CellItem` | 顯示在 `.ivu-cell-title`。 | 屬於主要文字內容。 |
 | `label` | `cell.vue` / `CellItem` | 顯示在 `.ivu-cell-label` 或 label slot。 | 屬於輔助描述內容。 |
 | `extra` | `cell.vue` / `CellItem` | 顯示在 `.ivu-cell-extra`。 | 屬於右側補充資訊。 |
-| `disabled` | `cell.vue` / style mixin | 影響 disabled class 與樣式。 | 原始筆記指出 example 沒有阻止 click 邏輯；後續需用 click handler 逐行確認。 |
+| `disabled` | `cell.vue` / style mixin | 影響 disabled class 與樣式。 | example 沒有阻止 click 邏輯；後續需用 click handler 逐行確認。 |
 | `selected` | `cell.vue` / `cell.less` / `select.less` | 影響 selected class 與樣式。 | 不代表 `CellGroup` 自動管理選取狀態。 |
 | `to` | `mixins/link.js` / `cell.vue` branch | 改變 wrapper、arrow 與 navigation。 | 有 `to` 時渲染 link branch，並顯示 arrow。 |
 | `target` | `mixins/link.js` | 影響 link 開啟方式。 | `target="_blank"` 交給 link mixin 處理。 |
@@ -507,8 +489,8 @@ export default {
 | --- | --- | --- |
 | 只看 `cell.vue` 就以為看完 `Cell`。 | `cell.vue` 是核心檔案，容易讓人誤以為所有行為都在裡面。 | `Cell` 的完整行為還包含 `link.js`、`globalConfig.js`、`cell.less`、`select.less`、`.d.ts` 與 example。 |
 | 把 `CellItem` 當成 public component。 | 它是 `.vue` 檔，而且名稱看起來像元件。 | `CellItem` 沒有 public export，主要服務 `Cell` 的內部展示結構。 |
-| 以為 `CellGroup` 會管理 selected 狀態。 | group component 常常讓人聯想到狀態管理。 | 原始筆記指出 `CellGroup` 的主要責任是 provide 自己並 emit `on-click`，不是管理 selected。 |
-| 以為 `disabled` 一定會阻止 click。 | 在許多元件中 disabled 會阻止互動。 | 原始筆記指出 example 中 disabled 只改變 class，沒有阻止 click 邏輯；實際行為仍需讀 `cell.vue` click handler 確認。 |
+| 以為 `CellGroup` 會管理 selected 狀態。 | group component 常常讓人聯想到狀態管理。 | `CellGroup` 的主要責任是 provide 自己並 emit `on-click`，不是管理 selected。 |
+| 以為 `disabled` 一定會阻止 click。 | 在許多元件中 disabled 會阻止互動。 |  example 中 disabled 只改變 class，沒有阻止 click 邏輯；實際行為仍需讀 `cell.vue` click handler 確認。 |
 | 以為 `to` 只是 href。 | `to` 看起來像路徑設定。 | 在 `Cell` 中，`to` 會影響 wrapper branch、arrow 顯示與 link mixin navigation。 |
 | 只看 `cell.less` 就分析 selected / disabled。 | component style 通常集中在 component less 檔，容易忽略 mixin。 | hover、disabled、selected 等共用 item 規則還來自 `.select-item()`。 |
 | 把 `.d.ts` 當成 runtime 真相。 | TypeScript 型別看起來很完整。 | `.d.ts` 是 public contract 宣告，實際行為仍要回到 `.vue`、mixin 與 style 確認。 |
@@ -538,7 +520,7 @@ export default {
 6. `cell.less` 與 `mixins/select.less` 分別負責哪些樣式？為什麼不能只看其中一個？
 7. `types/cell.d.ts` 對理解 `Cell / CellGroup` 有什麼幫助？它和 runtime 原始碼的關係是什麼？
 8. `examples/routers/cell.vue` 的閱讀價值是什麼？它如何幫助你驗證 public API？
-9. 原始筆記指出 disabled example 沒有阻止 click 邏輯。若要確認這件事，你下一步應該讀哪個檔案、哪一類邏輯？
+9. disabled example 沒有阻止 click 邏輯。若要確認這件事，你下一步應該讀哪個檔案、哪一類邏輯？
 10. 如果你要把這份 Source Map 延伸成下一篇筆記，你會優先寫 click flow、link flow、style flow 還是 type flow？為什麼？
 
 ---
@@ -581,7 +563,7 @@ export default {
 
 | 檢查項目 | 結果 |
 | --- | --- |
-| 是否保留原始筆記的核心資訊 | 已保留 `Cell`、`CellItem`、`CellGroup`、mixin、style、type、example、export、install 等核心來源。 |
+| 是否保留核心資訊 | 已保留 `Cell`、`CellItem`、`CellGroup`、mixin、style、type、example、export、install 等核心來源。 |
 | 是否補上必要背景 | 已補充 Source Map、public/internal component、runtime/type/style/example、provide/inject、mixin 等基本觀念。 |
 | 是否避免只做重新排版 | 已將原始路徑與責任分工補成段落式教學內容。 |
 | 是否避免編造未提供的技術細節 | 對 click handler、link navigation、CSS selector 細節皆標註需後續逐行確認。 |

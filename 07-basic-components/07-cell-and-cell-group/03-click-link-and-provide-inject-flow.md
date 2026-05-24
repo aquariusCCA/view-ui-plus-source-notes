@@ -1,27 +1,5 @@
 # View UI Plus Cell / CellGroup：Click、Link 與 Provide / Inject 事件流程解析
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經整理出 `Cell` 在點擊時會同時牽涉兩條流程：
-
-1. 透過 `provide / inject` 回報 `name` 給 `CellGroup`，最後對外觸發 `on-click`。
-2. 如果 `Cell` 帶有 `to`，則把點擊交給 `mixins/link.js` 處理導頁邏輯。
-
-這個方向是正確的，而且已經抓到 `Cell` 最容易被誤解的地方：**group event 與 navigation 不是互斥流程，而是同一次 click 中先後發生的兩段行為**。
-
-不過，原始筆記仍有幾個可以補強的地方：
-
-- 目前流程已列出，但還可以再補成「事件責任鏈」，讓讀者清楚知道每一層元件負責什麼。
-- `provide / inject` 的用途已說明，但還可以補充為什麼這裡不使用一般 `$emit` 層層往上傳。
-- `handleClickItem()` 的時序很重要，可以獨立拉成核心段落，避免讀者只記住「會點擊」卻忽略「先 emit，再 navigation」。
-- `disabled`、`target="_blank"`、ctrl / meta click 都是容易誤判的 runtime 邊界，應該用表格和情境補強。
-- `linkUrl`、`handleCheckClick()`、`handleClick()`、`handleOpenTo()` 之間的責任可以再拆清楚，避免把 `<a href>` 和 JavaScript navigation 混在一起理解。
-- 原始筆記已提到 source 裡有 `todo Vue3` 註解，因此相關行為應保留不確定性，不應過度推論。
-
-本章重構後，會把原本偏 source map 的記錄，改寫成一篇「事件流程教材型筆記」。重點不是背程式碼，而是建立一個能閱讀 View UI Plus 類似元件的事件心智模型。
-
----
-
 ## 1. 本章定位
 
 本章是 `View UI Plus` 中 `Cell / CellGroup` 的 **click flow 與 link navigation 筆記**。
@@ -499,7 +477,7 @@ this.handleOpenTo();
 
 這個設計是為了模擬使用者在瀏覽器中對 link 使用 ctrl / meta click 時的常見預期：在新分頁或新視窗開啟。
 
-不過，原始筆記也指出一個需要謹慎理解的地方：`handleOpenTo()` 裡對 string `to` 有提前 return 的註解，提到避免跳轉兩次，並且有 Vue 3 行為待驗證的註記。這表示這裡不能單純用「按住 ctrl 一定會由 JavaScript window.open」來理解，還要考慮 `<a>` 原生行為與 source 中的防重複跳轉設計。
+不過，`handleOpenTo()` 裡對 string `to` 有提前 return 的註解，提到避免跳轉兩次，並且有 Vue 3 行為待驗證的註記。這表示這裡不能單純用「按住 ctrl 一定會由 JavaScript window.open」來理解，還要考慮 `<a>` 原生行為與 source 中的防重複跳轉設計。
 
 ---
 
@@ -525,7 +503,7 @@ if (this.target === '_blank') {
 1. JavaScript 呼叫 `handleOpenTo()`。
 2. `<a target="_blank">` 的瀏覽器原生行為。
 
-原始筆記也保留了 source 註解：
+source 註解：
 
 ```js
 if (typeof this.to === 'string') return; // 會跳轉兩次 // todo Vue3这里不跳2次，待验证
@@ -682,7 +660,7 @@ function handleClick(name) {
 }
 ```
 
-更完整的封裝也可以避免在 disabled 狀態下傳入 `to`，但這屬於使用者端設計，不是原始筆記中 `Cell` runtime 已經提供的行為。
+更完整的封裝也可以避免在 disabled 狀態下傳入 `to`，但這屬於使用者端設計，`Cell` runtime 已經提供的行為。
 
 ---
 
@@ -748,7 +726,7 @@ click.ctrl / click.meta
 | 以為 `linkUrl` 就是導頁邏輯。 | 它看起來會 resolve router path。 | `linkUrl` 主要提供 `<a href>`，真正 click navigation 在 `handleCheckClick()` 後續方法。 |
 | 以為 `replace` 永遠會生效。 | `replace` 是 public prop，容易直覺認為所有導頁都用它。 | 只有有 router、非 absolute URL、一般 navigation 時才會走 `router.replace()`。 |
 | 以為 `target="_blank"` 只有瀏覽器原生行為。 | template 上有 `:target="target"`。 | `handleCheckClick()` 也會偵測 `_blank` 並呼叫 `handleOpenTo()`。 |
-| 以為 `Cell` 可以安全脫離 `CellGroup` 點擊。 | `Cell` 本身是 public component，直覺上可單獨使用。 | 原始筆記中的 `handleClickItem()` 直接呼叫 `this.CellGroupInstance.handleClick()`，若沒有注入會有風險。 |
+| 以為 `Cell` 可以安全脫離 `CellGroup` 點擊。 | `Cell` 本身是 public component，直覺上可單獨使用。 | `handleClickItem()` 直接呼叫 `this.CellGroupInstance.handleClick()`，若沒有注入會有風險。 |
 
 ---
 

@@ -1,21 +1,5 @@
 # View UI Plus Cell / CellGroup：Render、樣式、箭頭與全域設定
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經掌握了 `Cell` 畫面生成的幾個關鍵來源：`cell.vue` 的 render branch、`cell.less` 的結構樣式、`.select-item()` mixin 的共用列表行樣式、`#arrow` slot，以及 `$VIEWUI.cell` 全域設定。不過如果要把它變成長期可複習的教材型筆記，還需要進一步把這些資訊整理成一條完整的閱讀線。
-
-目前原始筆記最值得補強的地方有四個。
-
-第一，原始筆記已經列出 `Cell` 會根據 `to` 渲染 `<a>` 或 `<div>`，但還可以再明確說明：`to` 不只影響 navigation，也同時影響根節點 class、arrow 是否出現、footer 是否右移。也就是說，`to` 在這個元件中同時扮演「行為分支」與「視覺分支」的開關。
-
-第二，原始筆記已經指出樣式來源有三層，但初學者容易只打開 `cell.less`，然後找不到 padding、hover、disabled 的完整規則。因此本章需要特別強調：`Cell` 的視覺結果不是由單一檔案決定，而是由 `cell.vue` 產生 class，再由 `cell.less` 與 `mixins/select.less` 共同接手。
-
-第三，原始筆記已經整理 arrow 的 slot 與全域設定，但還可以再補成「優先序模型」。閱讀這段原始碼時，不能只問「箭頭在哪裡設定」，而要問：「使用者提供 `#arrow` slot 時會發生什麼？沒有 slot 時，`Icon` 的 `type`、`custom`、`size` 又從哪裡來？」
-
-第四，原始筆記已經指出 type declaration 看不出部分 runtime 細節。這對閱讀元件庫原始碼很重要，因為 `.d.ts` 只能描述對外 API 形狀，無法完整描述 class、Less、slot fallback、全域設定優先序與行為邊界。因此本章會把 runtime、style、type 與 global config 放在同一個脈絡中閱讀。
-
----
-
 ## 1. 本章定位
 
 本章是一篇 **Render / Style / Arrow / Global Config 對照筆記**，目標是幫助你理解 `View UI Plus` 的 `Cell` 如何把 props、slots、link 狀態與全域設定轉成實際畫面。
@@ -387,7 +371,7 @@ cell?: {
 
 ### 4.10 `.select-item()` mixin 補上列表行共用規則
 
-原始筆記中特別重要的一點是：`cell.less` 最後呼叫了 `.select-item()`：
+`cell.less` 最後呼叫了 `.select-item()`：
 
 ```less
 .select-item(@cell-prefix-cls, @cell-prefix-cls);

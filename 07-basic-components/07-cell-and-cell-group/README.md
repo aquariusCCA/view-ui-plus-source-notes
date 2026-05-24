@@ -1,20 +1,5 @@
 # View UI Plus Cell / CellGroup 原始碼閱讀筆記包 README
 
-## 0. 原始筆記問題分析
-
-原始 README 已經具備清楚的方向：它指出本目錄聚焦 `Cell`、`CellItem` 與 `CellGroup`，並且提醒讀者不要只把 `Cell` 理解成普通列表項，而要看到它背後串起的 `CellGroup`、`Cell`、`CellItem`、`link mixin`、`cell.less` 與 `globalConfig` 轉換鏈。
-
-不過，作為整個筆記包的入口文件，原始版本還可以再補強幾個地方：
-
-1. **定位可以更明確**：原始 README 已經像總覽，但還沒有清楚說明它與 `01` 到 `04` 四篇筆記之間的分工。對初學者來說，容易不知道應該先把 README 當導讀，還是當完整內容閱讀。
-2. **心智模型可以更完整**：原文列出轉換鏈，但還可以進一步解釋每一層在整個元件系統中的角色，例如 public component、internal layout、shared mixin、style system、global config 各自解決什麼問題。
-3. **Source Baseline 表格已經有價值，但需要補閱讀方式**：原文列出 runtime、style、type、example、registry、install 等檔案，但可以再補充「這些檔案應該怎麼搭配閱讀」，避免表格只變成路徑索引。
-4. **Reading Focus 已經抓到重點，但可以轉成學習路線**：原文把問題拆成元件邊界、public contract、展示結構、事件導頁、樣式箭頭五類，這很好；但若補上初次閱讀、深入閱讀與回查閱讀路線，會更適合作為 README。
-5. **Self Check 可以更有層次**：原始問題已經能檢查理解，但可以分成概念理解、流程推理、原始碼閱讀與實務判斷，讓讀者知道自己在測哪一種能力。
-6. **資訊邊界需要標註**：目前 README 以本地保存的 View UI Plus `v1.3.20` 為基準。若未來版本更新，`disabled`、`link mixin`、`globalConfig` 或 class 行為可能改變，因此本 README 的結論應以該版本 source 為準。
-
----
-
 ## 1. 本章定位
 
 這份 README 是 `Cell / CellGroup` 原始碼閱讀筆記包的**入口導讀**。它的任務不是逐行解釋 `cell.vue`，也不是取代後續四篇細節筆記，而是先幫讀者建立一張總地圖。
