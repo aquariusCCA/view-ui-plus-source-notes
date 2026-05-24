@@ -1,23 +1,5 @@
 # Badge 原始碼閱讀總覽：從展示規則到樣式分工
 
-## 0. 原始筆記問題分析
-
-原始 `README.md` 已經具備一份目錄導讀應有的基本骨架：它明確指出本目錄聚焦 View UI Plus 的 `Badge` 元件，也已經整理出 source baseline、reading focus、notes index、learning outcome 與 self check。這些內容很適合放在 `Badge` 筆記包的根目錄，用來幫助讀者先建立整體閱讀方向。
-
-不過，如果這份 README 要作為長期學習用的「教材型導讀」，仍然可以補強幾個面向。
-
-第一，原始筆記已經說明 `Badge` 是低互動展示型元件，但還可以再補充：低互動不代表沒有閱讀價值。`Badge` 的價值不在事件處理，而在它如何把多個 props、slots 與 computed 收斂成固定的 DOM 與樣式模式。這正是閱讀 UI 元件庫時很重要的一種能力。
-
-第二，原始筆記已經列出 `props / slots -> template branch -> computed -> DOM -> badge.less` 的轉換鏈，但可以再把這條鏈補成更清楚的閱讀模型。對初學者來說，這條鏈不是單純流程，而是一種分析展示型元件的方法：先看輸入，再看模式選擇，再看顯示條件，最後回到樣式實作。
-
-第三，原始筆記的 source baseline 表格已經很完整，但可以補上「為什麼要看這些檔案」與「每個檔案在整個元件閱讀中扮演什麼角色」。只列路徑容易變成索引表；補上閱讀目的與關聯後，才能成為 source map。
-
-第四，原始筆記有整理三篇子筆記的閱讀順序，但還可以補成更像學習路線的安排：先建立入口地圖，再理解 public contract，最後對照 class/style/position。這樣讀者會知道每一篇筆記要解決什麼問題，而不是只是照順序打開檔案。
-
-第五，原始筆記已經有 self check，但可以補充更多題型，讓它同時檢查概念理解、branch 優先序、computed 分工、slot override、style source 與原始碼閱讀路線。
-
----
-
 ## 1. 本章定位
 
 本章是 `Badge` 元件筆記包的 **README 導讀筆記**。它不是要深入逐行分析 `badge.vue` 或 `badge.less`，而是先回答三個問題：
@@ -47,7 +29,7 @@
 
 `Badge` 在 View UI Plus 中屬於低互動展示型元件。它主要負責把狀態、數量或提示訊息以小型視覺標記呈現出來。
 
-所謂「低互動」，指的是它本身不負責處理使用者互動流程。根據原始筆記整理，`Badge`：
+所謂「低互動」，指的是它本身不負責處理使用者互動流程。`Badge`：
 
 1. 不處理 click。
 2. 不宣告 emits。
@@ -384,7 +366,7 @@ ivu-badge-status-dot  -> 狀態點，inline-block
 
 ### 7.5 `overflowCount` 使用 `>=`
 
-根據原始筆記整理，`finalCount` 使用的是 `parseInt(count) >= parseInt(overflowCount)`。因此：
+`finalCount` 使用的是 `parseInt(count) >= parseInt(overflowCount)`。因此：
 
 ```txt
 count = 99

@@ -1,19 +1,5 @@
 # Badge Public Contract And Display Rules：從 Props 到顯示優先序
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經抓到 `Badge` 元件最重要的學習主軸：它不是一個複雜的互動元件，而是一個由 `props`、`slots`、template branch 與 computed rules 共同決定畫面的展示型元件。原始筆記也已經整理出 `count`、`dot`、`status`、`color`、`#count`、`#text` 等輸入之間的關係，尤其是 `dot`、`status || color`、一般 count branch 之間的互斥優先序。
-
-不過，如果要把這份筆記放進長期知識庫，它還可以再補強幾個地方。
-
-第一，原始筆記雖然列出 props 對照表，但還可以進一步說明「public contract」的閱讀意義。對元件庫來說，public contract 不只是有哪些 props，而是元件承諾外部使用者可以如何輸入資料、覆蓋內容，以及哪些輸入組合會被優先處理。
-
-第二，原始筆記已經指出 template branch 的優先序，但可以再把它轉成更適合閱讀原始碼的思考流程：先判斷元件模式，再判斷 slot override，最後判斷 computed 是否允許渲染或顯示。這樣之後閱讀其他展示型元件時，也能套用同一種分析方式。
-
-第三，`finalCount`、`badge`、`hasCount` 目前已經有程式碼與表格，但仍需要補充它們彼此的責任邊界。否則初學者容易把「是否建立 DOM 節點」和「DOM 節點是否顯示」混在一起。
-
-第四，原始筆記的重點集中在 runtime 規則，這是正確的。不過 `className`、`type`、`offset`、`statusClasses`、`statusStyles` 的視覺結果仍需回到後續的 style 筆記確認。本章會保留這個邊界，不會把尚未分析的 `badge.less` 細節提前補滿。
-
 ## 1. 本章定位
 
 本章是一篇 **Public API 與顯示規則對照筆記**，用來理解 `Badge` 對外開放哪些輸入，以及這些輸入如何在 runtime 中轉換成實際畫面。
@@ -106,7 +92,7 @@
 
 `Badge` 的 template 是本章的核心。因為它決定了 props 之間不是自由疊加，而是先經過三段互斥分支。
 
-原始筆記整理的 template 結構如下：
+template 結構如下：
 
 ```vue
 <span v-if="dot" :class="classes" ref="badge">
@@ -143,7 +129,7 @@ else
 
 dot branch 的重點是「顯示一個小點」，而不是顯示數字。它仍然保留 default slot，讓小點可以附著在某個子元素上，例如連結、按鈕、圖示或文字。
 
-需要注意的是，dot branch 中的 dot 是否顯示，仍會交給 `badge` computed 搭配 `v-show` 判斷。因此 `dot` 代表進入 dot 模式，不代表小點在所有情境下一定可見。原始筆記也指出，若 `dot` 搭配 `count=0`，dot 節點會存在，但會被 `v-show` 隱藏。
+需要注意的是，dot branch 中的 dot 是否顯示，仍會交給 `badge` computed 搭配 `v-show` 判斷。因此 `dot` 代表進入 dot 模式，不代表小點在所有情境下一定可見。若 `dot` 搭配 `count=0`，dot 節點會存在，但會被 `v-show` 隱藏。
 
 ### 5.2 `status || color` branch：第二優先序
 
@@ -172,7 +158,7 @@ dot branch 的重點是「顯示一個小點」，而不是顯示數字。它仍
 
 ## 6. Count Branch：一般角標與 Slot Override
 
-當元件進入 count branch 後，內部還有一層 slot 優先序。原始筆記整理如下：
+當元件進入 count branch 後，內部還有一層 slot 優先序。
 
 ```txt
 有 #count
@@ -198,7 +184,7 @@ dot branch 的重點是「顯示一個小點」，而不是顯示數字。它仍
 </Badge>
 ```
 
-這種寫法會進入 custom count 路線，使用 `customCountClasses`，也就是原始筆記中提到的 `ivu-badge-count ivu-badge-count-custom`。依原始筆記描述，這類 custom count 樣式會取消一般角標的背景、邊框與陰影，讓使用者自訂的圖示或內容可以自己決定視覺效果。
+這種寫法會進入 custom count 路線，使用 `customCountClasses`，這類 custom count 樣式會取消一般角標的背景、邊框與陰影，讓使用者自訂的圖示或內容可以自己決定視覺效果。
 
 ### 6.2 `#text`：只覆蓋一般 count 文字
 
@@ -231,7 +217,7 @@ dot branch 的重點是「顯示一個小點」，而不是顯示數字。它仍
 
 `finalCount` 只在一般 count branch 中有意義。它負責決定「當沒有用 `#text` 覆蓋時，角標裡應該顯示什麼文字」。
 
-原始筆記中的 computed 如下：
+computed 如下：
 
 ```js
 finalCount () {
@@ -269,7 +255,7 @@ badge    -> 已建立的角標是否透過 v-show 顯示
 
 ### 8.1 `hasCount`：決定一般 count branch 是否建立 `sup`
 
-原始筆記中的 `hasCount` 如下：
+`hasCount` 如下：
 
 ```js
 hasCount () {
@@ -285,7 +271,7 @@ hasCount () {
 
 ### 8.2 `badge`：決定角標是否透過 `v-show` 顯示
 
-原始筆記中的 `badge` 如下：
+`badge` 如下：
 
 ```js
 badge () {
@@ -349,11 +335,11 @@ status branch 由 `status || color` 啟用。它的 template 結構如下：
 </Badge>
 ```
 
-依據原始筆記的 branch 規則，`status="success"` 會進入 status branch，而 status branch 沒有 `<slot></slot>`，所以 default slot 不會在這條路線中被渲染。
+branch 規則，`status="success"` 會進入 status branch，而 status branch 沒有 `<slot></slot>`，所以 default slot 不會在這條路線中被渲染。
 
 第二，status branch 的文字來自 `#text` 或 `text`。如果兩者都沒有，仍然會渲染 status dot，只是後面的 `.ivu-badge-status-text` 內容為空。
 
-第三，`color` 在這裡是 status dot 的顏色來源，不是一般 count badge 的背景色設定。原始筆記指出，`statusClasses` 與 `statusStyles` 的分工如下：
+第三，`color` 在這裡是 status dot 的顏色來源，不是一般 count badge 的背景色設定。`statusClasses` 與 `statusStyles` 的分工如下：
 
 ```txt
 status -> ivu-badge-status-{status}
@@ -363,7 +349,7 @@ status -> ivu-badge-status-{status}
 
 也就是說，內建色會走 class，自訂色則會透過 inline style 寫入 `backgroundColor`。
 
-> 此處需要後續補充：本章只根據原始筆記保留「內建色走 class，自訂色走 inline style」的結論；實際內建色清單、class 產生規則與動畫細節，應在 `03-class-style-and-position.md` 對照 `badge.less` 補完整。
+> 此處需要後續補充：本章只根據「內建色走 class，自訂色走 inline style」的結論；實際內建色清單、class 產生規則與動畫細節，應在 `03-class-style-and-position.md` 對照 `badge.less` 補完整。
 
 ## 10. Public Contract 的使用情境對照
 
@@ -492,13 +478,3 @@ dot -> status/color -> count
 3. **status color 系統**：整理 `status`、內建 `color`、自訂 hex color 與 `.make-color-classes()` 的關係。
 4. **slot override 設計模式**：比較 `#count` 與 `#text` 的 API 設計，理解元件庫如何提供「整體覆蓋」與「局部覆蓋」。
 5. **展示型元件的 public contract 分析法**：把本章的閱讀方法套用到 `Tag`、`Avatar`、`Alert` 等其他 View UI Plus 元件。
-
-## 16. 資訊不足與後續確認
-
-本章依據目前提供的原始筆記重構，沒有額外假設未提供的 source code 行為。以下內容需要在後續章節或實際原始碼中確認：
-
-1. `statusClasses` 判斷「內建 color」的完整色名清單。
-2. `badge.less` 中 `ivu-badge-count-custom` 實際取消哪些樣式，以及是否還有其他 selector 影響 custom count。
-3. `offset` 使用 `margin-top` / `margin-right` 後，在不同 branch 與不同 slot 組合下的實際定位差異。
-4. `processing` status 的動畫定義與 class 結構。
-5. 官方 example 是否還有其他未列入原始筆記的組合情境。

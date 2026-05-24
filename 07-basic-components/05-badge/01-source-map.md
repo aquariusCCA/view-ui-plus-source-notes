@@ -1,27 +1,5 @@
 # View UI Plus `Badge` 組件原始碼閱讀筆記：Source Map 與責任分工
 
-## 0. 原始筆記問題分析
-
-這份原始筆記屬於「原始碼閱讀筆記」為主，「API / 型別筆記」為輔的內容。它的核心目的不是教使用者如何單純使用 `Badge`，而是帶讀者建立 `Badge` 在 View UI Plus 原始碼中的閱讀地圖，理解 runtime、style、type、example、registry 與 plugin install 之間的責任分工。
-
-原始筆記已經整理出許多重要資訊，例如 `badge.vue`、`badge.less`、`types/badge.d.ts`、`examples/routers/badge.vue`、`src/components/index.js` 與 `src/index.js` 等檔案路徑，也已經指出 `dot`、`status/color`、一般 count 是互斥的 template branch。這些都是閱讀 `Badge` 原始碼時不可遺失的核心資訊。
-
-不過，如果要把這份筆記放進長期知識庫，原始版本還可以再補強幾個地方。
-
-第一，原始筆記已經列出檔案與角色，但對初學者來說，還需要先理解為什麼一個看似簡單的 `Badge` 元件會被拆成 runtime、style、type、example 與 registry 多個來源。這部分如果沒有補背景，讀者容易把 source map 看成一張檔案清單，而不是一張閱讀路線圖。
-
-第二，原始筆記已經指出 `badge.vue` 有三段 template branch，但還可以更清楚地說明這種 branch 設計對使用者行為的影響。尤其是 `dot`、`status`、`color` 與一般 `count` 不會同時疊加，這不是單純語法問題，而是 `Badge` 的模式選擇規則。
-
-第三，`badge.less` 的說明目前偏向 selector 對照表。這對回查很有用，但對學習者來說，還需要補上「為什麼定位、尺寸、顏色與動畫要放在 less 裡理解」，以及「只看 `.vue` 為什麼無法完整理解視覺結果」。
-
-第四，`types/badge.d.ts` 與 runtime 的關係可以再加強。型別檔描述的是 public contract，也就是元件對使用者公開的使用方式；但它不一定能完整呈現 runtime 的 branch 優先序與 computed 細節。因此閱讀型別檔之後，仍然需要回到 `badge.vue` 驗證實際行為。
-
-第五，原始筆記已有總結與自我檢查問題，但可以再補上常見誤解、後續延伸方向，以及哪些資訊需要回到實際原始碼繼續確認。
-
-> 此處需要後續補充：本章目前根據既有筆記所整理的 source map 重構，尚未逐行展開 `badge.vue`、`badge.less` 與 `types/badge.d.ts` 的完整原始碼。若後續要寫成深度原始碼解析，應另外建立「runtime computed 詳解」、「template branch 詳解」與「less selector 詳解」等獨立筆記。
-
----
-
 ## 1. 本章定位
 
 本章是一篇 `Badge` 組件的 source map 筆記。所謂 source map，不是瀏覽器 sourcemap，而是「原始碼閱讀地圖」：它負責告訴讀者，要理解一個元件，應該從哪些檔案開始讀、每個檔案負責什麼，以及這些檔案之間如何共同構成元件的完整行為。
@@ -108,7 +86,7 @@ components/index.js + src/index.js：決定元件如何被匯出與安裝
 
 ### 4.1 Public props：使用者可以控制哪些行為
 
-根據原始筆記，`badge.vue` 宣告的 public props 包含：
+`badge.vue` 宣告的 public props 包含：
 
 ```txt
 count / dot / overflowCount / className / showZero / text
@@ -130,7 +108,7 @@ status / type / offset / color
 
 ### 4.2 Template branch：`dot`、`status/color`、一般 count 是互斥模式
 
-原始筆記指出，`badge.vue` 的 template 可以先抓住三段 branch：
+`badge.vue` 的 template 可以先抓住三段 branch：
 
 ```vue
 <span v-if="dot">...</span>
@@ -201,7 +179,7 @@ status / type / offset / color
 
 ### 5.2 為什麼 `color` 容易被誤解
 
-在很多元件中，`color` 可能被直覺理解成「設定元件主色」。但在 `Badge` 中，原始筆記已經指出：只要 `status || color` 成立，就會進入 status template。
+在很多元件中，`color` 可能被直覺理解成「設定元件主色」。但在 `Badge` 中，只要 `status || color` 成立，就會進入 status template。
 
 這代表：
 
@@ -213,7 +191,7 @@ status / type / offset / color
 
 ### 5.3 `offset` 的本質是角標位置微調
 
-原始筆記指出，`styles` 會將 `offset` 轉成 `margin-top` 與 `margin-right`。這代表 `offset` 主要是對角標本體做視覺上的位置微調，而不是改變整個 wrapper 的 layout 結構。
+`styles` 會將 `offset` 轉成 `margin-top` 與 `margin-right`。這代表 `offset` 主要是對角標本體做視覺上的位置微調，而不是改變整個 wrapper 的 layout 結構。
 
 因此閱讀 `offset` 時，要把它理解成「在既有定位規則上加一層偏移」。真正的基本定位仍然要回到 `.ivu-badge-count` 或 `.ivu-badge-dot` 等 selector 看。
 
@@ -223,7 +201,7 @@ status / type / offset / color
 
 `types/badge.d.ts` 的角色是描述 `Badge` 對外公開的使用契約。它不一定是理解 runtime 優先序的最佳入口，但它非常適合拿來建立 public API 的第一層輪廓。
 
-根據原始筆記，`types/badge.d.ts` 描述的 props 包含：
+`types/badge.d.ts` 描述的 props 包含：
 
 ```txt
 count
@@ -242,7 +220,7 @@ color
 
 ### 6.1 Slot contract
 
-`Badge` 的型別也描述了 slots。原始筆記指出有兩個重要 slot：
+`Badge` 的型別也描述了 slots。有兩個重要 slot：
 
 | Slot | typing 描述 | Runtime 位置 | 使用理解 |
 | --- | --- | --- | --- |
@@ -310,7 +288,7 @@ export { default as Badge } from './badge';
 
 ### 8.3 全域安裝：`src/index.js`
 
-原始筆記指出，全域安裝在 `src/index.js` 中透過整個 component map 間接完成：
+全域安裝在 `src/index.js` 中透過整個 component map 間接完成：
 
 ```js
 Object.keys(ViewUI).forEach(key => {
@@ -370,7 +348,7 @@ export { Badge } from './badge'
 
 #### 誤解二：`color` 是一般數字角標的背景色
 
-原始筆記指出，只要 `status || color` 成立，就會進入 status template。因此 `color` 更接近 status/color 模式的狀態點設定，而不是一般 count badge 的背景色。
+只要 `status || color` 成立，就會進入 status template。因此 `color` 更接近 status/color 模式的狀態點設定，而不是一般 count badge 的背景色。
 
 #### 誤解三：只看 `types/badge.d.ts` 就能完整理解行為
 
@@ -429,6 +407,6 @@ template 只告訴你渲染哪個 DOM 與 class。真正的定位、尺寸、顏
 | `count`、`overflowCount`、`showZero` 等 props 的完整型別與預設值 | 目前筆記有列 props 名稱，但未完整展開每個 prop 的型別、default 與 validator。 |
 | `badge`、`hasCount`、`finalCount` 的完整條件 | 這些 computed 直接影響 DOM 是否渲染與最後顯示文字，適合獨立深挖。 |
 | `status` 與 `color` 的內建值範圍 | 目前已知道內建色與自訂色處理不同，但完整可用值仍應回到型別與 less 確認。 |
-| `processing` 動畫的 selector 與觸發條件 | 原始筆記提到 status processing animation，但未展開動畫細節。 |
+| `processing` 動畫的 selector 與觸發條件 | status processing animation，但未展開動畫細節。 |
 | `offset` 陣列的邊界處理 | 目前只知道會轉成 `margin-top` 與 `margin-right`，但尚未確認非法值或缺值處理。 |
 

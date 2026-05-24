@@ -1,21 +1,5 @@
 # Badge Class、Style 與 Position：從 runtime class 到 less 視覺系統
 
-## 0. 原始筆記問題分析
-
-原始筆記已經整理出 `Badge` 的樣式來源與幾條重要路徑，例如一般 count、custom count、dot、status 與 color 的差異。這些內容本身是正確且有價值的，但如果要作為長期學習用的教材型筆記，仍然需要補強幾個面向。
-
-第一，原始筆記已經列出許多 class 與 less 規則，但還需要更明確地說明「runtime 產生 class」與「less 實際決定畫面」之間的責任分界。對初學者來說，只看到 `ivu-badge-count`、`ivu-badge-dot`、`ivu-badge-status-dot` 這些名稱，容易誤以為它們只是不同顏色或不同尺寸的 badge，但實際上它們代表的是不同的 layout model。
-
-第二，原始筆記有指出 `offset` 會產生 `margin-top` 與 `margin-right`，但可以再補充：這表示 `offset` 不是改寫 `top`、`right`、`transform`，也不是移動被包裹的 default slot，而是調整角標本體的外距。這個差異會影響後續閱讀元件定位邏輯時的判斷。
-
-第三，原始筆記有提到 `#count` 會使用 custom count 樣式，但需要更清楚說明它不是「只改文字」，而是替換整個角標內容，並且取消預設背景、陰影與部分視覺框架。因此 `#count` 更接近「自訂角標節點」，而 `#text` 才是「只改角標文字」。
-
-第四，原始筆記已經提到 status branch 是 inline 狀態點，但可以再強化它和一般 count / dot 的差異：status branch 不依附 default slot，也不走 absolute 定位，而是輸出一組普通 inline 內容。這是理解 `color`、`status`、`processing` 動畫時的關鍵。
-
-第五，這份筆記很適合補成「閱讀 View UI Plus 展示型元件樣式系統」的範例。`Badge` 雖然元件規模不大，但它把 `template branch`、`computed class`、`inline style`、`Less selector`、`slot override` 與 `語意色系` 串在一起，是練習元件原始碼閱讀的好材料。
-
----
-
 ## 1. 本章定位
 
 本章是一篇 `Badge` 的 **runtime class 與 style source 對照筆記**。它的目標不是重新解釋所有 props 的 public API，也不是完整展開每個 Less selector，而是聚焦在一條主線：
@@ -45,8 +29,6 @@
 | --- | --- | --- |
 | Runtime source | `src/components/badge/badge.vue` | template branch、computed class、computed style、slot 狀態。 |
 | Style source | `src/styles/components/badge.less` | `ivu-badge` wrapper、count、custom count、dot、status、color、processing animation。 |
-
-本章使用原始筆記中已整理出的程式片段作為分析基礎。若要做更精準的版本差異比對，需要再回到對應版本的 View UI Plus source code 確認完整上下文。
 
 閱讀這類元件時，可以用一個固定問題來引導：
 
@@ -386,7 +368,7 @@ customCountClasses () {
 
 ### 7.2 Custom count 的邊界
 
-原始筆記有一個重要觀察：`customCountClasses` 不會加上 `ivu-badge-count-alone`。
+有一個重要觀察：`customCountClasses` 不會加上 `ivu-badge-count-alone`。
 
 也就是說，如果沒有 default slot，但使用 `#count`，它仍然保留一般 `ivu-badge-count` 的 absolute positioning。這種組合不是官方範例主線，閱讀時應標註為「需要實際畫面確認」或「非主要使用情境」。不要直接推論它一定會形成理想的獨立顯示效果。
 
@@ -510,7 +492,7 @@ styles () {
 
 ### 9.3 `offset` 作用於哪些模式？
 
-根據原始筆記整理，`styles` 會被綁到：
+`styles` 會被綁到：
 
 | 模式 | 是否套用 `styles` |
 | --- | --- |
@@ -579,7 +561,7 @@ transform: translateX(50%);
 
 ### 10.2 Dot 的顯示控制
 
-dot 的可見性由 `badge` computed 控制。原始筆記整理的情境如下：
+dot 的可見性由 `badge` computed 控制。
 
 | 輸入 | dot 是否顯示 | 原因 |
 | --- | --- | --- |
