@@ -1,32 +1,5 @@
 # View UI Plus `Icon` 圖標元件原始碼地圖與閱讀指南
 
-> 筆記類型：原始碼閱讀筆記 + 架構分析筆記  
-> 適用主題：View UI Plus `Icon` 元件  
-> 版本線索：原始筆記使用 `view-ui-plus-v1.3.20` 路徑作為閱讀對象  
-> 學習目標：理解 `Icon` 元件從 public API、runtime component、icon font style 到 plugin install 的完整關係
-
----
-
-## 0. 原始筆記問題分析
-
-這份原始筆記本身已經具備很清楚的 source map 意識，能夠把 `Icon` 的 runtime、型別宣告、樣式來源、範例與全域註冊串在一起。對於第一次閱讀 View UI Plus 原始碼的人來說，這比只看 `src/components/icon/icon.vue` 更有價值，因為 `Icon` 不是單一 `.vue` 檔就能完整理解的元件。
-
-不過，如果要把它放進長期維護的個人知識庫，仍然可以再補強幾個方向。
-
-第一，原始筆記目前偏向「地圖型筆記」，它已經列出該看哪些檔案，但部分檔案之間的責任邊界還可以說得更清楚。例如 `src/components/icon/index.js`、`src/components/index.js`、`src/index.js` 都和「對外可使用」有關，但它們分別處在單元件出口、元件庫集中匯出、Vue plugin 安裝三個不同層級。這些差異如果沒有拆開講，初學者容易把它們都看成「註冊檔案」。
-
-第二，原始筆記已經指出 `Icon` 是「class 轉接器」，但還可以更明確說明渲染鏈路：使用者傳入 `type` → component 產生 class → CSS selector 命中 `.ivu-icon-xxx:before` → icon font 顯示字形。這條鏈路是理解 icon font 元件的核心。
-
-第三，原始筆記有提到 `type`、`size`、`color`、`custom` 四個 props，但可以再從「元件 API 設計」角度補充：哪些 props 負責接內建圖標，哪些 props 負責樣式控制，哪些 props 負責擴充自訂 icon font。
-
-第四，原始筆記已有常見誤區，但可以加入「排錯路線」。因為 `Icon` 常見問題通常不是 Vue component 本身壞掉，而是 class、style import、font resource 或 icon name 對不上。把排錯順序寫進筆記，未來實務維護會更有幫助。
-
-第五，原始筆記已經有自我檢查問題，但題目可以再擴充到「流程理解題、架構分層題、實務排錯題、延伸設計題」，讓它更像教材章節的結尾練習。
-
-> 資訊邊界說明：本章根據原始筆記提供的檔案路徑與行為描述進行重構。若要進一步確認 `classes`、`styles` 的每一行 runtime 實作，仍需要回到實際的 `icon.vue` 原始碼逐行核對。本章不假裝補入未提供的原始碼細節。
-
----
-
 ## 1. 本章定位
 
 本章是一份 `Icon` 圖標元件的原始碼閱讀指南。它不以逐行解釋每一段程式碼為目標，而是先幫你建立一張完整的閱讀地圖：如果想理解 View UI Plus 的 `Icon` 元件，到底要看哪些檔案？這些檔案各自回答什麼問題？它們之間又如何串成一個可被使用者穩定使用的 public component？
@@ -65,7 +38,7 @@
 
 ### 2.2 `Icon` 本身不是圖標資料庫，而是 class 轉接器
 
-初學者很容易以為 `Icon` component 裡面存放了所有圖標，因為官方範例頁通常會列出大量圖標名稱。但實際上，依照原始筆記提供的 source map，`Icon` component 的主要任務是根據 `type` 產生類似 `ivu-icon-ios-add` 的 class。
+初學者很容易以為 `Icon` component 裡面存放了所有圖標，因為官方範例頁通常會列出大量圖標名稱，`Icon` component 的主要任務是根據 `type` 產生類似 `ivu-icon-ios-add` 的 class。
 
 真正決定 `ivu-icon-ios-add` 顯示什麼圖形的，是 `src/styles/common/iconfont/` 底下的 icon font 樣式。這些樣式會定義 `.ivu-icon` 的字體、渲染方式，以及每個 `.ivu-icon-xxx:before` 對應的 Unicode `content`。
 
@@ -157,7 +130,7 @@ CSS 命中：.ivu-icon-ios-add:before
 
 ### 5.1 `icon.vue`：最小 runtime component
 
-`src/components/icon/icon.vue` 是 `Icon` 的 runtime 實作。根據原始筆記，它的 template 非常短：
+`src/components/icon/icon.vue` 是 `Icon` 的 runtime 實作。它的 template 非常短：
 
 ```vue
 <i :class="classes" :style="styles"></i>
@@ -186,12 +159,12 @@ props -> styles  -> style attribute
 
 `types/icon.d.ts` 是 `Icon` 對外的型別宣告。閱讀元件庫時，型別檔非常重要，因為它代表元件庫承諾給使用者的 public contract。
 
-根據原始筆記，`Icon` 對外公開四個 props：
+`Icon` 對外公開四個 props：
 
 | Prop | Type | 主要責任 | 說明 |
 | --- | --- | --- | --- |
 | `type` | `string` | 指定內建圖標 | 圖標名稱，會對應到 `ivu-icon-${type}` |
-| `size` | `number \| string` | 控制圖標大小 | 原始筆記說明單位是 px，runtime 會轉成 `font-size` |
+| `size` | `number \| string` | 控制圖標大小 | 單位是 px，runtime 會轉成 `font-size` |
 | `color` | `string` | 控制圖標顏色 | 轉成 CSS color |
 | `custom` | `string` | 接入自訂 class | 用於外部 icon font 或自定義圖標 class |
 
@@ -221,7 +194,7 @@ src/components/icon/index.js
 
 ### 5.4 `src/styles/common/index.less`：common style 入口
 
-`src/styles/common/index.less` 是 common style 的入口之一。根據原始筆記，它會匯入：
+`src/styles/common/index.less` 是 common style 的入口之一。它會匯入：
 
 ```less
 @import "iconfont/ionicons";
@@ -233,7 +206,7 @@ src/components/icon/index.js
 
 ### 5.5 `src/styles/common/iconfont/`：真正的圖標字形系統
 
-`src/styles/common/iconfont/` 是 `Icon` 真正能顯示圖標的關鍵。根據原始筆記，`ionicons.less` 會再匯入三類檔案：
+`src/styles/common/iconfont/` 是 `Icon` 真正能顯示圖標的關鍵。`ionicons.less` 會再匯入三類檔案：
 
 ```less
 @import "_ionicons-variables";
@@ -263,7 +236,7 @@ src/components/icon/index.js
 
 ### 5.6 `examples/routers/icon.vue`：官方範例如何使用 `Icon`
 
-`examples/routers/icon.vue` 是官方範例頁。根據原始筆記，這個檔案會透過大量 `icons` 陣列搭配：
+`examples/routers/icon.vue` 是官方範例頁。這個檔案會透過大量 `icons` 陣列搭配：
 
 ```vue
 <Icon v-for="item in icons" :key="item" :type="item" />
@@ -279,7 +252,7 @@ src/components/icon/index.js
 
 ### 5.7 `src/components/index.js`：確認 `Icon` 是 public export
 
-`src/components/index.js` 是元件集中匯出的地方。根據原始筆記，它包含：
+`src/components/index.js` 是元件集中匯出的地方。它包含：
 
 ```js
 export { default as Icon } from './icon';
@@ -293,7 +266,7 @@ export { default as Icon } from './icon';
 
 ### 5.8 `src/index.js`：plugin install 與全域註冊
 
-`src/index.js` 是 View UI Plus 的主要安裝入口之一。根據原始筆記，它會把 components 收集成 `ViewUI`，並在 `install(app)` 時呼叫：
+`src/index.js` 是 View UI Plus 的主要安裝入口之一。它會把 components 收集成 `ViewUI`，並在 `install(app)` 時呼叫：
 
 ```js
 app.component(key, ViewUI[key]);
@@ -378,7 +351,7 @@ CSS icon font：
 
 ### 7.1 `type`：內建圖標的入口
 
-`type` 是 `Icon` 最核心的 prop。它代表使用者要使用哪一個內建圖標。從原始筆記來看，`type` 會被轉成 `ivu-icon-${type}` 形式的 class。
+`type` 是 `Icon` 最核心的 prop。它代表使用者要使用哪一個內建圖標。`type` 會被轉成 `ivu-icon-${type}` 形式的 class。
 
 例如：
 
@@ -396,7 +369,7 @@ CSS icon font：
 
 ### 7.2 `custom`：自訂 icon class 的擴充入口
 
-`custom` 則是給外部 icon font 或自定義 class 使用的入口。原始筆記提到，其他範例或其他元件中可能會出現：
+`custom` 則是給外部 icon font 或自定義 class 使用的入口。其他範例或其他元件中可能會出現：
 
 ```vue
 <Icon custom="i-icon i-icon-search" />
@@ -408,7 +381,7 @@ CSS icon font：
 
 ### 7.3 `size`：透過字體大小控制圖標尺寸
 
-因為 `Icon` 使用 icon font，所以圖標大小通常透過 `font-size` 控制。`size` prop 的型別是 `number | string`，原始筆記也提到註解說明單位是 px。
+因為 `Icon` 使用 icon font，所以圖標大小通常透過 `font-size` 控制。`size` prop 的型別是 `number | string`，單位是 px。
 
 這裡要注意一件事：如果 runtime 會補上 `px`，那麼 `size` 比較適合傳數字或數字字串，例如 `16`、`24`、`"32"`。如果想傳入任意 CSS 單位，例如 `1.5rem`，就需要回到實際 runtime 實作確認是否支援，不能只根據型別 `string` 就推論一定支援所有 CSS 單位。
 
@@ -487,7 +460,7 @@ examples/routers/icon.vue
 | 以為 `Icon` component 裡存放所有圖標 | 範例頁列出大量圖標名稱，看起來像 component 管理所有圖標 | 圖標字形在 icon font 樣式與字體檔中，component 只產生 class |
 | 只看 `icon.vue` 就以為讀完了 | `Icon` runtime 很短，容易讓人覺得邏輯很簡單 | 還必須看 `src/styles/common/iconfont/`，才能知道 class 如何顯示成圖標 |
 | 把 `type` 和 `custom` 當成同一件事 | 兩者最後都會變成 class | `type` 接內建 `ivu-icon-*` 命名；`custom` 接外部自訂 class |
-| 看到 `size` 是 `number \| string` 就以為支援所有 CSS 單位 | 型別中的 `string` 看起來很寬 | 原始筆記指出 runtime 會補上 `px`，是否支援 `rem`、`em` 等單位需看實際實作 |
+| 看到 `size` 是 `number \| string` 就以為支援所有 CSS 單位 | 型別中的 `string` 看起來很寬 | runtime 會補上 `px`，是否支援 `rem`、`em` 等單位需看實際實作 |
 | 以為 `src/components/icon/index.js` 是全域註冊入口 | 它也在做 export，容易和 plugin install 混淆 | 它只是單元件出口；全域註冊要看 `src/index.js` 的 `install(app)` |
 | 以為圖標沒顯示一定是 Vue component 壞掉 | 使用時看到的是 `<Icon>`，直覺會先懷疑元件 | icon font 類元件還要檢查 style import、font resource、class naming 與 `:before content` |
 

@@ -1,59 +1,5 @@
 # View UI Plus Icon 元件原始碼閱讀筆記：從 Props 到 DOM 輸出
 
-## 0. 原始筆記類型與重構方向
-
-### 0.1 筆記類型判斷
-
-這份筆記主要屬於「原始碼閱讀筆記」，分析對象是 View UI Plus 的 `Icon` 圖標元件在 runtime 階段如何運作。它不是圖標清單，也不是完整 icon font 樣式解析，而是聚焦在一條非常核心的閱讀線：
-
-```txt
-props
-  -> computed class / computed style
-  -> template DOM
-  -> CSS icon font 顯示結果
-```
-
-同時，這份筆記也帶有一點「API / 設定筆記」的性質，因為 `Icon` 對外提供的四個 props：`type`、`custom`、`size`、`color`，本質上就是使用者操作此元件的 public API。
-
-### 0.2 原始筆記目前已經清楚的地方
-
-原始筆記已經把 `Icon` 的 runtime 行為整理得相當明確，尤其是以下幾點：
-
-- `Icon` 最終輸出固定是 `<i>` 節點。
-- `type` 和 `custom` 主要影響 class。
-- `size` 和 `color` 主要影響 inline style。
-- `Icon` 沒有 slot、methods、emits，行為邊界非常清楚。
-- `type` 和 `custom` 可以同時存在，但實務上通常擇一使用。
-- `size` 雖然接受 `number | string`，但 runtime 會補上 `px`，因此不適合直接傳入 `1em` 這類 CSS 單位。
-
-這些內容是後續重構時必須保留的核心資訊。
-
-### 0.3 重構時需要補強的地方
-
-為了讓這份筆記更適合長期學習與複習，本章會補強以下方向：
-
-| 補強方向 | 說明 |
-| --- | --- |
-| 建立閱讀模型 | 不只描述程式碼結果，也先建立「props-to-render」的閱讀框架。 |
-| 補上元件庫設計視角 | 說明為什麼 `Icon` 這種小元件仍然是元件庫的重要基礎元件。 |
-| 拆清楚 class 與 style 的責任 | 分別說明 `type/custom` 與 `size/color` 的設計分工。 |
-| 補上邊界條件 | 例如 `size="1em"`、`size={0}`、`custom` 不會自動載入字體等問題。 |
-| 補上排錯路線 | 當圖標沒有顯示時，應該從 props、class、CSS、font file 哪些地方檢查。 |
-| 補上複習設計 | 加入自我檢查問題與後續延伸方向，方便放進個人知識庫。 |
-
-### 0.4 資訊不足處
-
-這份筆記主要根據 `Icon` runtime 行為進行整理。若要進一步確認下列內容，需要後續對照 View UI Plus 專案原始碼中的實際檔案：
-
-- `Icon` 在 `Button`、`Tabs`、`Tree`、`Image` 等元件中的完整使用路徑。
-- `Icon` 是否在所有版本中都保持相同 props 行為。
-- icon font 樣式檔中每一個 `.ivu-icon-xxx:before` 的實際對應內容。
-- `custom` 在官方範例或實際專案中的推薦用法與限制。
-
-本章會避免編造未提供的檔案路徑與實作細節，只根據原始筆記提供的資訊與 Vue 元件的一般閱讀方式進行教學化整理。
-
----
-
 ## 1. 本章定位：為什麼要讀 `Icon` 的 props 與 render？
 
 `Icon` 是 View UI Plus 中非常小的基礎元件，但它很適合拿來練習「如何閱讀元件庫原始碼」。

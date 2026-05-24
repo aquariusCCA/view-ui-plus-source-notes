@@ -1,53 +1,5 @@
 # View UI Plus Icon 圖標元件：Icon Font System 教材型筆記
 
-> 本筆記聚焦於 View UI Plus v1.3.20 的 `Icon` 圖標樣式系統，說明 Ionicons、`.ivu-icon`、`.ivu-icon-${type}:before`、字體檔與 `Icon` component 之間如何協作。
->
-> 本章不逐一列出所有圖標名稱，也不深入比較每個圖標的視覺差異。重點是建立一條可長期複習的閱讀主線：**HTML class 如何透過 CSS 與 icon font 變成畫面上的圖標**。
-
----
-
-## 0. 原始筆記類型與問題分析
-
-### 0.1 筆記類型判斷
-
-這份原始筆記主要屬於「樣式系統閱讀筆記」，同時帶有一點「原始碼閱讀筆記」與「架構分析筆記」的性質。
-
-原因是它不是在講 `Icon` component 的完整 runtime 邏輯，而是聚焦在：
-
-- View UI Plus 如何匯入 icon font 相關樣式。
-- `.ivu-icon` 基礎 class 負責什麼。
-- `.ivu-icon-${type}:before` 如何透過 `content` 指定具體圖標字形。
-- `Icon` component 的 `type`、`custom`、`size`、`color` 為什麼能和樣式系統接上。
-
-也就是說，本章真正要理解的不是「Vue 元件怎麼寫」，而是「元件產生的 class 如何進入 CSS icon font 系統，最後變成圖標」。
-
-### 0.2 原始筆記目前的優點
-
-原始筆記已經抓到 `Icon` 圖標系統中最關鍵的幾個節點：
-
-| 已有內容 | 價值 |
-| --- | --- |
-| `src/styles/index.less` 到 `iconfont/ionicons.less` 的匯入流程 | 可以幫助讀者找到樣式入口，不會只停留在 `icon.vue`。 |
-| `_ionicons-variables.less`、`_ionicons-font.less`、`_ionicons-icons.less` 的責任分工 | 能建立 icon font 系統的模組地圖。 |
-| `.ivu-icon` 與 `.ivu-icon-${type}:before` 的關係 | 抓到「基礎樣式」與「具體字形」的分工。 |
-| `custom` 需要外部 CSS 支援 | 能避免誤以為 View UI Plus 會自動支援所有第三方 icon。 |
-| `size` / `color` 與 icon font 的關係 | 說明為什麼圖標可以像文字一樣調整大小與顏色。 |
-
-### 0.3 需要補強的地方
-
-原始筆記已經有清楚的結論，但若要成為長期學習用的教材，還可以補強以下部分：
-
-| 需要補強的方向 | 補強原因 |
-| --- | --- |
-| 更明確地說明 icon font 的基本模型 | 初學者可能知道 `class`，但不一定理解 glyph、code point、`font-family`、`:before` 的關係。 |
-| 將 Less 檔案拆成「命名基準、字體載入、圖標清單」三層理解 | 有助於未來閱讀其他元件庫或 icon font 系統。 |
-| 補上從 `<Icon type="ios-add" />` 到畫面顯示的完整鏈路 | 讓讀者能把 runtime 與 CSS 串起來，而不是只記住單一檔案。 |
-| 補充 `custom` 的責任邊界 | 避免把 `custom` 誤解成「幫我載入第三方 icon」。 |
-| 加入排錯路線 | 實務中圖標不顯示時，通常不是 Vue 壞掉，而是 class、CSS、font path 或建置資源有問題。 |
-| 標註版本與資訊邊界 | 本章基於 View UI Plus v1.3.20 的筆記內容；不同版本的路徑、字體或建置結果需要重新確認。 |
-
----
-
 ## 1. 本章定位
 
 在閱讀 `Icon` 元件時，很多人會先打開 `src/components/icon/icon.vue`，看到它只輸出一個 `<i>` 標籤，就以為這個元件很簡單，甚至覺得沒有什麼值得研究。
@@ -161,7 +113,7 @@ View UI Plus 的主樣式入口是：
 src/styles/index.less
 ```
 
-原始筆記指出，這個入口會匯入 common 樣式：
+這個入口會匯入 common 樣式：
 
 ```less
 @import "./common/index";
@@ -220,7 +172,7 @@ icons：最後定義每個 icon 名稱對應到哪個 glyph
 
 ### 4.1 核心變數
 
-原始筆記列出的 `_ionicons-variables.less` 核心變數如下：
+`_ionicons-variables.less` 核心變數如下：
 
 ```less
 @ionicons-font-path: "./fonts";
@@ -315,7 +267,7 @@ Less icons：定義 .ivu-icon-${name}:before
 
 ### 5.1 `@font-face`：把 Ionicons 字體註冊給瀏覽器
 
-原始筆記列出的 `_ionicons-font.less` 會先定義 `@font-face`：
+`_ionicons-font.less` 會先定義 `@font-face`：
 
 ```less
 @font-face {
@@ -338,11 +290,11 @@ Less icons：定義 .ivu-icon-${name}:before
 
 這裡同時提供多種格式，例如 `woff2`、`woff`、`ttf`、`svg`。通常這是為了支援不同瀏覽器或不同建置環境。實務上現代瀏覽器多半會優先使用較新的格式，例如 `woff2`；但具體載入哪一個，仍取決於瀏覽器支援與 CSS 解析結果。
 
-> 注意：本章只根據原始筆記提供的 v1.3.20 路徑與檔案內容說明。若使用的 View UI Plus 版本不同，字體檔格式、路徑或匯入方式需要重新確認。
+> 注意：本章只根據 v1.3.20 路徑與檔案內容說明。若使用的 View UI Plus 版本不同，字體檔格式、路徑或匯入方式需要重新確認。
 
 ### 5.2 `.ivu-icon()` mixin 與 `.ivu-icon`
 
-原始筆記指出，`_ionicons-font.less` 會定義 `.ivu-icon()` mixin，並套用到 `.ivu-icon`：
+`_ionicons-font.less` 會定義 `.ivu-icon()` mixin，並套用到 `.ivu-icon`：
 
 ```less
 .ivu-icon {
@@ -360,7 +312,7 @@ Less icons：定義 .ivu-icon-${name}:before
 - 字體平滑設定
 - 垂直對齊設定
 
-原始筆記沒有完整列出 mixin 每一行，因此這裡不把每一條 CSS 規則視為絕對完整清單。更重要的是理解它的角色：**`.ivu-icon` 讓一個普通的 `<i>` 元素具備 icon font 的基礎顯示能力。**
+沒有完整列出 mixin 每一行，因此這裡不把每一條 CSS 規則視為絕對完整清單。更重要的是理解它的角色：**`.ivu-icon` 讓一個普通的 `<i>` 元素具備 icon font 的基礎顯示能力。**
 
 ### 5.3 為什麼 `.ivu-icon` 必須存在
 
@@ -859,7 +811,7 @@ Ionicons font file
 
 ## 16. 版本與資訊邊界
 
-本章基於原始筆記中提供的 View UI Plus v1.3.20 檔案路徑與內容進行整理。以下資訊需要在實際專案中視版本重新確認：
+本章基於 View UI Plus v1.3.20 檔案路徑與內容進行整理。以下資訊需要在實際專案中視版本重新確認：
 
 - `src/styles/index.less`、`common/index.less`、`iconfont/ionicons.less` 的實際路徑。
 - `_ionicons-variables.less` 中的字體路徑與版本。
