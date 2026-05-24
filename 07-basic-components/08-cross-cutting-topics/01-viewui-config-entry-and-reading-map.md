@@ -1,31 +1,5 @@
 # `$VIEWUI`：View UI Plus 全域設定入口與基礎元件命中地圖
 
-> 筆記類型：原始碼閱讀筆記 + API / 設定筆記 + 架構分析筆記  
-> Source Baseline：`view-ui-plus-v1.3.20`  
-> 本章目的：建立 `$VIEWUI` 的來源、runtime shape、元件讀取方式與基礎元件命中地圖。
-
----
-
-## 0. 原始筆記問題分析
-
-這份原始筆記已經有清楚的閱讀方向，尤其是能把 `$VIEWUI` 從 plugin install、type declaration、component runtime 讀取三個層次拆開來看。這是閱讀 UI library 原始碼時很重要的能力，因為全域設定通常不會只出現在一個檔案，而是分散在「安裝入口」、「型別宣告」、「元件預設值」、「mixin」與「子元件 props 傳遞」之間。
-
-不過，若要把它放進長期知識庫，原始筆記仍有幾個可以補強的地方。
-
-第一，原始筆記的結論密度偏高，已經指出 `$VIEWUI` 是 runtime config container，但還可以再補充為什麼它不是 prop，也不是 `$Message`、`$Modal` 這類命令式 API。這對第一次閱讀 View UI Plus plugin 機制的人很重要，否則容易把所有掛在 `globalProperties` 上的東西都混為一談。
-
-第二，原始筆記列出了 `src/index.js`、`src/mixins/globalConfig.js`、`types/index.d.ts` 與 `src/components/*`，但每個檔案在整體閱讀流程中的角色仍可以補成「閱讀地圖」。也就是先看哪個檔案建立設定，再看哪個檔案描述 public API，最後回到元件確認設定是否真的被使用。
-
-第三，原始筆記已經有命中矩陣，但可以再強化「命中」與「沒有命中」的意義。尤其是 `Icon`、`Divider`、`Tag`、`Badge` 沒有直接讀取 `$VIEWUI`，這不是附帶資訊，而是判斷全域設定影響範圍時的重要對照組。
-
-第四，原始筆記中有多個表格與流程圖，適合保留，但需要在表格後補上教學段落，避免筆記只變成速查表。對原始碼閱讀來說，表格只是索引，真正重要的是理解資料如何從 `app.use(ViewUIPlus, options)` 流進元件。
-
-第五，原始筆記提到後續會拆成 `$VIEWUI.size`、`$VIEWUI.transfer`、`$VIEWUI.cell` 三篇，但沒有明確說明本章和後續章節的邊界。因此本章會把它定位成「入口與閱讀地圖」，不深入展開每個設定造成的畫面差異。
-
-第六，原始筆記沒有提供每個元件內部完整的 computed、render、class 組裝或子元件 props 傳遞細節。因此本章只整理已明確提供的結論；若涉及更細的畫面差異、CSS class 或 render 結構，會標註為「此處需要後續補充」。
-
----
-
 ## 1. 本章定位
 
 本章是一篇「原始碼地圖型」筆記，主題是 View UI Plus 的 `$VIEWUI` 全域設定入口，以及它在基礎元件中的實際命中範圍。它不是單一元件的使用教學，也不是完整的 plugin system 深入分析，而是用來幫你建立一張閱讀地圖：知道 `$VIEWUI` 從哪裡來、長什麼樣子、哪些元件會讀它、哪些元件不會讀它。
@@ -104,7 +78,7 @@ Component source：確認哪些元件實際讀取 $VIEWUI
 
 ### 3.1 Source Baseline
 
-本章以 `view-ui-plus-v1.3.20` 的原始碼整理為基準。原始筆記指出，閱讀 `$VIEWUI` 時至少要看以下幾類檔案。
+本章以 `view-ui-plus-v1.3.20` 的原始碼整理為基準。閱讀 `$VIEWUI` 時至少要看以下幾類檔案。
 
 | Source | 完整路徑 | 閱讀重點 |
 | --- | --- | --- |
@@ -163,7 +137,7 @@ app.use(ViewUIPlus, {
 });
 ```
 
-在 `src/index.js` 的 install 流程中，View UI Plus 會把 `opts` 整理後寫入 `app.config.globalProperties.$VIEWUI`。原始筆記提供的核心片段如下：
+在 `src/index.js` 的 install 流程中，View UI Plus 會把 `opts` 整理後寫入 `app.config.globalProperties.$VIEWUI`。核心片段如下：
 
 ```js
 app.config.globalProperties.$VIEWUI = {
@@ -186,8 +160,6 @@ app.config.globalProperties.$VIEWUI = {
 第二，install 流程會替部分 key 建立預設值。例如 `size` 沒有傳入時會是空字串 `''`；`capture` 沒有傳入時預設為 `true`；`transfer` 若沒有出現在 `opts` 中，預設為空字串 `''`。
 
 第三，`cell` 即使在使用者 options 中沒有提供完整設定，runtime 中仍會被建立為一個物件，並且其中的 `arrow`、`customArrow`、`arrowSize` 預設為空字串。這代表元件讀取 `$VIEWUI.cell` 時，可以期待它是一個存在的物件；但具體欄位是否有值，仍取決於使用者 options。
-
-此處需要後續補充：原始筆記沒有提供 `src/index.js` 中 `$VIEWUI` 完整物件的全部 key，因此本章只整理和基礎元件相關的 `size`、`transfer`、`cell`，以及片段中出現的 `capture`。
 
 ### 4.2 Runtime shape 與 Type declaration 要分層閱讀
 
@@ -213,7 +185,7 @@ app.config.globalProperties.$VIEWUI = {
 
 ### 4.3 元件讀取方式一：Prop default 直接讀 `globalProperties`
 
-第一種讀取模式，是元件在 prop default 中直接讀取目前 app 的 `globalProperties.$VIEWUI`。原始筆記提供的典型片段如下：
+第一種讀取模式，是元件在 prop default 中直接讀取目前 app 的 `globalProperties.$VIEWUI`。典型片段如下：
 
 ```js
 default () {
@@ -243,7 +215,7 @@ default () {
 
 ### 4.4 元件讀取方式二：透過 `globalConfig` mixin
 
-第二種讀取模式，是元件透過 `globalConfig` mixin 把 `$VIEWUI` 存到元件實例上。原始筆記指出，`src/mixins/globalConfig.js` 會在 `created()` 中讀取：
+第二種讀取模式，是元件透過 `globalConfig` mixin 把 `$VIEWUI` 存到元件實例上。`src/mixins/globalConfig.js` 會在 `created()` 中讀取：
 
 ```js
 this.globalConfig = instance.appContext.config.globalProperties.$VIEWUI;
@@ -257,13 +229,13 @@ mixins: [ mixinsLink, globalConfig ]
 
 這種模式通常更適合 component-specific config。也就是設定不是單純的通用 prop default，而是某一類元件自己的全域設定，例如 `Cell` 的 arrow icon、custom arrow icon 或 arrow size。
 
-和 prop default 模式相比，`globalConfig` mixin 的特點是：它先把整個 `$VIEWUI` 掛到元件實例上，後續元件可以在 computed、method、render 或其他內部邏輯中讀取 `this.globalConfig`。不過，原始筆記目前只指出 `Cell` 會讀取 `$VIEWUI.cell`，尚未提供 `Cell` 內部如何組裝 Icon 的完整細節。
+和 prop default 模式相比，`globalConfig` mixin 的特點是：它先把整個 `$VIEWUI` 掛到元件實例上，後續元件可以在 computed、method、render 或其他內部邏輯中讀取 `this.globalConfig`。不過，`Cell` 會讀取 `$VIEWUI.cell`，尚未提供 `Cell` 內部如何組裝 Icon 的完整細節。
 
 此處需要後續補充：若要完整理解 `Cell` 的 arrow 行為，需要回到 `src/components/cell/cell.vue` 追蹤 `globalConfig.cell.arrow`、`globalConfig.cell.customArrow`、`globalConfig.cell.arrowSize` 最後如何進入 `Icon` 或 render 結構。
 
 ### 4.5 `$VIEWUI` 在基礎元件中的命中範圍
 
-原始筆記整理了 `07-basic-components/` 中實際命中 `$VIEWUI` 的位置。這張命中矩陣是本章最重要的索引之一。
+`07-basic-components/` 中實際命中 `$VIEWUI` 的位置。這張命中矩陣是本章最重要的索引之一。
 
 | 元件 | Source | `$VIEWUI` key | 影響 |
 | --- | --- | --- | --- |
@@ -281,7 +253,7 @@ mixins: [ mixinsLink, globalConfig ]
 
 ### 4.6 沒有命中的元件也是閱讀重點
 
-原始筆記列出的未命中元件如下：
+未命中元件如下：
 
 | 元件 | 結論 | 閱讀意義 |
 | --- | --- | --- |
@@ -419,7 +391,7 @@ app.use(ViewUIPlus, {
 });
 ```
 
-初學者可能會推論：既然 `Tag` 是基礎元件，那它也會使用全域 `size`。但根據原始筆記整理，`Tag` 在 v1.3.20 中沒有直接讀取 `$VIEWUI`。因此不能只因為 `$VIEWUI.size` 存在，就認定 `Tag` 會跟著變大。
+初學者可能會推論：既然 `Tag` 是基礎元件，那它也會使用全域 `size`。`Tag` 在 v1.3.20 中沒有直接讀取 `$VIEWUI`。因此不能只因為 `$VIEWUI.size` 存在，就認定 `Tag` 會跟著變大。
 
 這個情境是閱讀 UI library 原始碼時的典型提醒：全域設定的影響範圍不是靠直覺推論，而是靠 source code 驗證。
 

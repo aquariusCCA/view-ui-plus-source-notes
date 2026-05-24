@@ -1,23 +1,5 @@
 # `$VIEWUI.transfer` 在基礎元件中的實際落點：從全域設定到 `AvatarList` 內部 `Tooltip`
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經抓到 `$VIEWUI.transfer` 在 `07-basic-components/` 範圍內最重要的結論：它不是所有基礎元件都會使用的通用設定，而是目前集中落在 `AvatarList`，再由 `AvatarList` 傳給內部的 `Tooltip`。
-
-不過，如果要把這份筆記放進長期學習用的知識庫，仍然可以再補強幾個面向。
-
-第一，原始筆記雖然有列出 `$VIEWUI.transfer` 的來源與 `AvatarList.transfer` 的 default 邏輯，但還需要更清楚說明為什麼 `transfer` 這類設定通常會出現在浮層元件中。對初學者來說，若不先理解「浮層掛載位置」這個背景，就容易把 `transfer` 誤解成一般 CSS layout 設定。
-
-第二，原始筆記已經指出 `AvatarList` 會把 `transfer` 傳給 `Tooltip`，但還可以補成更完整的資料流：`install options` 如何進入 `$VIEWUI.transfer`，`AvatarList.transfer` 如何用它當 fallback，最後又在什麼條件下才真的渲染 `Tooltip`。
-
-第三，原始筆記中的命中矩陣非常重要，但目前偏向結論表。為了讓筆記更適合複習，應該補上「為什麼其他基礎元件不算命中」的判斷方法。閱讀 View UI Plus 原始碼時，不能看到全域 options 存在就推論所有元件都會受影響，而是要回到元件是否實際讀取該 key。
-
-第四，這份筆記可以和 `$VIEWUI.size` 做比較。`size` 最後通常會進入 class 或 inline style；`transfer` 則是傳給浮層元件，改變 DOM 掛載策略。兩者都是 top-level global options，但語意完全不同。
-
-第五，原始筆記沒有展開 `Tooltip` 內部如何根據 `transfer` 決定掛載位置。由於目前提供的筆記只涵蓋 `AvatarList` 到 `Tooltip` 的傳遞，不應編造 `Tooltip` 內部細節；這一段應標註為後續可獨立閱讀的主題。
-
----
-
 ## 1. 本章定位
 
 本章是一篇「原始碼閱讀筆記」加上「全域設定行為分析筆記」。它的目標不是教你如何使用 `AvatarList` 做完整 UI，也不是深入分析 `Tooltip` 的浮層掛載實作，而是建立一張清楚的 `$VIEWUI.transfer` 影響地圖。
@@ -117,7 +99,7 @@ View UI Plus 透過 plugin install 階段建立 `$VIEWUI`，並把它掛到 Vue 
 | `src/components/avatar-list/avatar-list.vue` | `AvatarList.transfer` 如何讀取 `$VIEWUI.transfer`，以及如何傳給內部 `Tooltip`。 |
 | `Tooltip` 相關 source | 此處需要後續補充。本章只追蹤到 `AvatarList` 把 `transfer` 傳入 `Tooltip`，不展開 `Tooltip` 內部實作。 |
 
-完整路徑依原始筆記脈絡可對應到：
+完整路徑脈絡可對應到：
 
 ```txt
 01-origin/source/view-ui-plus-v1.3.20/src/index.js
@@ -280,7 +262,7 @@ AvatarList 內部 Tooltip 的浮層是否使用 transfer 掛載策略。
 
 ### 4.4 `Tooltip` 出現條件：不是有 `transfer` 就一定有浮層效果
 
-原始筆記中特別指出，`transfer` 只有在 `Tooltip` 被渲染時才有實際效果。這一點非常重要。
+`transfer` 只有在 `Tooltip` 被渲染時才有實際效果。這一點非常重要。
 
 `Tooltip` 的渲染條件是：
 
@@ -545,7 +527,7 @@ app.use(ViewUIPlus, {
 | `AvatarList` 自己實作了浮層 | 因為 `transfer` prop 出現在 `AvatarList` 上，看起來像是 `AvatarList` 自己處理浮層。 | `AvatarList` 是把 `transfer` 傳給內部 `Tooltip`，浮層能力來自 `Tooltip`。 |
 | 設定 `$VIEWUI.transfer=true` 一定會讓 `AvatarList` DOM 改變 | 容易把全域設定理解成必然生效的開關。 | 只有 `Tooltip` branch 被渲染時，`transfer` 才有實際效果。 |
 | `Avatar` 也會受 `transfer` 影響 | `AvatarList` 內部會渲染 `Avatar`，所以容易誤以為所有設定都傳給 `Avatar`。 | `Avatar` 接收的是 `src`、`size`、`shape`，不是 `transfer`。 |
-| 所有基礎元件都有 `transfer` | 因為 `transfer` 是全域設定，容易被過度泛化。 | 在 v1.3.20 的基礎元件範圍內，原始筆記只確認 `AvatarList` 直接讀取。 |
+| 所有基礎元件都有 `transfer` | 因為 `transfer` 是全域設定，容易被過度泛化。 | 在 v1.3.20 的基礎元件範圍內，`AvatarList` 直接讀取。 |
 | `transfer: false` 等同於沒有設定 | 因為 JavaScript 中 `false` 是 falsy value。 | `false` 是明確設定，所以 `src/index.js` 用 key-existence 判斷保留它。 |
 | 只要看到 type declaration 有 `transfer`，就代表所有元件都使用 | 型別宣告描述 public option shape，不能代表 runtime 命中情況。 | 必須回到元件 source，確認是否實際讀取 `$VIEWUI.transfer`。 |
 

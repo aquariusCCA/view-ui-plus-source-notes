@@ -1,23 +1,5 @@
 # `$VIEWUI.cell` 與 `Cell` 預設箭頭設定：全域設定、Mixin 與 Render 分支閱讀筆記
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經正確抓到 `$VIEWUI.cell` 的核心資料流：使用者在 `app.use(ViewUIPlus, { cell })` 傳入設定，View UI Plus 在 install 階段建立 `$VIEWUI.cell`，接著 `Cell` 透過 `globalConfig` mixin 取得全域設定，最後由 `arrowType`、`customArrowType`、`arrowSize` 等 computed 屬性決定預設箭頭 `Icon` 的 props。
-
-不過，若要讓這份筆記更適合長期學習，還可以補強幾個方向。
-
-第一，原始筆記雖然列出了資料流，但對「為什麼 `$VIEWUI.cell` 不走 prop default，而是走 `globalConfig` mixin + computed」的設計意圖說明較少。這會導致初學者只記住結論，卻不容易理解 `Cell` 和 `Button`、`AvatarList` 在全域設定消費方式上的差異。
-
-第二，原始筆記已經提到 `Cell` 只有在 `to` 有值時才渲染 arrow，也提到 `#arrow` slot 會覆蓋預設 `Icon`，但這兩個條件其實是理解 `$VIEWUI.cell` 是否生效的關鍵。因此本篇會把它們提升為「前置條件」來講解，而不是只放在 render 片段旁邊。
-
-第三，`arrow`、`customArrow`、`arrowSize` 三個欄位的關係需要更完整地整理。尤其是 `customArrow` 有值時，`arrowType` 會被清空，這不是隨機設計，而是為了避免同時傳入 `Icon.type` 與 `Icon.custom`，造成 icon 來源語意不清。
-
-第四，這份筆記適合加入更多閱讀路線與情境推演。例如：沒有設定全域 `cell` 時會怎麼走？設定 `cell.arrow` 時會怎麼走？設定 `cell.customArrow` 時為什麼要清掉 `type`？單一 `Cell` 要完全客製 arrow 時應該用全域設定還是 slot？這些問題都能幫助讀者把原始碼邏輯轉成實務判斷能力。
-
-第五，本篇只根據原始筆記中提供的 `Cell`、`$VIEWUI.cell` 與相關片段進行整理。若後續要深入分析 `globalConfig` mixin 的完整生命週期、`Icon` 對 `type` / `custom` / `size` 的實際處理，應拆成獨立筆記補充。
-
----
-
 ## 1. 本章定位
 
 本章是一篇「原始碼閱讀筆記」加上「全域設定行為分析筆記」。它要解決的問題不是教你如何使用 `Cell` 的所有功能，而是專門說明 `$VIEWUI.cell` 如何影響 `Cell` 的預設箭頭。
@@ -75,7 +57,7 @@ app.config.globalProperties.$VIEWUI
 
 ### 2.2 `Cell` 的 arrow 是 link cue，不是每個 `Cell` 都會出現
 
-`Cell` 的 arrow 通常用來提示使用者：「這個項目可以前往另一個位置或執行導向行為」。因此在原始筆記提供的 render branch 中，arrow 區塊被綁在 `to` 條件上：
+`Cell` 的 arrow 通常用來提示使用者：「這個項目可以前往另一個位置或執行導向行為」。因此在 render branch 中，arrow 區塊被綁在 `to` 條件上：
 
 ```vue
 <div class="ivu-cell-arrow" v-if="to">
@@ -97,7 +79,7 @@ app.config.globalProperties.$VIEWUI
 
 ### 2.4 `Icon.type` 與 `Icon.custom` 的來源語意不同
 
-原始筆記中提到，當 `$VIEWUI.cell.customArrow` 有值時，`arrowType` 會被清空。這個行為很重要，因為 `type` 與 `custom` 通常代表不同的 icon 來源或使用方式。
+當 `$VIEWUI.cell.customArrow` 有值時，`arrowType` 會被清空。這個行為很重要，因為 `type` 與 `custom` 通常代表不同的 icon 來源或使用方式。
 
 如果同時傳入 `Icon.type` 與 `Icon.custom`，讀者會很難判斷最後應該以哪一個 icon 來源為準。因此 `Cell` 在 computed 中使用「`customArrow` 優先，並清空 `arrowType`」的策略，讓預設 `Icon` 的來源保持單一且明確。
 
@@ -107,7 +89,7 @@ app.config.globalProperties.$VIEWUI
 
 ### 3.1 Source Baseline
 
-本篇原始筆記涉及的主要來源如下。
+本篇主要來源如下。
 
 | Source | 閱讀重點 |
 | --- | --- |
@@ -152,7 +134,7 @@ app.config.globalProperties.$VIEWUI
 
 ### 4.1 `$VIEWUI.cell` 在 install 階段的 runtime shape
 
-原始筆記中列出的 install 建立邏輯如下：
+install 建立邏輯如下：
 
 ```js
 cell: {
@@ -172,7 +154,7 @@ cell: {
 }
 ```
 
-這個設計的好處是，消費端元件可以穩定地讀取 `config.cell.arrow`、`config.cell.customArrow`、`config.cell.arrowSize`，而不必每次都先判斷 `cell` 物件是否存在。不過，從原始筆記中的 `arrowType` 寫法來看，`Cell` 仍然會先判斷 `config` 是否存在，這是為了避免某些情境下 `$VIEWUI` 尚未被建立或元件被單獨使用時發生錯誤。
+這個設計的好處是，消費端元件可以穩定地讀取 `config.cell.arrow`、`config.cell.customArrow`、`config.cell.arrowSize`，而不必每次都先判斷 `cell` 物件是否存在。不過，從 `arrowType` 寫法來看，`Cell` 仍然會先判斷 `config` 是否存在，這是為了避免某些情境下 `$VIEWUI` 尚未被建立或元件被單獨使用時發生錯誤。
 
 這裡也要注意 fallback 策略：`arrow`、`customArrow`、`arrowSize` 使用的是 truthy 判斷。也就是說，如果傳入空字串，最後仍然會被視為沒有設定。對 `arrowSize` 而言，如果傳入的是 `0`，也會因為 falsy 被轉成空字串。這是否符合實際需求，通常要看元件是否允許 `0` 這種尺寸語意；就本篇筆記範圍而言，只能確定原始碼使用 truthy fallback。
 
@@ -190,7 +172,7 @@ type declaration 回答的是「使用者可以傳入什麼 shape」，runtime i
 
 ### 4.2 `Cell` 透過 `globalConfig` mixin 取得 `$VIEWUI`
 
-原始筆記中指出，`Cell` 的 source 位於：
+`Cell` 的 source 位於：
 
 ```txt
 src/components/cell/cell.vue
@@ -235,7 +217,7 @@ getCurrentInstance().appContext.config.globalProperties
 
 ### 4.3 Arrow render branch：`$VIEWUI.cell` 生效前的兩個條件
 
-原始筆記提供的 render 片段如下：
+render 片段如下：
 
 ```vue
 <div class="ivu-cell-arrow" v-if="to">
@@ -269,7 +251,7 @@ Cell.to 有值
 
 ### 4.4 `arrowType`：內建 icon 與 custom icon 的互斥策略
 
-原始筆記中的 `arrowType` computed 如下：
+`arrowType` computed 如下：
 
 ```js
 arrowType () {
@@ -310,7 +292,7 @@ arrowType () {
 
 ### 4.5 `customArrowType`：只在 `customArrow` 有值時生效
 
-原始筆記中的 `customArrowType` computed 如下：
+`customArrowType` computed 如下：
 
 ```js
 customArrowType () {
@@ -357,7 +339,7 @@ custom="使用者設定的 customArrow"
 
 ### 4.6 `arrowSize`：只負責傳遞 size，不負責創造 arrow
 
-原始筆記中的 `arrowSize` computed 如下：
+`arrowSize` computed 如下：
 
 ```js
 arrowSize () {
@@ -396,7 +378,7 @@ $VIEWUI.cell.arrowSize
 
 ### 4.7 `$VIEWUI.cell` 與 local props / slots 的責任分工
 
-原始筆記指出，`Cell` 沒有提供 `arrow`、`customArrow`、`arrowSize` 這些 local props。這是一個值得注意的 API 設計選擇。
+`Cell` 沒有提供 `arrow`、`customArrow`、`arrowSize` 這些 local props。這是一個值得注意的 API 設計選擇。
 
 使用者若要改變 arrow，有兩條路：
 
@@ -641,7 +623,7 @@ app.use(ViewUIPlus, {
 
 | 誤區 | 為什麼容易誤解 | 正確理解 |
 | --- | --- | --- |
-| `Cell` 有 `arrow` prop | 因為 `$VIEWUI.cell.arrow` 看起來像某個元件 prop | v1.3.20 原始筆記範圍中，`Cell` 沒有 local `arrow` prop；arrow 預設來自 `$VIEWUI.cell` 或 `#arrow` slot。 |
+| `Cell` 有 `arrow` prop | 因為 `$VIEWUI.cell.arrow` 看起來像某個元件 prop | v1.3.20 範圍中，`Cell` 沒有 local `arrow` prop；arrow 預設來自 `$VIEWUI.cell` 或 `#arrow` slot。 |
 | 設定 `$VIEWUI.cell` 後所有 `Cell` 都會出現 arrow | 只看到全域 arrow 設定，忽略 render branch 的 `v-if="to"` | 只有 `to` 有值的 `Cell` 才會渲染 `.ivu-cell-arrow`。 |
 | `customArrow` 和 `arrow` 會一起傳給 `Icon` | 看到兩個設定都存在，以為會同時生效 | `customArrow` 有值時，`arrowType` 會被清空，避免同時傳 `Icon.type` 與 `Icon.custom`。 |
 | `#arrow` slot 只是改 icon type | 把 slot 想成 prop 的另一種寫法 | `#arrow` slot 會覆蓋整個 fallback `Icon`，可以放入任意自訂結構。 |

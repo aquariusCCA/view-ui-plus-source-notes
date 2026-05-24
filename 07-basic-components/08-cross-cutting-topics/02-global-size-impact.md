@@ -1,23 +1,5 @@
 # Global Size Impact：`$VIEWUI.size` 對基礎元件預設尺寸的影響
 
-## 0. 原始筆記問題分析
-
-這份原始筆記已經掌握了 `$VIEWUI.size` 最重要的結論：它不是全站 CSS 主題開關，而是部分元件在 `size` prop 沒有被使用者明確傳入時，才會讀取的全域預設值。原始筆記也已經把 `Button`、`ButtonGroup`、`Avatar` 與 `AvatarList` 的差異整理出來，這是閱讀 View UI Plus 基礎元件時很關鍵的判斷。
-
-不過，如果要把這份筆記放進長期知識庫，仍然可以再補強幾個地方。
-
-第一，原始筆記偏向「結論整理」，例如直接說 `$VIEWUI.size` 只影響哪些元件，但對初次閱讀原始碼的人來說，還需要先理解 `$VIEWUI.size` 在整個 View UI Plus plugin install 流程中的位置，以及它為什麼會進入元件的 `prop default`。
-
-第二，原始筆記已經列出 `Button`、`ButtonGroup`、`Avatar` 的 class / style mapping，但這三者的差異需要用更教學化的方式說明。尤其是 `Button` 不產生 `ivu-btn-default` 作為 size class，而 `ButtonGroup` 會產生 `ivu-btn-group-default`，這是容易誤判的地方。
-
-第三，`AvatarList` 是一個很適合用來訓練「不要只看子元件，也要看父元件是否傳入 prop」的案例。原始筆記已經指出它不讀 `$VIEWUI.size`，但可以再補上為什麼「內部使用 `Avatar`」不等於「會吃到 `Avatar` 自己的 global default」。
-
-第四，原始筆記提到 `ButtonGroup` 透過 group class 和 less selector 影響群組內按鈕視覺，但沒有提供對應 less 檔案與 selector 細節。因此本章會把這一點標註為「此處需要後續補充」，避免假裝已經確認未提供的樣式原始碼。
-
-本章重構後的目標，是把這份筆記從「全域 size 命中整理」提升成一篇可以反覆複習的原始碼閱讀章節：先建立觀念，再看資料流，最後比較各元件的落地差異。
-
----
-
 ## 1. 本章定位
 
 本章是一篇「原始碼閱讀筆記 + 全域設定行為分析筆記」。它專門分析 View UI Plus 的 `$VIEWUI.size` 如何從 plugin install options 進入基礎元件，並最終影響元件的 class 或 inline style。
@@ -101,7 +83,7 @@ install 階段建立 $VIEWUI.size
 
 ### 2.4 全域尺寸設定不等於 theme system
 
-`$VIEWUI.size` 很容易被誤解成一種 theme 設定，例如「我設成 large，整個 UI 就全部變大」。但從原始筆記整理的基礎元件範圍來看，它只影響實際在 `size` prop default 中讀取 `$VIEWUI.size` 的元件。
+`$VIEWUI.size` 很容易被誤解成一種 theme 設定，例如「我設成 large，整個 UI 就全部變大」。它只影響實際在 `size` prop default 中讀取 `$VIEWUI.size` 的元件。
 
 因此，`$VIEWUI.size` 更精準的定義是：
 
@@ -150,7 +132,7 @@ $VIEWUI.size
 
 ### 3.2 Source Baseline
 
-本章主要根據原始筆記中列出的下列 source 觀察結果整理。
+下列 source 觀察結果整理。
 
 | Source | 在本章中的角色 | 閱讀重點 |
 | --- | --- | --- |
@@ -221,7 +203,7 @@ app.config.globalProperties.$VIEWUI = {
 | `size: ''` | `''` | 因為是 falsy value，結果仍是空字串 |
 | `size: null` / `undefined` | `''` | 因為是 falsy value，結果仍是空字串 |
 
-這裡要特別和其他全域設定區分。原始筆記指出，`transfer`、`capture` 的處理方式不是單純 `opts.xxx || ''`，而可能使用 key-existence 判斷。因此你不能把 `$VIEWUI.size` 的 fallback 規則直接套到所有 `$VIEWUI` key 上。
+這裡要特別和其他全域設定區分。`transfer`、`capture` 的處理方式不是單純 `opts.xxx || ''`，而可能使用 key-existence 判斷。因此你不能把 `$VIEWUI.size` 的 fallback 規則直接套到所有 `$VIEWUI` key 上。
 
 對 `$VIEWUI.size` 來說，目前能確定的規則是：
 
@@ -323,7 +305,7 @@ default
 | `small` | `ivu-btn-small` | 小尺寸按鈕 |
 | `large` | `ivu-btn-large` | 大尺寸按鈕 |
 
-這裡最容易混淆的是 `ivu-btn-default`。在 `Button` 中，`default` 也可能出現在 button type 的語意裡，例如預設按鈕類型；但就原始筆記整理的 size class mapping 來看，`Button` 不會因為 `size === 'default'` 而產生 `ivu-btn-default` 這個 size class。
+這裡最容易混淆的是 `ivu-btn-default`。在 `Button` 中，`default` 也可能出現在 button type 的語意裡，例如預設按鈕類型；size class mapping 來看，`Button` 不會因為 `size === 'default'` 而產生 `ivu-btn-default` 這個 size class。
 
 因此閱讀 `Button` 時要把兩件事分開：
 
@@ -370,11 +352,9 @@ ButtonGroup:
   default -> 產生 ivu-btn-group-default
 ```
 
-另外，原始筆記中特別指出：`ButtonGroup` 沒有把 `size` prop 直接傳給子 `Button`。它是透過 group class 和 less selector 影響群組內按鈕的視覺。
+另外，`ButtonGroup` 沒有把 `size` prop 直接傳給子 `Button`。它是透過 group class 和 less selector 影響群組內按鈕的視覺。
 
 這個設計代表 `ButtonGroup` 的尺寸行為是「群組容器主導」，而不是「把 size prop 分發給每一個 Button」。因此閱讀它時，不能只找子元件 props，也要追 CSS / Less selector 如何針對 group class 改變內部按鈕樣式。
-
-> 此處需要後續補充：原始筆記沒有提供 `ButtonGroup` 對應的 Less selector 內容，因此本章不展開具體 CSS 規則。後續若要深入，應補讀 button 相關樣式檔，確認 `ivu-btn-group-small`、`ivu-btn-group-large`、`ivu-btn-group-default` 如何影響子按鈕。
 
 ---
 
@@ -386,7 +366,7 @@ ButtonGroup:
 src/components/avatar/avatar.vue
 ```
 
-和 `Button` 相比，`Avatar` 的 `size` 支援範圍比較寬。原始筆記整理出的支援形式包括：
+和 `Button` 相比，`Avatar` 的 `size` 支援範圍比較寬。支援形式包括：
 
 ```txt
 small / default / large
@@ -426,7 +406,7 @@ if (this.size && !oneOf(this.size, sizeList)) {
 | `large` | 產生 `ivu-avatar-large` | 大尺寸 class 樣式 |
 | 非預設尺寸 | 產生 inline `width` / `height` / `lineHeight` / `fontSize` | 依照 `this.size` 計算 |
 
-這裡有一個設計上的細節需要特別注意：`$VIEWUI.size` 的 type 在原始筆記中被視為 `string`，所以理論上使用者可能在 install 階段傳入非標準字串，例如：
+這裡有一個設計上的細節需要特別注意：`$VIEWUI.size` 的 type 被視為 `string`，所以理論上使用者可能在 install 階段傳入非標準字串，例如：
 
 ```js
 app.use(ViewUIPlus, {
@@ -468,7 +448,7 @@ Avatar 會讀 $VIEWUI.size
 所以 AvatarList 應該也會受到 $VIEWUI.size 影響
 ```
 
-但原始筆記指出，這個推論是錯的。
+但這個推論是錯的。
 
 原因是 `AvatarList` 自己的 `size` prop default 固定為 `default`，它不讀 `$VIEWUI.size`。更重要的是，它會把自己的 `size` 傳給子 `Avatar`。
 
@@ -495,7 +475,7 @@ app.use(ViewUIPlus, { size: 'large' })
 
 ### 4.7 受影響與不受影響的基礎元件
 
-根據原始筆記整理，`07-basic-components/` 範圍內的 `$VIEWUI.size` 命中情況如下。
+根據 `07-basic-components/` 範圍內的 `$VIEWUI.size` 命中情況如下。
 
 | 元件 | 是否直接讀 `$VIEWUI.size` | 結論 | 閱讀重點 |
 | --- | --- | --- | --- |
@@ -605,7 +585,7 @@ app.use(ViewUIPlus, {
 <AvatarList />
 ```
 
-直覺上可能以為 `AvatarList` 內部使用 `Avatar`，所以它應該跟著變大。但原始筆記指出，`AvatarList.size` default 固定為 `default`，而且會把 `size` 傳給內部 `Avatar`。
+直覺上可能以為 `AvatarList` 內部使用 `Avatar`，所以它應該跟著變大。但 `AvatarList.size` default 固定為 `default`，而且會把 `size` 傳給內部 `Avatar`。
 
 所以實際流程是：
 
@@ -693,7 +673,7 @@ app.use(ViewUIPlus, {
 | `AvatarList` 會跟著全域 size 改變 | 因為它內部使用 `Avatar` | `AvatarList` 自己的 `size` default 固定為 `default`，並把 `size` 傳給子 `Avatar` |
 | `Avatar` 的 size 只會走 class | 標準尺寸確實是 class mapping | 非標準尺寸會走 inline style |
 | 可以把任意自訂尺寸放進 `$VIEWUI.size` | `Avatar` 支援自訂尺寸，容易推論全域也可以這樣用 | 全域 size 會被多個元件讀取，應優先使用 `small` / `default` / `large` 這類跨元件安全值 |
-| 看到 `ivu-btn-default` 就以為是 Button size class | `default` 同時可能出現在 type 和 size 語意中 | 原始筆記中的 `Button` size mapping 不會為 `default` 產生 `ivu-btn-default` size class |
+| 看到 `ivu-btn-default` 就以為是 Button size class | `default` 同時可能出現在 type 和 size 語意中 | `Button` size mapping 不會為 `default` 產生 `ivu-btn-default` size class |
 
 ---
 

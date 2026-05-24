@@ -1,34 +1,5 @@
 # Basic Components `$VIEWUI` 全域設定影響筆記：閱讀入口與橫向地圖
 
-## 0. 原始筆記問題分析
-
-這份原始 `README.md` 已經具備清楚的目錄定位：它知道自己不是要重複每個基礎元件的完整 `props`、`render`、`style` 細節，而是要把 `$VIEWUI` 對 `07-basic-components/` 的影響整理成一條橫向主線。這個方向是正確的，因為 `$VIEWUI` 本質上不是某一個元件的功能，而是 plugin install 階段建立出來的全域 runtime config。
-
-不過，原始筆記比較像「目錄說明」與「速查表」，還沒有完全展開成適合長期學習的教材型筆記。主要可以補強的地方有幾個。
-
-第一，原始筆記列出了資料流：
-
-```txt
-app.use(ViewUIPlus, options)
-  -> src/index.js 建立 $VIEWUI
-  -> component default / globalConfig mixin 讀取 $VIEWUI
-  -> 基礎元件的預設 size、transfer、arrow 行為改變
-```
-
-這條線很重要，但原始筆記沒有進一步解釋每一段在原始碼閱讀上代表什麼。對第一次閱讀 View UI Plus 原始碼的人來說，還需要知道：`app.use()` 是入口，`src/index.js` 是 plugin install 的核心位置，`globalProperties.$VIEWUI` 是 Vue app 層級的 runtime config，而 component 端只有在實際讀取這個 config 時才會受到影響。
-
-第二，原始筆記有列出 Topic Plan，但它仍偏向「我要寫哪些檔案」的規劃表，還沒有補成「應該怎麼讀」的學習路線。對學習者來說，只知道有四篇筆記還不夠，還需要知道為什麼要先讀入口地圖，再讀 `$VIEWUI.size`、`$VIEWUI.transfer`、`$VIEWUI.cell`，以及每一篇要解決哪一種混淆。
-
-第三，Source Baseline 很重要，但原始筆記只列出 source path 與用途，尚未明確說明這些 source 的可信度層級。閱讀框架原始碼時，要區分「runtime source 已確認的行為」、「type declaration 描述的 public shape」與「文件或命名讓人推測的行為」。這種區分能避免把型別宣告誤解成實際消費邏輯。
-
-第四，基礎元件命中概覽已經整理得不錯，但仍需要補上閱讀重點：命中 `$VIEWUI` 的元件要追蹤資料如何進入 `props default`、`computed`、`render` 或子元件 props；未命中的元件則不是不重要，而是用來建立反例，提醒我們不要因為全域設定存在，就推論所有元件都會使用它。
-
-第五，原始筆記有 Working Rule，但還可以補成筆記維護規範。尤其當未來 View UI Plus 版本升級、或閱讀範圍從 `07-basic-components/` 擴大到表單、浮層、資料展示元件時，這份 README 應該能作為整個 `$VIEWUI` 筆記目錄的入口與邊界說明。
-
-此處需要後續補充：如果未來要分析 `Form`、`Input`、`Select`、`Tooltip`、`Modal` 等非基礎元件，需要另外建立新的命中矩陣，不能直接沿用本篇針對 `07-basic-components/` 的結論。
-
----
-
 ## 1. 本章定位
 
 這篇筆記是 `$VIEWUI` 全域設定在 `07-basic-components/` 中的「閱讀入口、章節索引與橫向地圖」。它不是單一元件分析，也不是完整的 plugin system 教學，而是用來回答以下問題：
@@ -265,7 +236,7 @@ Cell.to 有值
 
 ### 4.5 命中元件與未命中元件要一起讀
 
-原始筆記中特別列出未直接命中 `$VIEWUI` 的元件，例如：
+列出未直接命中 `$VIEWUI` 的元件，例如：
 
 ```txt
 Icon
