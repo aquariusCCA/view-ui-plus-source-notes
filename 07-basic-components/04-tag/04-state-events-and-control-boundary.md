@@ -1,25 +1,5 @@
 # View UI Plus Tag：State、Events 與 Control Boundary 教材型筆記
 
-## 0. 原始筆記問題分析
-
-這份原始筆記的主題是 `View UI Plus` 中 `Tag` 元件的狀態、事件與外部控制邊界。原文已經抓到幾個重要觀察：`closable` 不會自動刪除、`checkable` 不等於 `v-model`、`checked` 不是唯一資料來源、`name` 會影響事件 payload。這些都是閱讀 `Tag` 原始碼時最容易混淆的地方。
-
-不過，若要把它整理成適合長期複習的教材型筆記，還可以進一步補強幾個面向。
-
-第一，原文已經列出 `checked`、`isChecked`、watcher、`check()`、`close()`，但它們之間的狀態流向還可以更明確。對初學者而言，只看到「watcher 會同步」還不夠，必須知道 `Tag` 的狀態模型不是純受控，也不是純非受控，而是「外部 prop 可同步、內部事件也會立即修改狀態」的混合模型。
-
-第二，原文已經說明 `closable` 不會自動刪除，但可以再補充這種設計背後的元件邊界：`Tag` 只是一顆可互動標籤，它不應該擅自修改父層列表資料，也不應該自行決定是否從 DOM 中消失。它只負責發出「使用者想關閉」的意圖，真正刪除資料的責任留給外部。
-
-第三，原文提到 `.stop` 很重要，但可以再拆開說明 root click 與 close icon click 的事件隔離。尤其當 `closable` 和 `checkable` 同時存在時，若沒有 `.stop`，點擊 close icon 可能同時觸發選取切換，這會讓使用者操作語意變得混亂。
-
-第四，原文有提到 `TagSelectOption`，但可以把它升級成「控制邊界案例」。因為 `TagSelectOption` 正好展示了 `Tag` 如何被更高階的列表選取元件包裝：`Tag` 只處理單顆點擊，`TagSelectOption` 保存單一 option 狀態，`TagSelect` 則統一管理整個列表與 `modelValue`。
-
-第五，這份筆記適合補上「常見誤解」、「設計取捨」、「閱讀路線」與「自我檢查問題」，讓它不只是事件流程速查表，而是可以反覆回查的原始碼閱讀筆記。
-
-> 本章內容以原始筆記提供的 `tag.vue`、官方 example 片段與 `TagSelectOption` 片段為基準。未提供完整原始碼的部分，不延伸推測具體實作細節。
-
----
-
 ## 1. 本章定位
 
 本章是一篇 `Tag` 元件的「狀態與事件控制邊界」筆記，重點不是樣式，也不是 props 型別對照，而是回答三個問題。
@@ -74,7 +54,7 @@ data () {
 
 這段程式碼代表：元件建立時，`Tag` 會把外部傳入的 `checked` prop 當作初始值，放進自己的內部狀態 `isChecked`。也就是說，`checked` 是外部輸入，`isChecked` 是元件內部真正拿來判斷目前選中狀態的資料。
 
-原始筆記指出，`checked` 的預設值是 `true`。因此，如果使用者只是寫：
+`checked` 的預設值是 `true`。因此，如果使用者只是寫：
 
 ```vue
 <Tag>Label</Tag>
@@ -142,7 +122,7 @@ on-change
 
 這代表只要點擊 `Tag` 根節點，就會呼叫 `check()`。不過，真正能不能切換選中狀態，取決於 `checkable`。
 
-原始筆記提供的 `check()` 流程如下：
+`check()` 流程如下：
 
 ```js
 check () {
@@ -276,7 +256,7 @@ function handleTagChange(checked, name) {
 
 當 `closable` 是 `true` 時，`Tag` 會渲染一個 close icon。使用者點擊 close icon 後會呼叫 `close(event)`。
 
-原始筆記提供的 `close()` 流程如下：
+`close()` 流程如下：
 
 ```js
 close (event) {
@@ -342,7 +322,7 @@ Tag 本身不刪除 DOM、不修改列表、不改變 isChecked
 
 ## 9. 官方 example 中的外部控制模式
 
-原始筆記提到，官方 example 中的單顆關閉是由外部控制。
+官方 example 中的單顆關閉是由外部控制。
 
 ```vue
 <Tag v-if="show" closable @on-close="handleClose">标签三</Tag>
@@ -498,7 +478,7 @@ watcher 再同步內部 isChecked
 
 ## 12. `TagSelectOption`：理解控制邊界的最佳案例
 
-`TagSelectOption` 是理解 `Tag` 控制邊界的重要 consumer。原始筆記提供的 template 如下：
+`TagSelectOption` 是理解 `Tag` 控制邊界的重要 consumer。template 如下：
 
 ```vue
 <Tag checkable :checked="checked" @on-change="handleChange" :color="color" v-bind="tagProps">
@@ -508,7 +488,7 @@ watcher 再同步內部 isChecked
 
 這段程式碼說明：`TagSelectOption` 並沒有重新實作一顆可點擊標籤，而是直接使用 `Tag` 的 `checkable` 能力。它把 `checked` 傳給 `Tag`，並接住 `Tag` emit 出來的 `on-change`。
 
-原始筆記提供的 `handleChange` 如下：
+`handleChange` 如下：
 
 ```js
 handleChange (checked) {
@@ -680,22 +660,13 @@ close icon click → emit on-close → external handles removal
 
 ## 20. 資訊不足與後續確認
 
-本章根據原始筆記中提供的程式片段與說明重構，以下內容需要在後續閱讀完整原始碼時再確認。
+以下內容需要在後續閱讀完整原始碼時再確認。
 
 | 待確認項目 | 為什麼需要確認 |
 | --- | --- |
-| `TagSelect` 完整實作 | 原始筆記只提供 `TagSelectOption` 的局部片段，尚未展開 `TagSelect` 如何管理 `modelValue`、全選與展開。 |
-| 官方 example 的完整上下文 | 原始筆記提供了關鍵片段，但若要精準整理所有 demo 場景，仍需回到完整 `examples/routers/tag.vue`。 |
+| `TagSelect` 完整實作 |  `TagSelectOption` 的局部片段，尚未展開 `TagSelect` 如何管理 `modelValue`、全選與展開。 |
+| 官方 example 的完整上下文 | 若要精準整理所有 demo 場景，仍需回到完整 `examples/routers/tag.vue`。 |
 | Vue 版本與事件 typing 細節 | 若要進一步分析 `onOnChange`、`onOnClose` 在 `.d.ts` 中的型別生成方式，需要對照完整 type declaration。 |
 | 是否存在歷史相容 API | 若要判斷事件命名是否受 View UI / iView 歷史影響，需要延伸閱讀版本演進。 |
 
 ---
-
-## 21. 品質檢查
-
-- 已保留原始筆記中的核心資訊：`checked`、`isChecked`、watcher、`check()`、`close()`、`on-change`、`on-close`、`name`、`.stop`、`TagSelectOption`。
-- 已把原本偏流程速查的內容補成段落式教學說明。
-- 已補上 `Tag` 狀態模型、事件 payload、控制邊界與設計取捨。
-- 已使用 Markdown 標題、表格、程式碼區塊與流程圖式文字整理。
-- 已標註資訊不足處，避免推測未提供的完整原始碼細節。
-- 已加入本章總結、自我檢查問題與後續延伸方向。

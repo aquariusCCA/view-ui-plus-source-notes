@@ -1,52 +1,5 @@
 # View UI Plus Tag 筆記 03：Render、Class 與 Color System
 
-## 0. 原始筆記問題分析
-
-### 0.1 筆記類型判斷
-
-這份筆記屬於 **原始碼閱讀筆記**，同時帶有一部分 **架構分析筆記** 的特徵。它不是單純介紹 `Tag` 的使用方式，而是在整理 `src/components/tag/tag.vue` 如何把 props、slot、內部狀態與 computed 結果轉換成 DOM、class、inline style，最後再交給 `tag.less` 形成實際畫面。
-
-因此，本章的重點不是背誦「有哪些 props」或「有哪些 class」，而是建立一條清楚的閱讀路線：
-
-```txt
-props / slot / isChecked
-        ↓
-template 條件渲染
-        ↓
-computed class / computed style
-        ↓
-DOM class / inline style
-        ↓
-tag.less selector
-        ↓
-最終視覺效果
-```
-
-只要掌握這條路線，之後閱讀其他 View UI Plus 元件時，也可以用同樣方法拆解「runtime source」與「style source」的責任分工。
-
-### 0.2 原始筆記目前的優點
-
-原始筆記已經抓到 `Tag` 元件最重要的閱讀切入點：`closable`、`checkable`、`checked`、`type`、`color` 與 `size` 都會影響 class 或 inline style；而內建色與自定義色不是同一套路徑。這些都是閱讀 `Tag` 原始碼時最容易混在一起的部分。
-
-原始筆記也已經把 template 拆成 root、dot、text、close icon 四個節點，這有助於理解 `Tag` 的 DOM 結構。尤其是 `dot` 與 `closable` 都是條件渲染，如果只看官方文件或畫面，很容易忽略它們背後對應的 runtime 分支。
-
-### 0.3 原始筆記需要補強的地方
-
-原始筆記雖然已經整理了許多重點，但仍比較接近「source map 摘要」。如果要放進長期學習筆記，還需要補強以下幾點：
-
-| 需要補強的方向 | 說明 |
-| --- | --- |
-| 從「現象」補到「流程」 | 不能只說 `color` 會影響 class / style，還要說明它如何從 props 進入 computed，再分流到 less 或 inline style。 |
-| 從「節點表格」補到「template 心智模型」 | root、dot、text、Icon 不只是四個 DOM 節點，它們分別承擔容器、輔助視覺、內容承載與互動入口的角色。 |
-| 從「class 清單」補到「class 責任分層」 | 有些 class 是基礎樣式，有些是狀態 class，有些是視覺分支 class，有些只是讓 less selector 可以命中。 |
-| 從「顏色分類」補到「顏色系統」 | 內建色靠 class + less，自定義色靠 computed inline style，這兩條路徑要分開學。 |
-| 補上常見誤解 | 例如 `name` 不會渲染文字、`closable` 不會自動移除 DOM、`checked=false` 對不同 `type` 的視覺影響不完全相同。 |
-| 標註資訊不足處 | 原始筆記沒有完整展開每個 computed 的完整程式碼，也沒有完整列出 `tag.less` 所有 selector，因此細節需要後續回到 source 補充。 |
-
-本章會在保留原始資訊的前提下，把它重構成一篇「教學型原始碼閱讀筆記」。
-
----
-
 ## 1. 本章定位
 
 本章專門分析 View UI Plus `Tag` 元件的 **render、class 與 color system**。也就是說，本章關心的是：
@@ -65,7 +18,7 @@ tag.less selector
 
 ## 2. Source Baseline
 
-本章以本地保存的 View UI Plus `v1.3.20` 原始碼為閱讀基準。原始筆記中主要涉及以下來源：
+本章以本地保存的 View UI Plus `v1.3.20` 原始碼為閱讀基準。主要涉及以下來源：
 
 | 類型 | 路徑 | 本章閱讀重點 |
 | --- | --- | --- |
@@ -156,7 +109,7 @@ tag.less 根據 class 套用樣式
 
 ## 5. Root Class：`classes` 如何把 props 與狀態轉成 class
 
-`Tag` 的 root class 由 `classes` computed 決定。原始筆記中整理的邏輯如下：
+`Tag` 的 root class 由 `classes` computed 決定。整理的邏輯如下：
 
 ```js
 [
@@ -229,7 +182,7 @@ root class 只能決定整顆 Tag 的主要外觀。`Tag` 裡面的文字、圓�
 
 ### 6.1 Text：承載 slot，也承載文字顏色邏輯
 
-文字節點的 class 由 `textClasses` 決定。原始筆記整理出它可能涉及以下 class：
+文字節點的 class 由 `textClasses` 決定。整理出它可能涉及以下 class：
 
 ```txt
 ivu-tag-text
@@ -415,7 +368,7 @@ tag.less 裡 .ivu-tag-dot / .ivu-tag-dot-inner
 
 ## 8. 內建色路徑：class + less
 
-內建色的判斷基準是 `initColorList`。原始筆記列出的清單如下：
+內建色的判斷基準是 `initColorList`。清單如下：
 
 ```txt
 default
@@ -477,7 +430,7 @@ ivu-tag-success
 
 runtime 不會產生 `ivu-tag-#EF6AFF`。這時會改走 computed inline style。
 
-原始筆記指出，自定義色主要會經過三個 computed：
+自定義色主要會經過三個 computed：
 
 ```txt
 wraperStyles
@@ -489,7 +442,7 @@ bgColorStyle
 
 ### 9.1 `wraperStyles`：控制 root 外觀
 
-`wraperStyles` 主要處理 root `div` 的 inline style。原始筆記列出的可能影響範圍包括：
+`wraperStyles` 主要處理 root `div` 的 inline style。可能影響範圍包括：
 
 ```txt
 background
@@ -503,7 +456,7 @@ color
 
 ### 9.2 `textColorStyle`：控制文字顏色
 
-`textColorStyle` 主要影響 text `span`。原始筆記整理的判斷方向如下：
+`textColorStyle` 主要影響 text `span`。判斷方向如下：
 
 | 情境 | 文字處理方向 |
 | --- | --- |
@@ -555,7 +508,7 @@ ivu-tag-checked
 
 在本章，我們不深入討論 `checked` 如何被更新，只討論它如何影響畫面。
 
-原始筆記中特別標出的 less 規則很重要：
+less 規則很重要：
 
 ```less
 &:not(&-border):not(&-dot):not(&-checked) {
@@ -763,7 +716,7 @@ check()
 
 ## 18. 資訊不足與後續確認事項
 
-原始筆記已經提供足夠資訊建立本章主線，但仍有幾個地方需要後續回到完整 source 補充：
+仍有幾個地方需要後續回到完整 source 補充：
 
 1. `wraperStyles`、`textColorStyle`、`bgColorStyle` 的完整條件分支尚未逐行展開。
 2. `iconClass` 與 `lineColor` 的完整判斷邏輯尚未逐行展開。
@@ -774,14 +727,3 @@ check()
 這些部分不應在沒有 source 對照的情況下任意推測。後續若要深入，可以直接補一篇 `Tag` 的 computed 與 less selector 逐行閱讀筆記。
 
 ---
-
-## 19. 品質檢查
-
-- 已使用 Markdown 結構化輸出。
-- 已保留原始筆記中的核心資訊：template、root class、text / dot / icon class、自定義色、內建色、未選中樣式、close icon。
-- 已將速查型內容補成教學型說明。
-- 已補上 runtime 與 less 的責任分工。
-- 已補上 DOM 情境範例。
-- 已補上常見誤區與自我檢查問題。
-- 已標註資訊不足與後續確認事項。
-- 未編造未提供的具體 CSS 色值或完整 computed 實作。

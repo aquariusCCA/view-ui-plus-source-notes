@@ -1,35 +1,5 @@
 # View UI Plus Tag：Public Props 與 Type Contract 教材型筆記
 
-## 0. 原始筆記問題分析
-
-這份原始筆記的主題很明確：它不是單純列出 `Tag` 有哪些 props，而是想建立 `Tag` 的 **public contract** 對照關係，也就是「使用者可以傳什麼、runtime 實際怎麼處理、TypeScript declaration 又怎麼描述」。
-
-原始筆記已經保留了許多重要資訊，例如 `closable`、`checkable`、`checked`、`color`、`type`、`name`、`size` 的 runtime 限制，以及 `.d.ts` 中對應的型別表達；也有整理 `on-change`、`on-close` 在有無 `name` 時的事件 payload 差異。這些都是後續閱讀 `Tag` 原始碼時不能遺失的核心資訊。
-
-不過，以長期學習筆記來看，原始筆記仍有幾個可以補強的地方：
-
-1. **概念背景可以再補強**  
-   原始筆記直接進入 props 對照，但對初次閱讀元件庫原始碼的人來說，可能還不清楚為什麼要把 `runtime props`、`.d.ts` 和 `emits` 放在一起看。這部分需要先建立「public contract」的觀念。
-
-2. **props 分組可以再教學化**  
-   原始筆記已經把 props 分成互動能力、狀態輸入、視覺輸入、事件識別，但還可以進一步說明：這種分組如何幫助閱讀 `computed`、`methods`、`watcher` 與使用範例。
-
-3. **contract 落差需要補成判斷方法**  
-   原始筆記指出 `color`、`type`、`size` 在 runtime 與 `.d.ts` 之間有落差，但可以再補上判斷原則：什麼時候以 runtime 為準？什麼時候把 `.d.ts` 視為 TypeScript 使用者看到的 public surface？
-
-4. **`checked` 的控制邊界需要更清楚**  
-   原始筆記已經說明 `checked` 不是 `v-model`，但可以再補強成「半受控 / 內部狀態同步」的理解模型，讓後續閱讀 `TagSelectOption` 時比較容易接上。
-
-5. **事件 payload 可以補成列表場景**  
-   `name` 的價值不在畫面，而在事件回傳識別值。這點非常適合用「多個 Tag 列表刪除或切換」的情境說明。
-
-6. **適合拆成後續獨立筆記**  
-   這章只應專注在 public props 與 type contract。`render / class / color system`、`state / events / control boundary`、`TagSelectOption` 封裝關係，都適合拆成後續章節深入分析。
-
-資訊不足處也需要標註：本章根據目前筆記提供的內容重構，沒有額外逐行檢查完整 `tag.vue`、`tag.less`、`types/tag.d.ts` 的原始碼。因此涉及具體行號、完整型別宣告與完整 class 生成細節時，應在後續原始碼閱讀章節再確認。
-
----
-
 ## 1. 本章定位
 
 本章是一篇 **Public Props And Type Contract** 筆記，目標是理解 `View UI Plus` 的 `Tag` 元件對外暴露了哪些使用方式，以及這些使用方式在三個層次中的關係：
@@ -83,7 +53,7 @@
 
 ## 3. Source Baseline 與閱讀範圍
 
-本章以原始筆記中整理的 `View UI Plus v1.3.20` 相關來源為基準，重點關注以下檔案與概念。
+`View UI Plus v1.3.20` 相關來源為基準，重點關注以下檔案與概念。
 
 | 類型 | 來源 | 本章關注點 |
 | --- | --- | --- |
@@ -99,7 +69,7 @@
 
 ## 4. Runtime Props 總覽
 
-依照原始筆記，`tag.vue` 本身宣告的 props 可以整理如下。
+`tag.vue` 本身宣告的 props 可以整理如下。
 
 | Runtime prop | Runtime 限制 / default | Type declaration | 核心責任 |
 | --- | --- | --- | --- |
@@ -140,7 +110,7 @@
 
 `color` 是本章最值得注意的 prop，因為它清楚展示了 runtime 與 type declaration 的落差。
 
-依照原始筆記，runtime 中存在兩份顏色清單：
+runtime 中存在兩份顏色清單：
 
 ```js
 const initColorList = ['default', 'primary', 'success', 'warning', 'error', 'blue', 'green', 'red', 'yellow', 'pink', 'magenta', 'volcano', 'orange', 'gold', 'lime', 'cyan', 'geekblue', 'purple'];
@@ -182,7 +152,7 @@ color?: BuiltInColor | string
 
 ### 7.1 `type`：普通樣式不是獨立 runtime type
 
-依照原始筆記，runtime 中的 `type` validator 只接受兩個值：
+runtime 中的 `type` validator 只接受兩個值：
 
 ```js
 validator (value) {
@@ -219,7 +189,7 @@ type?: '' | 'border' | 'dot';
 
 `size` 則是另一種落差：runtime 比 `.d.ts` 更嚴格。
 
-依照原始筆記，runtime 的 `size` validator 限制為：
+runtime 的 `size` validator 限制為：
 
 ```txt
 default / medium / large
@@ -264,7 +234,7 @@ size?: string;
 1. `tag.vue` 的 `emits`
 2. `methods` 中實際 `$emit` 的參數
 
-依照原始筆記，`tag.vue` 宣告：
+`tag.vue` 宣告：
 
 ```js
 emits: ['on-change', 'on-close']
@@ -299,7 +269,7 @@ onOnChange?: (event?: any) => any;
 
 這表示如果使用者只是單獨使用一顆 Tag，可能只需要收到原生 click event；但如果是在列表中使用多顆 Tag，就可以透過 `name` 讓事件多帶回一個識別值。
 
-例如原始筆記中的官方 example：
+官方 example：
 
 ```vue
 <Tag
@@ -343,7 +313,7 @@ modelValue
 update:modelValue
 ```
 
-但依照原始筆記，`Tag` 的實作是：
+但依照 `Tag` 的實作是：
 
 ```js
 data () {
@@ -457,12 +427,3 @@ watch: {
 10. `on-change` 在列表選取場景中，為什麼通常需要搭配 `name`？
 11. 如果外部綁定 `:checked="selected"`，但在 `on-change` 裡沒有更新 `selected`，可能會有什麼問題？
 12. 為什麼閱讀元件庫時不能只看 `.d.ts`，也不能只看 `.vue` runtime？
-
-### 10.6 品質檢查
-
-- 已保留原始筆記中的核心 props、事件、runtime / `.d.ts` 落差與 `checked` 狀態模型。
-- 已將速查型 props 表補成 public contract 教學說明。
-- 已使用 Markdown 標題、表格與程式碼區塊。
-- 已將 `tag.vue`、`types/tag.d.ts`、`TagSelectOption`、`on-change`、`on-close`、`isChecked` 等技術名稱使用反引號標示。
-- 已標註資訊不足處，避免編造未提供的完整 source line 或未確認行為。
-- 已加入總結、常見誤區、自我檢查問題與後續延伸方向。

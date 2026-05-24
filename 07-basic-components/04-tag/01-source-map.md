@@ -1,47 +1,5 @@
 # View UI Plus `Tag` 元件 Source Map：閱讀入口、責任分工與學習路線
 
-## 0. 原始筆記問題分析
-
-### 0.1 筆記類型判斷
-
-這份筆記主要屬於「原始碼閱讀筆記」，同時帶有少量「API / 型別筆記」與「架構分析筆記」的性質。它不是在教如何使用 `Tag` 元件，也不是逐行解析 `tag.vue` 的每個 computed，而是在建立一張閱讀地圖，幫助讀者知道 View UI Plus 的 `Tag` 元件由哪些檔案共同組成，以及初次閱讀時應該先看哪裡、後看哪裡。
-
-從內容來看，原始筆記已經掌握了 `Tag` 的主要線索：runtime 在 `tag.vue`，樣式在 `tag.less`，型別宣告在 `types/tag.d.ts`，使用案例在 example，對外註冊與匯出則分散在 component registry、plugin install 與 type export entry。這些資訊非常適合整理成教材型 source map，讓讀者先建立全局理解，再進一步進入細節分析。
-
-### 0.2 原始筆記目前的優點
-
-原始筆記已經列出多個關鍵檔案，並且有意識地把 `Tag` 拆成 runtime、style、type、example、registry、consumer 幾個面向來看。這對閱讀 UI 元件庫原始碼很重要，因為一個元件的完整行為通常不只存在於 `.vue` 檔案中。以 `Tag` 來說，`tag.vue` 決定狀態與事件，`tag.less` 決定大部分視覺分支，`types/tag.d.ts` 則決定使用者在 TypeScript 環境下看到的 public contract。這種拆解方向是正確的。
-
-原始筆記也已經指出一個重要觀察：自定義色與內建色的處理方式不同。內建色大多依賴 less class，而自定義色主要依賴 `tag.vue` 產生 inline style。這個觀察很有價值，因為它能讓讀者理解「同一個 `color` prop，不一定只由 CSS class 處理」。
-
-### 0.3 原始筆記仍需要補強的地方
-
-原始筆記雖然已經具備 source map 的雛形，但仍有幾個地方需要重構，才能更適合長期學習與複習。
-
-第一，目前有些段落仍偏向檔案清單，讀者可以知道「有哪些檔案」，但不一定能理解「為什麼這些檔案要一起看」。例如 `tag.vue`、`tag.less`、`types/tag.d.ts` 三者的關係，應該補成一個「runtime → class/style → visual result → public API」的完整閱讀模型。
-
-第二，runtime、style、type、consumer 的責任已經列出，但缺少一個更清楚的主線：`Tag` 作為小型 UI 元件，同時具有展示狀態、可關閉行為、可選取行為與顏色分支。讀者需要先理解這些行為面向，再看每個檔案負責哪一部分，否則容易把它當成普通靜態標籤。
-
-第三，原始筆記列出 `TagSelectOption` 的閱讀價值，但還可以更明確說明它為什麼是理解「控制邊界」的入口。`Tag` 自己只負責單顆標籤的點擊切換與事件輸出，列表選取、`modelValue` 同步、全選邏輯則交給 `TagSelect` / `TagSelectOption`。這正好可以用來說明元件庫常見的分層設計：底層元件提供單點能力，上層元件組合出複合互動。
-
-第四，原始筆記提到 `types/tag.d.ts` 對自定義顏色與事件 payload 的表達不完全精準，但沒有把這件事延伸成閱讀提醒。重構後應該加入「型別宣告不一定完整等於 runtime 真實行為」的提醒，並標註需要後續補充的細節。
-
-第五，原始筆記已有自我檢查問題，但題目偏少，也比較集中在檔案位置。重構後應該增加概念理解題、流程理解題、責任分工題與延伸閱讀題，讓這份筆記更適合複習。
-
-### 0.4 此處需要後續補充的資訊
-
-這份重構筆記只依據目前上傳的 `01-source-map.md` 進行整理。原始筆記沒有提供 `tag.vue`、`tag.less`、`types/tag.d.ts` 的完整原始碼內容，因此以下細節不能在本章任意展開：
-
-- `classes`、`wraperStyles`、`textClasses`、`iconClass`、`lineColor`、`bgColorStyle`、`textColorStyle` 的完整 computed 條件。
-- `close()` 與 `check()` 實際 emit 的 payload 細節。
-- `types/tag.d.ts` 對事件 listener 的完整型別定義。
-- `tag.less` 中所有 selector 的實際順序、優先權與覆蓋關係。
-- 自定義色在不同 `type`、`checked`、`closable` 組合下的完整樣式結果。
-
-以上內容適合在後續筆記中拆成「runtime 深入解析」、「顏色系統解析」、「事件與型別落差解析」等獨立章節。
-
----
-
 ## 1. 本章定位
 
 本章是一篇 View UI Plus `Tag` 元件的 source map 筆記，目標是幫助讀者建立「第一次系統性閱讀 `Tag` 原始碼」時需要的全局地圖。
@@ -88,7 +46,7 @@
 
 所謂展示能力，是指它可以把 slot 內容包裝成標籤樣式，並依據 `color`、`type`、`size` 這類 props 顯示不同外觀。這部分通常需要同時看 `tag.vue` 與 `tag.less`，因為 `tag.vue` 會決定 class 與 inline style，而 `tag.less` 才會把 class 轉成真正的視覺結果。
 
-所謂互動能力，是指它不只是靜態文字。從原始筆記可知，`Tag` 有 `closable` 與 `checkable` 這類 prop，也有 `close()` 與 `check()` method。當使用者點擊 root tag 時，會進入 `check()`；當使用者點擊 close icon 時，會進入 `close()`。此外，`checked` prop 的變化會透過 watcher 同步到內部 `isChecked` 狀態。這表示 `Tag` 同時支援外部控制與內部互動狀態。
+所謂互動能力，是指它不只是靜態文字。`Tag` 有 `closable` 與 `checkable` 這類 prop，也有 `close()` 與 `check()` method。當使用者點擊 root tag 時，會進入 `check()`；當使用者點擊 close icon 時，會進入 `close()`。此外，`checked` prop 的變化會透過 watcher 同步到內部 `isChecked` 狀態。這表示 `Tag` 同時支援外部控制與內部互動狀態。
 
 所謂可組合能力，是指 `Tag` 本身只負責單顆標籤，但它可以被 `TagSelectOption` 這類上層元件包裝成列表選項。這種設計在 UI 元件庫中很常見：底層元件提供最小可用單位，上層元件負責資料集合、選取規則、同步邏輯與更複雜的互動流程。
 
@@ -102,7 +60,7 @@
 
 ### 4.1 Public props：元件對外可調整的入口
 
-原始筆記列出的 public props 包含：
+public props 包含：
 
 ```txt
 closable / checkable / checked / color / type / name / size
@@ -124,7 +82,7 @@ closable / checkable / checked / color / type / name / size
 
 ### 4.2 Template：固定 DOM 骨架與條件節點
 
-原始筆記列出的 template 結構如下：
+template 結構如下：
 
 ```vue
 <div :class="classes" @click.stop="check" :style="wraperStyles">
@@ -146,7 +104,7 @@ closable / checkable / checked / color / type / name / size
 
 ### 4.3 Computed class / style：runtime 與 less 的交界
 
-原始筆記列出的 computed class / style 包含：
+computed class / style 包含：
 
 ```txt
 classes
@@ -176,7 +134,7 @@ textColorStyle
 
 ### 4.4 Methods 與 watcher：互動狀態的入口
 
-原始筆記指出 `Tag` 有三條互動與同步路線：
+`Tag` 有三條互動與同步路線：
 
 ```txt
 root click -> check()
@@ -215,7 +173,7 @@ checked prop change -> isChecked watcher sync
 
 ### 5.2 內建色與自定義色要分開讀
 
-原始筆記中最值得保留的一個觀察是：內建色大多由 less class 負責，但自定義色不是。自定義色主要靠 `tag.vue` 的 inline style，因此 `Tag` 的顏色系統一定要同時看 runtime 與 less。
+內建色大多由 less class 負責，但自定義色不是。自定義色主要靠 `tag.vue` 的 inline style，因此 `Tag` 的顏色系統一定要同時看 runtime 與 less。
 
 這個觀察可以整理成以下模型：
 
@@ -231,13 +189,13 @@ checked prop change -> isChecked watcher sync
 
 ### 5.3 `checked`、`border`、`dot` 是樣式閱讀的三個關鍵狀態
 
-從原始筆記可知，`tag.less` 中特別處理了 `checked`、`border` 與 `dot`。這三個狀態應該優先閱讀，因為它們會改變 tag 的主要視覺語意。
+`tag.less` 中特別處理了 `checked`、`border` 與 `dot`。這三個狀態應該優先閱讀，因為它們會改變 tag 的主要視覺語意。
 
 `checked` 代表標籤是否處於選中狀態。對 `checkable` tag 來說，這通常會影響背景、邊框或文字顏色。由於 `checked` 也牽涉 `checked` prop、內部 `isChecked` 與 watcher，因此它是 runtime 與 style 的交會點。
 
-`border` 代表一種帶外框的 tag 變體。原始筆記指出 `&-border` 會處理外框、分隔線與 close icon 位置，這表示 border type 不只是改 border 顏色，也可能影響 close icon 的布局。
+`border` 代表一種帶外框的 tag 變體。`&-border` 會處理外框、分隔線與 close icon 位置，這表示 border type 不只是改 border 顏色，也可能影響 close icon 的布局。
 
-`dot` 代表帶有圓點提示的 tag 變體。原始筆記指出 dot type 會有 `&-dot` 與 `&-dot-inner`，並且 template 中也有 `showDot` 控制 dot 節點是否出現。這說明 dot type 是 runtime DOM 結構與 less 視覺樣式共同完成的，不是單靠 CSS pseudo-element 生成。
+`dot` 代表帶有圓點提示的 tag 變體。dot type 會有 `&-dot` 與 `&-dot-inner`，並且 template 中也有 `showDot` 控制 dot 節點是否出現。這說明 dot type 是 runtime DOM 結構與 less 視覺樣式共同完成的，不是單靠 CSS pseudo-element 生成。
 
 ---
 
@@ -247,7 +205,7 @@ checked prop change -> isChecked watcher sync
 
 ### 6.1 `types/tag.d.ts`：TypeScript public contract
 
-原始筆記指出，`types/tag.d.ts` 描述使用者可以傳入的 props 與事件 listener，例如：
+`types/tag.d.ts` 描述使用者可以傳入的 props 與事件 listener，例如：
 
 ```txt
 closable
@@ -263,13 +221,13 @@ onOnChange
 
 這些型別宣告的作用是建立 public contract，也就是告訴 TypeScript 使用者：這個元件允許哪些 props、事件 listener 名稱是什麼、各欄位大概接受什麼型別。
 
-但是，型別宣告不一定能完整表達 runtime 的全部細節。原始筆記已經指出，`types/tag.d.ts` 對自定義顏色與事件 payload 的表達不完全精準。這裡的閱讀提醒是：當你要真正理解元件行為時，不能只相信 `.d.ts`，也要回頭比對 `tag.vue` 的 props、methods、emit 行為，以及 example 中的實際用法。
+但是，型別宣告不一定能完整表達 runtime 的全部細節。`types/tag.d.ts` 對自定義顏色與事件 payload 的表達不完全精準。這裡的閱讀提醒是：當你要真正理解元件行為時，不能只相信 `.d.ts`，也要回頭比對 `tag.vue` 的 props、methods、emit 行為，以及 example 中的實際用法。
 
 此處需要後續補充：本章目前沒有完整 `types/tag.d.ts` 內容，因此無法精準列出每個 prop 的型別、預設值與 event payload。後續應獨立整理一篇「`Tag` 型別宣告與 runtime 行為對照表」。
 
 ### 6.2 Typed public export：`viewuiplus.components.d.ts`
 
-原始筆記指出，`types/viewuiplus.components.d.ts` 透過以下方式匯出 `Tag` 型別：
+`types/viewuiplus.components.d.ts` 透過以下方式匯出 `Tag` 型別：
 
 ```ts
 export { Tag } from './tag'
@@ -288,7 +246,7 @@ export { Tag } from './tag'
 
 ### 6.3 Component registry 與 plugin install
 
-原始筆記指出，runtime 的 public export 在 `src/components/index.js`：
+runtime 的 public export 在 `src/components/index.js`：
 
 ```js
 export { default as Tag } from './tag';
@@ -302,7 +260,7 @@ app.component(key, ViewUI[key]);
 
 這代表 `Tag` 的全域註冊不是只靠 `tag.vue` 自己完成，而是透過 View UI Plus 的 install 流程統一處理。對元件庫來說，這種集中式註冊很常見，因為它可以讓使用者透過 `app.use(ViewUIPlus)` 這類方式一次註冊多個元件。
 
-原始筆記也提到同一段附近有 `// todo i-tag` 註解，表示這個版本沒有像 `iButton` 那樣提供明確的 `iTag` alias 註冊。閱讀時要把正式 component name 與可能的歷史 alias 註解分開看，避免把 todo 註解誤解成已完成的 public API。
+`// todo i-tag` 註解，表示這個版本沒有像 `iButton` 那樣提供明確的 `iTag` alias 註冊。閱讀時要把正式 component name 與可能的歷史 alias 註解分開看，避免把 todo 註解誤解成已完成的 public API。
 
 ---
 
@@ -310,7 +268,7 @@ app.component(key, ViewUI[key]);
 
 `TagSelectOption` 是理解 `Tag` 控制邊界的重要入口。因為讀一個基礎元件時，不能只看它自己，也要看它如何被更高階的元件使用。consumer 可以告訴我們：元件作者預期底層元件承擔哪些責任，又把哪些責任交給上層。
 
-原始筆記列出的 `TagSelectOption` template 如下：
+`TagSelectOption` template 如下：
 
 ```vue
 <Tag checkable :checked="checked" @on-change="handleChange" :color="color" v-bind="tagProps">
@@ -332,7 +290,7 @@ app.component(key, ViewUI[key]);
 
 ### 7.1 `NotificationItem` 與其他 consumer 的閱讀價值
 
-原始筆記也列出 `notification/notification-item.vue` 會使用 `Tag` 呈現 notification 的狀態標籤。這種 consumer 的價值和 `TagSelectOption` 不同。
+`notification/notification-item.vue` 會使用 `Tag` 呈現 notification 的狀態標籤。這種 consumer 的價值和 `TagSelectOption` 不同。
 
 `TagSelectOption` 展示的是互動型 consumer：它使用 `checkable`，關注事件、checked 狀態與上層同步。
 
@@ -392,11 +350,11 @@ app.component(key, ViewUI[key]);
 
 ### 9.2 誤解二：`color` 一定都是 CSS class 控制
 
-原始筆記已經指出，內建色大多由 less class 負責，自定義色主要靠 `tag.vue` 的 inline style。這代表 `color` prop 背後至少有兩種處理路線。閱讀時要先判斷目前的 `color` 是不是內建色，否則可能會在 less 中找不到某些自定義顏色的 class。
+內建色大多由 less class 負責，自定義色主要靠 `tag.vue` 的 inline style。這代表 `color` prop 背後至少有兩種處理路線。閱讀時要先判斷目前的 `color` 是不是內建色，否則可能會在 less 中找不到某些自定義顏色的 class。
 
 ### 9.3 誤解三：`.d.ts` 等於 runtime 真實行為
 
-`.d.ts` 是 public type contract，但它不一定完整描述所有 runtime 分支。原始筆記提到 `types/tag.d.ts` 對自定義顏色與事件 payload 的表達不完全精準，因此閱讀時要把型別宣告與 runtime 實作互相對照。當兩者有落差時，應該標註為後續確認項，而不是直接假設其中一邊完全正確。
+`.d.ts` 是 public type contract，但它不一定完整描述所有 runtime 分支。`types/tag.d.ts` 對自定義顏色與事件 payload 的表達不完全精準，因此閱讀時要把型別宣告與 runtime 實作互相對照。當兩者有落差時，應該標註為後續確認項，而不是直接假設其中一邊完全正確。
 
 ### 9.4 誤解四：`TagSelectOption` 只是普通使用案例
 
@@ -404,7 +362,7 @@ app.component(key, ViewUI[key]);
 
 ### 9.5 誤解五：`// todo i-tag` 代表已經有 `iTag` alias
 
-原始筆記提醒，`src/index.js` 附近的 `// todo i-tag` 註解表示這個版本沒有像 `iButton` 那樣提供明確的 `iTag` alias 註冊。閱讀原始碼時要區分「已完成的 public API」與「todo / 註解中的可能意圖」，不要把註解誤當成已實作行為。
+`src/index.js` 附近的 `// todo i-tag` 註解表示這個版本沒有像 `iButton` 那樣提供明確的 `iTag` alias 註冊。閱讀原始碼時要區分「已完成的 public API」與「todo / 註解中的可能意圖」，不要把註解誤當成已實作行為。
 
 ---
 
@@ -443,13 +401,3 @@ app.component(key, ViewUI[key]);
 8. `TagSelectOption` 為什麼能幫助理解 `Tag` 的控制邊界？
 9. 點擊 close icon 時為什麼需要注意 `@click.stop`？它和 root 的 `check()` 有什麼關係？
 10. 如果你要下一步深入閱讀 `Tag`，你會先選擇 runtime、style、type 還是 consumer？為什麼？
-
-### 10.4 品質檢查
-
-本章已依照教材型筆記標準進行整理：
-
-- 已保留原始筆記中的核心檔案路徑、元件責任、事件流程與閱讀順序。
-- 已把原本偏 source map 的條列內容，補成具有背景、原因與閱讀方法的教學段落。
-- 已使用 Markdown 標題、表格、程式碼區塊與總結，方便放入個人知識庫。
-- 已標註目前資訊不足之處，避免編造未提供的 runtime 細節。
-- 已加入常見誤解、後續延伸方向與 10 題自我檢查問題。
