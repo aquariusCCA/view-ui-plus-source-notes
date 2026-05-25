@@ -1,9 +1,0 @@
-- Auth
-- Login
-- Captcha
-- City
-- Email
-- Mobile
-- Password
-- Submit
-- UserName
