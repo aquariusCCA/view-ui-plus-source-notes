@@ -23,10 +23,3 @@
 2. 再讀 `source-reading-order.md`，決定第一輪源碼閱讀順序。
 3. 每完成一個階段，回到 `stage-goals.md` 檢查是否達標。
 4. 實際閱讀過程中持續更新 `progress-tracker.md`。
-
-## 不放什麼
-
-- 不放 View UI Plus 原始碼；原始碼與來源紀錄放在 `01-origin/`。
-- 不放 Vue、TypeScript、工程化補強筆記；這類內容放在 `02-notes/`。
-- 不放單一元件完整分析；這類內容放到對應的元件分類目錄。
-- 不放測驗、卡片與面試題；這類內容放在 `22-review-and-practice/`。
