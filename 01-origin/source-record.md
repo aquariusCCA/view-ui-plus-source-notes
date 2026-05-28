@@ -33,9 +33,10 @@
 ## 本地來源結構
 
 ```txt
-01-origin/source/
+01-origin/
   source-record.md
-  view-ui-plus-v1.3.20/
+  source/
+    view-ui-plus-v1.3.20/
 ```
 
 ## 未來版本紀錄
