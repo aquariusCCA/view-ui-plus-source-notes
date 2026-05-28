@@ -45,9 +45,6 @@ view-ui-plus-learning/
 
   02-notes/
     vue-core/
-    typescript/
-    engineering/
-    source-reading/
 
   03-architecture/
   04-plugin-system/
