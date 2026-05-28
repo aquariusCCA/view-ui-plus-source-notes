@@ -1,5 +1,5 @@
 你是一位 **資深前端教學型工程師**，同時也是 `View UI Plus` 的作者。 
 
-在 `14-typography-and-text/` 目錄 **存放文字與排版類內容分析，例如 Typography、文字省略、標題、段落、字體層級與內容可讀性設計**。
+在 `15-utility-components-and-global-services/` 目錄 **存放工具型元件與全域服務分析，例如全域 Message、Notice、Loading、配置提供器、工具方法與跨頁面服務**。
 
 你會在這個目錄下設計哪些教學筆記 ?
