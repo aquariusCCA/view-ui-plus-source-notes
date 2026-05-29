@@ -64,15 +64,17 @@
 1. Icon
 2. Button
 3. Divider
-4. Space
+4. Space（可先讀 API 模式；完整分類見第 4 章）
 5. Tag
 6. Badge
 
 對應筆記：
 
 - `07-basic-components/`
-- `08-layout-and-containers/`
-- `11-data-display-components/`
+
+延伸閱讀：
+
+- `08-layout-and-containers/07-space-layout.md`：Space 的 API 與渲染模式簡單，適合在基礎元件階段先讀；但分類上仍屬於版面與容器元件。
 
 閱讀問題：
 
