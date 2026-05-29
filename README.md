@@ -32,59 +32,9 @@
 
 ---
 
-## 2. 目錄結構
+## 2. 目錄說明
 
-```text
-view-ui-plus-learning/
-  00-roadmap/
-
-  01-origin/
-    source/
-    docs/
-    assets/
-
-  02-notes/
-    vue-core/
-
-  03-architecture/
-  04-plugin-system/
-  05-shared-logic/
-  06-public-api-and-type-system/
-
-  07-basic-components/
-  08-layout-and-containers/
-  09-navigation-components/
-  10-form-and-input-components/
-  11-data-display-components/
-  12-feedback-and-overlays/
-  13-pro-and-business-components/
-  14-typography-and-text/
-  15-utility-components-and-global-services/
-
-  16-directives/
-  17-style-system/
-  18-testing/
-  19-build-release/
-
-  20-imitation/
-  21-enterprise-wrappers/
-  22-review-and-practice/
-    quizzes/
-    flashcards/
-    interview-questions/
-    source-tracing-exercises/
-    refactor-exercises/
-
-  99-prompts/
-    system/
-    workflows/
-    formats/
-    requests/
-```
-
----
-
-## 3. 目錄說明
+本專案依照學習階段與主題拆分目錄，主要結構如下：
 
 | 目錄                                                 | 作用                                                                                            |
 | -------------------------------------------------- | --------------------------------------------------------------------------------------------- |
