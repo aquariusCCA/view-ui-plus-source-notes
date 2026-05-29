@@ -82,7 +82,27 @@
 - 能畫出複合元件的子元件結構與資料流。
 - 能指出複雜元件中的核心抽象與邊界條件。
 
-## 第五輪：樣式、測試、建置與發布
+## 第五輪：閱讀文字與排版元件
+
+閱讀目標：
+
+- 閱讀 Typography、Title、Text、Paragraph、Link 與 Ellipsis 等文字元件。
+- 理解 copyable、editable、ellipsis、line clamp 等文字能力如何組合 Tooltip、Input、Copy 與 DOM 測量。
+- 區分純文字排版元件、資料展示元件與業務元件的分類邊界。
+
+主要輸出：
+
+- `14-typography-and-text/`
+- `05-shared-logic/07-link-behavior.md`
+- 文字與排版元件 API 對照表
+
+完成標準：
+
+- 能說明 Typography 家族如何共用基底能力並分化成不同語意元件。
+- 能拆解文字省略、可複製、可編輯能力的狀態來源、互動入口與外部依賴。
+- 能判斷 Typography、Ellipsis、WordCount、Time、Numeral 應該放在文字排版章，而不是資料展示或業務元件章。
+
+## 第六輪：樣式、測試、建置與發布
 
 閱讀目標：
 
@@ -101,7 +121,7 @@
 - 能追蹤一個元件 class 對應到哪份樣式。
 - 能說明元件庫如何從源碼變成可被使用者安裝的套件。
 
-## 第六輪：仿寫與企業封裝
+## 第七輪：仿寫與企業封裝
 
 閱讀目標：
 
@@ -111,6 +131,7 @@
 
 主要輸出：
 
+- `13-pro-and-business-components/`
 - `20-imitation/`
 - `21-enterprise-wrappers/`
 - `22-review-and-practice/`
