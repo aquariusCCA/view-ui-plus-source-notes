@@ -16,7 +16,7 @@
 | [learning-path.md](./learning-path.md) | 定義整體學習路線，說明從源碼準備到企業封裝的完整順序。 |
 | [source-reading-order.md](./source-reading-order.md) | 規劃 View UI Plus 源碼閱讀順序，避免一開始就陷入複雜元件細節。 |
 | [stage-goals.md](./stage-goals.md) | 拆分學習階段、能力目標、輸出物與進入下一階段的檢查點。 |
-| [progress-tracker.md](./progress-tracker.md) | 用表格追蹤每個目錄、主題與元件的閱讀進度。 |
+| [progress-tracker.md](./progress-tracker.md) | 用表格追蹤目錄進度、章節產出流水線、元件閱讀與待檢查事項。 |
 
 ## 建議使用方式
 

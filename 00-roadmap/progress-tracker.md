@@ -9,6 +9,16 @@
 - `已完成`
 - `按需補充`
 
+狀態使用規則：
+
+- `總進度` 只追目錄層級的大狀態與主要產出物。
+- `章節產出流水線` 追每章從 origin 到下游同步的閉環狀態。
+- `元件進度` 追單一元件的閱讀、源碼入口與筆記連結。
+- `待檢查事項` 承接 `note-package-workflow.md` 的影響範圍判斷。
+- `待複習` 表示可能過期、需要檢查或 review 尚未完成。
+- `已完成` 只用於該層產出已完成，且必要 review 已完成。
+- `按需補充` 用於不一定每章都需要產出的下游材料或基礎補強。
+
 ## 總進度
 
 | 目錄 | 主題 | 狀態 | 產出物 | 備註 |
@@ -36,6 +46,28 @@
 | `21-enterprise-wrappers/` | 企業封裝 | 未開始 |  | SearchForm、CrudTable、BusinessModal。 |
 | `22-review-and-practice/` | 複習與練習 | 未開始 |  | 題目、卡片、面試題、重構練習。 |
 
+## 章節產出流水線
+
+| 章節 | origin | atomic | atomic review | 正式筆記 | notes review | 下游同步 | 備註 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `03-architecture/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 整體架構主線。 |
+| `04-plugin-system/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 插件與全域註冊。 |
+| `05-shared-logic/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | hooks、utils、共用狀態。 |
+| `06-public-api-and-type-system/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | Props、Emits、Slots、Instance。 |
+| `07-basic-components/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | Button、Icon、Divider。 |
+| `08-layout-and-containers/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | Layout、Grid、Card、Space。 |
+| `09-navigation-components/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | Menu、Tabs、Breadcrumb、Page。 |
+| `10-form-and-input-components/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | Form、Input、Select、DatePicker。 |
+| `11-data-display-components/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | Table、Tree、List、Timeline。 |
+| `12-feedback-and-overlays/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | Modal、Drawer、Tooltip、Message。 |
+| `13-pro-and-business-components/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 複合封裝與業務模式。 |
+| `14-typography-and-text/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | Typography、文字省略。 |
+| `15-utility-components-and-global-services/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | Message、Notice、Loading、配置。 |
+| `16-directives/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | directive 生命週期與 DOM 行為。 |
+| `17-style-system/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | SCSS、變數、主題、BEM。 |
+| `18-testing/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 單元測試與元件測試。 |
+| `19-build-release/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 打包、型別產物、npm 發布。 |
+
 ## 元件進度
 
 | 元件 | 分類目錄 | 狀態 | 源碼入口 | 筆記 | 備註 |
@@ -53,6 +85,12 @@
 | Tree | `11-data-display-components/` | 未開始 |  |  | 看遞迴資料與節點狀態。 |
 | Modal | `12-feedback-and-overlays/` | 未開始 |  |  | 看掛載、關閉與事件。 |
 | Message | `15-utility-components-and-global-services/` | 未開始 |  |  | 看命令式服務。 |
+
+## 待檢查事項
+
+| 日期 | 影響來源 | 需要檢查 | 候選同步 | 建議標記 | 處理狀態 |
+| --- | --- | --- | --- | --- | --- |
+|  |  |  |  |  |  |
 
 ## 每週檢查
 
