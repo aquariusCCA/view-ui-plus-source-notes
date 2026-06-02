@@ -23,13 +23,13 @@ notes content review
 20-imitation/、21-enterprise-wrappers/、22-review-and-practice/
 ```
 
-對於主題章節，建議使用以下結構：
+對於主題章節，建議使用以下結構；其中資產目錄只在有本地資產時按需建立：
 
 ```text
 <章節>/
     origin/
-        assets/
-            images/
+        assets/          # 有本地資產時才建立
+            images/      # 按實際資產類型建立
             pdfs/
             excels/
             word/
@@ -44,6 +44,7 @@ notes content review
 | 目錄 | 作用 | 規則 |
 | --- | --- | --- |
 | `origin/` | 原始資料區 | 保存可追溯來源。內容不直接覆蓋成正式筆記，可以整理連結、補充資產引用與修正明顯格式問題。 |
+| `origin/assets/` | 資產根目錄 | 只有在章節有本地資產時才需要建立；沒有本地資產時可省略此目錄。 |
 | `origin/assets/images/` | 圖片資產 | 存放截圖、圖解、流程圖、元件效果圖。Markdown 需提供可理解的 alt 文字。 |
 | `origin/assets/pdfs/` | PDF 資產 | 存放 PDF 文件與外部文件快照。筆記中引用時需說明文件用途。 |
 | `origin/assets/excels/` | 試算表資產 | 存放 Excel 或 CSV 類表格資料。引用時需說明資料欄位或分析目的。 |
@@ -59,30 +60,3 @@ notes content review
 - 正式筆記要建立教學主線：用問題意識串起源碼、設計原因、實作流程與可遷移的設計原則。
 - 正式筆記不能只像整理稿：每個關鍵結論都應該能回到原始碼、型別檔、範例或明確推論。
 - 後續 `20-imitation/`、`21-enterprise-wrappers/`、`22-review-and-practice/` 只根據正式筆記生成，不直接依賴未審查的 `origin/` 或 `atomic/`。
-
-## Review 標準
-
-atomic review 主要檢查：
-
-- 主題是否單一。
-- 是否有明確來源。
-- 是否有過度發散、重複或混入其他章節內容。
-- 是否足以生成一篇正式筆記。
-
-notes content review 主要檢查：
-
-- 教學主線是否清楚。
-- 源碼依據是否足夠。
-- 是否避免只背 API 或只做表面整理。
-- 是否能支援後續仿寫、企業封裝、複習題與重構練習。
-
-## 目前套用範圍
-
-第一階段先套用在：
-
-- `03-architecture/`
-- `04-plugin-system/`
-- `05-shared-logic/`
-- `06-public-api-and-type-system/`
-
-這四章目前的 numbered notes 先視為 `origin/` 原始資料；正式筆記會在 atomic review 後再回到章節根目錄產生。
