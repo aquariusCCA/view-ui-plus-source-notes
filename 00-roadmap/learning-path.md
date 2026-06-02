@@ -93,7 +93,7 @@
 主要輸出：
 
 - `14-typography-and-text/`
-- `05-shared-logic/07-link-behavior.md`
+- `05-shared-logic/origin/07-link-behavior.md`
 - 文字與排版元件 API 對照表
 
 完成標準：

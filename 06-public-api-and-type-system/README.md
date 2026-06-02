@@ -6,16 +6,18 @@
 
 | 順序 | 筆記 | 學習重點 |
 | --- | --- | --- |
-| 1 | [公開 API 總覽](./01-public-api-overview.md) | 建立 Props、Emits、Slots、Methods、Instance、全域服務與型別導出的 API 地圖 |
-| 2 | [Props 設計與 runtime 驗證](./02-props-design-and-runtime-validation.md) | 分析 prop 命名、預設值、validator、全域設定覆蓋與型別宣告 |
-| 3 | [事件與 v-model 契約](./03-events-and-v-model-contract.md) | 拆解 `emits`、`update:modelValue`、`on-*` 事件命名與雙向綁定 |
-| 4 | [Slots API 設計](./04-slots-api-design.md) | 分析 default slot、具名 slot、scoped slot 與 fallback 的公開契約 |
-| 5 | [Instance 方法與暴露行為](./05-instance-methods-and-exposed-behavior.md) | 判斷哪些 methods 屬於公開可依賴 API，哪些只是內部實作細節 |
-| 6 | [全域服務型別 API](./06-global-services-type-api.md) | 分析 `$Message`、`$Modal`、`$Notice`、`$Loading` 等全域服務的 runtime 與型別宣告 |
-| 7 | [元件 d.ts 設計](./07-component-dts-design.md) | 閱讀 `DefineComponent`、listener prop、`v-slots` 與元件型別宣告模式 |
-| 8 | [型別導出地圖](./08-type-export-map.md) | 分析 `types/index.d.ts` 與 `viewuiplus.components.d.ts` 如何組織公開型別出口 |
-| 9 | [Runtime API 與 Type API 漂移](./09-runtime-api-vs-type-api-drift.md) | 對照 `.vue` 與 `.d.ts`，找出命名、型別寬鬆、遺漏與版本漂移問題 |
-| 10 | [公開 API 設計檢查清單](./10-public-api-design-checklist.md) | 總結設計新元件 API 與型別宣告時可重複使用的檢查流程 |
+| 1 | [公開 API 總覽](./origin/01-public-api-overview.md) | 建立 Props、Emits、Slots、Methods、Instance、全域服務與型別導出的 API 地圖 |
+| 2 | [Props 設計與 runtime 驗證](./origin/02-props-design-and-runtime-validation.md) | 分析 prop 命名、預設值、validator、全域設定覆蓋與型別宣告 |
+| 3 | [事件與 v-model 契約](./origin/03-events-and-v-model-contract.md) | 拆解 `emits`、`update:modelValue`、`on-*` 事件命名與雙向綁定 |
+| 4 | [Slots API 設計](./origin/04-slots-api-design.md) | 分析 default slot、具名 slot、scoped slot 與 fallback 的公開契約 |
+| 5 | [Instance 方法與暴露行為](./origin/05-instance-methods-and-exposed-behavior.md) | 判斷哪些 methods 屬於公開可依賴 API，哪些只是內部實作細節 |
+| 6 | [全域服務型別 API](./origin/06-global-services-type-api.md) | 分析 `$Message`、`$Modal`、`$Notice`、`$Loading` 等全域服務的 runtime 與型別宣告 |
+| 7 | [元件 d.ts 設計](./origin/07-component-dts-design.md) | 閱讀 `DefineComponent`、listener prop、`v-slots` 與元件型別宣告模式 |
+| 8 | [型別導出地圖](./origin/08-type-export-map.md) | 分析 `types/index.d.ts` 與 `viewuiplus.components.d.ts` 如何組織公開型別出口 |
+| 9 | [Runtime API 與 Type API 漂移](./origin/09-runtime-api-vs-type-api-drift.md) | 對照 `.vue` 與 `.d.ts`，找出命名、型別寬鬆、遺漏與版本漂移問題 |
+| 10 | [公開 API 設計檢查清單](./origin/10-public-api-design-checklist.md) | 總結設計新元件 API 與型別宣告時可重複使用的檢查流程 |
+
+以上資料目前作為 `origin/` 原始資料；正式筆記會在 `atomic/` 完成切分與 review 後，再生成到本章根目錄。
 
 ## 原始碼主線
 

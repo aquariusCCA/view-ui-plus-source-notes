@@ -77,3 +77,22 @@
 | `99-prompts/requests/`                             | 存放實際請求型提示詞，例如針對某個元件、某篇筆記、某段源碼所使用的具體 AI 請求。                                                    |
 
 ---
+
+## 3. 筆記資料流
+
+主題章節採用 `origin -> atomic -> formal notes` 的資料流：
+
+```text
+<章節>/
+    origin/
+        assets/
+        *.md
+    atomic/
+    *.md
+```
+
+- `origin/` 保存原始資料與可追溯來源。
+- `atomic/` 保存重新切分、合併與修正後的候選原子筆記。
+- 章節根目錄的 `.md` 是正式筆記，作為後續仿寫、企業封裝與複習材料的基準。
+
+完整規則見 [00-roadmap/note-package-workflow.md](./00-roadmap/note-package-workflow.md)。
