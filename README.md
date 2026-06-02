@@ -70,10 +70,13 @@
 | `22-review-and-practice/interview-questions/`      | 存放面試題整理，例如元件庫設計、Vue 原理、TypeScript 型別設計、工程化與企業封裝問題。                                            |
 | `22-review-and-practice/source-tracing-exercises/` | 存放源碼追蹤練習，例如從元件入口追到渲染邏輯、事件處理、共用 hook 與樣式來源。                                                    |
 | `22-review-and-practice/refactor-exercises/`       | 存放重構練習，例如將重複邏輯抽成 composable、優化 Props 設計、拆分元件與改善型別安全。                                          |
-| `99-prompts/`                                      | 存放 AI 輔助學習提示詞，用於規範筆記重構、源碼分析、題目生成、格式輸出與學習流程。                                                   |
-| `99-prompts/system/`                               | 存放系統級提示詞，例如角色設定、筆記風格、教學要求與整體輸出規範。                                                             |
-| `99-prompts/workflows/`                            | 存放流程型提示詞，例如源碼閱讀流程、元件分析流程、筆記重構流程與複習流程。                                                         |
+| `99-prompts/`                                      | 存放 AI 輔助學習提示詞，用於規範源碼分析、筆記重構、題目生成、格式輸出與學習流程。                                                   |
+| `99-prompts/_drafts/`                              | 存放尚未穩定、尚未拆分的大型混合 Prompt 草稿。                                                                  |
+| `99-prompts/core/`                                 | 存放核心提示詞規則，例如角色設定、源碼閱讀原則、筆記風格、教學要求與整體輸出規範。                                                     |
+| `99-prompts/workflows/`                            | 存放流程型提示詞，例如源碼閱讀流程、元件分析流程、`origin` 轉 `atomic`、正式筆記生成與複習流程。                                      |
 | `99-prompts/formats/`                              | 存放格式型提示詞，例如 README 格式、元件分析模板、API 表格模板、練習題模板與總結模板。                                             |
+| `99-prompts/examples/`                             | 存放 Few-shot 範例，例如高品質元件分析、源碼追蹤、仿寫任務與複習題範例。                                                        |
+| `99-prompts/criteria/`                             | 存放品質標準，例如來源依據檢查、正式筆記驗收、元件 API 檢查與練習題品質清單。                                                     |
 | `99-prompts/requests/`                             | 存放實際請求型提示詞，例如針對某個元件、某篇筆記、某段源碼所使用的具體 AI 請求。                                                    |
 
 ---
