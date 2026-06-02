@@ -210,7 +210,7 @@ Prompt 檔案建議使用小寫英文與連字號。
 | 輸出格式 | `<output>-format.md` | `component-analysis-note-format.md` |
 | 輸出範例 | `<output>-example.md` | `button-analysis-example.md` |
 | 驗收標準 | `<output>-quality-checklist.md` | `source-backed-note-checklist.md` |
-| 實際提問 | `<action>-<target>.md` | `generate-component-note.md`、`review-formal-note.md` |
+| 實際提問 | `<action>-<target>.md` | `generate-component-note.md`、`review-formal-note.md`、`judge-note-package-update.md` |
 
 建議使用：
 
@@ -225,6 +225,7 @@ component-analysis-note-format.md
 component-api-checklist.md
 generate-component-note.md
 review-formal-note.md
+judge-note-package-update.md
 ```
 
 避免使用：
