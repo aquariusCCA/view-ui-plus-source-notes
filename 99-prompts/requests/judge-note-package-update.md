@@ -3,7 +3,7 @@
 把下方模板貼給 AI，並填入本次改動資訊。完整判斷規則以 `00-roadmap/note-package-workflow.md` 為準，本檔只作為入口提問。
 
 ```text
-請依照 `00-roadmap/note-package-workflow.md` 協助判斷這次 HTML 筆記包更新的影響範圍。
+請依照 `00-roadmap/note-package-workflow.md` 協助判斷這次 View UI Plus Learning Notes 更新的影響範圍。
 
 1. 章節名稱：
 2. 改動位置：01-origin / <章節>/origin / <章節>/origin/assets / <章節>/atomic / <章節>/*.md 正式筆記 / 20-imitation / 21-enterprise-wrappers / 22-review-and-practice / 99-prompts / 其他
