@@ -83,6 +83,8 @@
 
 ## 3. 筆記資料流
 
+README 只保留最小資料流摘要；完整規則、更新判斷與 review 標準見 [00-roadmap/note-package-workflow.md](./00-roadmap/note-package-workflow.md)。
+
 主題章節採用 `origin -> atomic -> formal notes` 的資料流：
 
 ```text
@@ -98,4 +100,4 @@
 - `atomic/` 保存重新切分、合併與修正後的候選原子筆記。
 - 章節根目錄的 `.md` 是正式筆記，作為後續仿寫、企業封裝與複習材料的基準。
 
-完整規則見 [00-roadmap/note-package-workflow.md](./00-roadmap/note-package-workflow.md)。
+若 README 與 workflow 文件描述不一致，以 workflow 文件為準。
