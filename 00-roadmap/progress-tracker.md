@@ -25,7 +25,7 @@
 | --- | --- | --- | --- | --- |
 | `01-origin/` | 來源與版本基準 | 已整理 | `source-record.md` | 主線版本為 `v1.3.20`。 |
 | `02-notes/` | 基礎知識補強 | 按需補充 |  | 主線閱讀中遇到不熟的 Vue、TS、工程化概念時，再補充整理。 |
-| `03-architecture/` | 整體架構 | 未開始 |  | 第一輪主線閱讀。 |
+| `03-architecture/` | 整體架構 | 待複習 | `README.md`、`01-*.md` 到 `08-*.md` | origin、atomic 與正式筆記已產出，待確認下游同步。 |
 | `04-plugin-system/` | 插件與註冊 | 未開始 |  | 追 `install` 與全域註冊。 |
 | `05-shared-logic/` | 共用邏輯 | 未開始 |  | hooks、utils、共用狀態。 |
 | `06-public-api-and-type-system/` | API 與型別 | 未開始 |  | Props、Emits、Slots、Instance。 |
@@ -50,7 +50,7 @@
 
 | 章節 | origin | atomic | atomic review | 正式筆記 | notes review | 下游同步 | 備註 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `03-architecture/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 整體架構主線。 |
+| `03-architecture/` | 已整理 | 已整理 | 已完成 | 已完成 | 已完成 | 待複習 | 正式筆記已產出，待檢查 README、下游材料與引用同步。 |
 | `04-plugin-system/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 插件與全域註冊。 |
 | `05-shared-logic/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | hooks、utils、共用狀態。 |
 | `06-public-api-and-type-system/` | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | 未開始 | Props、Emits、Slots、Instance。 |
@@ -90,7 +90,7 @@
 
 | 日期 | 影響來源 | 需要檢查 | 候選同步 | 建議標記 | 處理狀態 |
 | --- | --- | --- | --- | --- | --- |
-|  |  |  |  |  |  |
+| 2026-06-03 | `03-architecture/` 結構改動 | 檢查 README、正式筆記承接、下游引用與 tracker 狀態是否一致 | `03-architecture/README.md`、`20-imitation/`、`21-enterprise-wrappers/`、`22-review-and-practice/` | 待複習 | 未處理 |
 
 ## 每週檢查
 
