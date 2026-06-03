@@ -2,174 +2,163 @@
 
 ## 學習目標
 
-這篇筆記整理 View UI Plus 中不直接等同於單一元件、但支撐整套元件庫的架構表面：共用能力、樣式系統、型別入口與打包產物。
+這篇筆記整理 View UI Plus 中不直接等同於單一元件、但支撐整套元件庫的非元件表面：共用能力、Less 樣式系統、TypeScript 型別入口與打包產物。
 
-讀完後，你應該能判斷：
+讀完後，你應該能判斷一個問題應該回到 `.vue`、utils/mixins/directives/locale、Less、types 還是 build/dist 檢查，而不是把所有行為都當成單一元件內部細節。
 
-1. 哪些能力不應該放在單一元件內部重複實作。
-2. 樣式入口、型別入口與建置產物如何支撐使用者消費體驗。
-3. 為什麼分析元件庫必須同時看 runtime、style、type 與 build surface。
-
-## 來源與對照
-
-主要 atomic：
+## 對照源碼
 
 - `03-architecture/atomic/06-shared-style-type-build-surfaces.md`
-
-origin 對照：
-
 - `03-architecture/origin/01-project-structure.md`
 - `03-architecture/origin/02-module-layers.md`
 - `03-architecture/origin/07-core-design-principles.md`
 - `03-architecture/origin/08-architecture-summary.md`
-
-對照源碼：
-
+- `01-origin/source/view-ui-plus-v1.3.20/src/utils/`
+- `01-origin/source/view-ui-plus-v1.3.20/src/mixins/`
 - `01-origin/source/view-ui-plus-v1.3.20/src/directives/`
 - `01-origin/source/view-ui-plus-v1.3.20/src/locale/`
-- `01-origin/source/view-ui-plus-v1.3.20/src/mixins/`
-- `01-origin/source/view-ui-plus-v1.3.20/src/utils/`
 - `01-origin/source/view-ui-plus-v1.3.20/src/styles/index.less`
-- `01-origin/source/view-ui-plus-v1.3.20/src/styles/components/`
+- `01-origin/source/view-ui-plus-v1.3.20/build/build-style.js`
 - `01-origin/source/view-ui-plus-v1.3.20/types/index.d.ts`
 - `01-origin/source/view-ui-plus-v1.3.20/dist/`
-- `01-origin/source/view-ui-plus-v1.3.20/vite.config.js`
 
-## 非元件層也是架構主體
+## 支撐元件庫的非元件層
 
-`src/components/` 是閱讀 View UI Plus 的主線，但成熟元件庫不只由元件組成。除了元件實作，View UI Plus 還有多個支撐層：
+`src/components/` 是閱讀主線，但成熟元件庫不只由元件組成。View UI Plus 還包含多個支撐表面。
 
 | 區域 | 責任 |
 | --- | --- |
-| `src/directives/` | 自訂指令，例如尺寸、樣式、文字截斷與點擊外部。 |
+| `src/directives/` | 自訂指令，例如尺寸、樣式、文字截斷與尺寸監聽。 |
 | `src/locale/` | 語系切換與 i18n 整合入口。 |
 | `src/mixins/` | 跨元件共用的 Options API 邏輯。 |
 | `src/utils/` | DOM、日期、CSV、鍵盤碼、樣式檢查等工具函數。 |
 | `src/styles/` | Less 樣式入口、變數、mixins、動畫與元件樣式。 |
-| `types/` | 對外 TypeScript 型別宣告。 |
+| `types/` | 對外提供 TypeScript 型別宣告。 |
 | `dist/` | 打包後提供給使用者消費的產物。 |
 
-這些區域共同支撐元件庫的一致行為、視覺樣式、型別體驗與發布結果。閱讀單一元件時，只要看到它依賴這些區域，就應該把它視為跨元件架構設計，而不是局部細節。
+這些區域讓元件庫能維持一致行為、視覺、型別與發布體驗。閱讀元件時，如果看到元件依賴這些區域，應該把它視為跨元件架構設計，而不是只看成單一元件自己的程式碼。
 
 ## 共用能力層
 
-共用能力層包含 `utils/`、`mixins/`、`directives/` 與 `locale/`。
+`utils/`、`mixins/`、`directives/`、`locale/` 的價值在於降低跨元件重複。
 
-| 區域 | 常見責任 |
+| 表面 | 閱讀重點 |
 | --- | --- |
-| `utils/` | DOM 操作、日期處理、CSV、鍵盤碼、樣式檢查、transfer queue 等工具。 |
-| `mixins/` | link、form、locale、emitter、globalConfig 等跨元件 Options API 邏輯。 |
-| `directives/` | click outside、transfer dom、resize、style、line clamp 等指令能力。 |
-| `locale/` | 語系資料、格式化與 i18n 整合。 |
+| `utils/` | DOM 操作、日期處理、CSV、鍵盤碼、樣式判斷等是否被多個元件使用。 |
+| `mixins/` | Options API 共用邏輯如何注入 props、computed、methods 或生命週期。 |
+| `directives/` | 指令如何被 `src/index.js` 整理並透過 `app.directive` 全域註冊。 |
+| `locale/` | 元件文字如何和語系切換、i18n 函數接上。 |
 
-共用層的價值是降低重複，並讓跨元件行為有穩定來源。例如彈層轉移、語系文字、表單關聯、路由跳轉、DOM 操作如果散落在每個元件裡，後續維護會很難追蹤。
-
-這也影響閱讀方式：當某個元件引用 mixin 或 util 時，不應只看元件本檔。那個 mixin 或 util 可能才是多個元件共用行為的真正來源。
+這些不是「雜物目錄」。當多個元件共享同一類行為時，把它抽到共用能力層，可以讓元件實作更聚焦，也讓後續 review 有固定查找位置。
 
 ## 樣式系統
 
-`src/styles/index.less` 是 View UI Plus 樣式入口。依 source，它透過 Less `@import` 串起：
+`src/styles/index.less` 是樣式入口，明確透過 `@import` 串起：
 
-- `custom`
-- `base`
-- `mixins/index`
-- `common/index`
-- `animation/index`
-- `components/index`
+```less
+@import "./custom";
+@import "./base";
+@import "./mixins/index";
+@import "./common/index";
+@import "./animation/index";
+@import "./components/index";
+```
 
-這代表樣式系統和 JS 入口是分離的：`src/index.js` 負責 JS 匯出與安裝，`src/styles/index.less` 負責樣式入口與 Less 串接。
+這代表樣式系統和 JS 元件入口是分離的。閱讀 `.vue` 檔時看到 class，不代表樣式定義就在同一個檔案內；通常要回到 `src/styles/components/` 或整體 Less 入口查對應規則。
 
-閱讀樣式時要關注：
+樣式閱讀時要關注：
 
-1. class prefix 是否一致。
-2. 狀態 class 是否和 props、data 或 computed 對應。
-3. 變數和 mixins 是否被多個元件重用。
-4. 動畫、浮層、尺寸是否有統一模式。
-5. 元件樣式是否透過 `src/styles/components/` 集中管理。
+- class prefix 是否一致。
+- 狀態 class 是否和 props、data、computed 對應。
+- 變數與 mixins 是否被多個元件重用。
+- 動畫、浮層、尺寸是否有統一模式。
 
-這裡不能只從 `.vue` 檔判斷樣式。某個 props 對應的 class 可能在元件檔中生成，但真正的視覺效果在 Less 中。
+## 型別體驗
 
-## 型別入口
+`types/index.d.ts` 和各元件型別檔讓 TypeScript 使用者能取得：
 
-`types/index.d.ts` 是 TypeScript 使用者理解 View UI Plus 公開 API 的入口。它提供：
+- 元件型別。
+- `install` options 型別。
+- 全域服務屬性型別。
+- `$VIEWUI` 全域配置型別。
 
-1. 元件型別匯出。
-2. `install(app, options)` 型別。
-3. 全域安裝 options 型別。
-4. `ComponentCustomProperties` 擴充。
-5. `$VIEWUI` 與多個全域服務屬性型別。
-
-這說明成熟元件庫的 API 不只存在於 JavaScript runtime。對 TypeScript 使用者來說，型別宣告同樣是公開 API 的一部分。
-
-分析全域服務時尤其要注意：`src/index.js` 掛載 `$Message`、`$Modal` 等 runtime 屬性；`types/index.d.ts` 則讓 TypeScript 知道這些屬性存在。這兩者要分開檢查，不能混為一談。
-
-同時也要反向檢查型別是否漏掉 runtime 公開面。以目前 source 來看，`src/index.js` 匯出 `version`、`locale`、`i18n`、`lang` 與預設 API，但 `types/index.d.ts` 主要宣告元件、`install`、全域 options 與 `ComponentCustomProperties`。`$VIEWUI` runtime 內也有 `capture`，但 `ViewUIPlusGlobalOptions` 未列出這個 key。這些落差不一定影響所有使用方式，但足以提醒我們：d.ts 是要查證的公開表面，不是 runtime 完整性的自動保證。
+這說明成熟元件庫的 API 不只存在於 JavaScript runtime，也存在於 TypeScript 型別層。入口設計、全域註冊和命令式服務都需要在型別層有對應宣告。
 
 ## 建置產物
 
-`dist/` 是發布產物，不是主要閱讀源碼，但它能幫助理解使用者最後消費到什麼。
+`dist/` 不是主要閱讀源碼，但能幫助理解使用者最終消費結果。
 
-從發布角度看，View UI Plus 的源碼會被整理成：
+從來源可確認的產物鏈路如下：
 
 ```txt
 src/index.js
+  -> vite.config.js
   -> dist/viewuiplus.min.js
   -> dist/viewuiplus.min.esm.js
 
 src/styles/index.less
+  -> build/build-style.js
   -> dist/styles/viewuiplus.css
 
 types/index.d.ts
+  -> package.json typings
   -> 使用者 TypeScript 型別入口
 ```
 
-`package.json` 的 `main` 與 `typings` 也把使用者消費入口指向 `dist` 與 `types`。因此，雖然正式閱讀不應把 `dist/` 當成主要源碼，但它仍然是架構圖的一部分。
+`build/build-style.js` 使用 `gulp-less`、`autoprefixer`、`cleanCSS`，將 `../src/styles/index.less` 編譯並輸出為 `../dist/styles/viewuiplus.css`，也會拷貝 iconfont 字型到 `dist/styles/fonts`。
 
-## Runtime / Type / 樣式 / Build 分工
+## 來源明確支持
 
-這一篇的核心是把四個表面分清楚：
+- `src/styles/index.less` 明確匯入 `custom`、`base`、`mixins/index`、`common/index`、`animation/index`、`components/index`。
+- `build/build-style.js` 明確從 `../src/styles/index.less` 編譯 CSS，輸出 `viewuiplus.css` 到 `../dist/styles`，並拷貝字型檔。
+- `types/index.d.ts` 明確匯出元件型別、宣告 install，並擴充 `ComponentCustomProperties`。
+- `package.json` 明確有 `build:prod`、`build:style`、`build:lang`，且 `files` 包含 `dist`、`src`、`types`。
+- `dist/` 內可見 `viewuiplus.min.js`、`viewuiplus.min.esm.js`，`dist/styles/` 內可見 `viewuiplus.css`。
 
-| 表面 | 代表檔案 | 不應混淆的地方 |
+## 根據來源推論
+
+- 將 `utils/`、`mixins/`、`directives/`、`locale/` 合稱「共用能力層」，是 atomic / origin 基於目錄責任與跨元件用途做出的架構讀法。
+- 將 `dist/` 視為消費結果檢查面，是根據 `package.json main`、build scripts 與實際產物位置做出的閱讀策略。
+- 目前來源未找到 `dist/package.json`，因此它只能列為來源不足的疑點，不能寫成 View UI Plus 既有消費面。
+
+## Runtime / Type / Style / Build 落差
+
+| 落差類型 | 可能發生的情況 | 檢查檔案 |
 | --- | --- | --- |
-| Runtime | `src/index.js`、`src/components/*`、`src/utils/`、`src/mixins/` | 實際安裝、渲染、事件、服務掛載與共用邏輯。 |
-| Style | `src/styles/index.less`、`src/styles/components/` | 視覺狀態、Less 變數、mixins、動畫與 class 效果。 |
-| Type | `types/index.d.ts`、`types/*.d.ts` | TypeScript 使用者看到的元件、全域屬性與 options。 |
-| Build | `package.json`、`vite.config.js`、`dist/` | 打包流程、發布產物與使用者消費入口。 |
-
-例如：
-
-- runtime 掛了 `$Message`，不代表 type 自動有 `$Message`。
-- type 有全域 options，不代表已覆蓋 `$VIEWUI` runtime 的每個 key。
-- props 產生了某個狀態 class，不代表樣式一定已分析完整。
-- `dist/` 有打包產物，不代表應直接把壓縮後程式碼當主要閱讀來源。
-- d.ts 裡存在某個型別，不代表 runtime 行為一定和型別完全一致，仍要回源碼確認。
-
-## 關鍵設計
-
-View UI Plus 的非元件層展示了幾個架構重點：
-
-1. 跨元件行為應該收斂到共用能力層，而不是分散在多個元件。
-2. 樣式應該有統一入口，讓變數、mixins、動畫與元件樣式可以串起來。
-3. 型別宣告應該補足使用者側開發體驗，尤其是全域服務與 install options，但仍要回查是否漏掉 runtime 公開面。
-4. 建置產物不是主要閱讀源碼，但它是發布與消費路徑的一部分。
-5. 分析元件庫時要明確標示每個結論來自 runtime、style、type 還是 build。
+| Runtime 有能力，type 沒補 | `$Message` 可執行但 TS 沒提示 | `src/index.js`、`types/index.d.ts` |
+| `.vue` 有狀態 class，style 沒對應 | class 出現在渲染中但樣式缺失 | `src/components/*/*.vue`、`src/styles/components/` |
+| Less 有樣式，但 build 沒產出 | source 樣式存在但使用者消費不到 CSS | `src/styles/index.less`、`build/build-style.js`、`dist/styles/` |
+| 元件依賴共用能力但未查 | 誤把跨元件邏輯當成本元件內部行為 | `src/utils/`、`src/mixins/`、`src/directives/`、`src/locale/` |
 
 ## 設計啟發
 
-如果要設計自己的元件庫，除了寫元件本身，還要回答：
+元件庫架構分析不能只看 `.vue`。如果要設計自己的元件庫，除了元件實作，也要回答：
 
-1. 共用工具、mixins、composables 或 directives 應該放在哪裡。
-2. 樣式是否有統一入口，狀態 class 是否有命名規則。
-3. 全域配置與全域服務是否需要 TypeScript 型別。
-4. 打包後的 JS、CSS 與型別使用者如何消費。
-5. source、types、styles、dist 之間是否有清楚對應。
+- 共用工具和共用狀態邏輯要放在哪裡？
+- 樣式是否有統一入口？
+- 全域服務與全域配置是否有型別？
+- 打包後的 JS 與 CSS 使用者如何消費？
+- 內部共用能力和公開 API 是否有清楚邊界？
 
-新增跨元件能力時，不要先急著塞進某個元件。應該先判斷它屬於元件實作、共用能力、樣式、型別還是建置表面。
+## 實戰使用場景
+
+- 新增跨元件能力時，先判斷它屬於 utils、mixins、directives、locale、style 還是 type，不要直接複製到多個元件。
+- 排查樣式不生效時，先從 class 回到 `src/styles/components/`，再確認 `src/styles/index.less` 與 `build/build-style.js`。
+- 排查型別缺失時，檢查 runtime 入口後，必須比對 `types/index.d.ts` 和各元件型別檔。
+- 做發布前 review 時，確認 JS、CSS、types 三個使用者消費面都有對應來源。
+
+## 實作檢查任務
+
+1. 打開 `src/styles/index.less`，列出它匯入的六個 Less 表面。
+2. 打開 `build/build-style.js`，確認 CSS 與 fonts 會輸出到哪裡。
+3. 在 `types/index.d.ts` 找出 `install`、`ViewUIPlusInstallOptions`、`ComponentCustomProperties`。
+4. 選一個全域服務，從 `src/index.js` 查到 type 宣告。
+5. 選一個元件 class，從 `.vue` 或 JS 實作追到 `src/styles/components/`。
 
 ## 複習題
 
 1. 為什麼樣式入口不能只從單一 `.vue` 檔理解？
-2. `utils/`、`mixins/`、`directives/` 和 `locale/` 各自降低了哪些重複？
+2. `utils/`、`mixins/`、`directives/`、`locale/` 各自降低哪些重複？
 3. `types/index.d.ts` 如何補足 runtime API？
 4. `dist/` 為什麼不是主要閱讀源碼，但仍然有架構價值？
-5. 如果新增一個跨元件能力，你會如何判斷它應該放在哪一層？
+5. 如果新增一個跨元件能力，應如何判斷它屬於元件實作、共用能力、樣式還是型別？
