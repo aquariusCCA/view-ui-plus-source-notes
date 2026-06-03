@@ -9,7 +9,7 @@
 - Release URL：https://github.com/view-design/ViewUIPlus/releases/tag/v1.3.20
 - GitHub Tag：v1.3.20
 - Commit：fcad615
-- 本地路徑：`01-origin/source/view-ui-plus-v1.3.20/`
+- 本地路徑：`origin/source/view-ui-plus-v1.3.20/`
 - 紀錄日期：2026-05-19
 
 ## 為什麼選這個版本

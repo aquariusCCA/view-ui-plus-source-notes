@@ -19,7 +19,7 @@ view-ui-plus-source-notes/
 ```
 
 1. 先建立三個空 Vue 專案。
-2. 只先做 `01-clone-practic`e。
+2. 只先做 `01-clone-practice`。
 3. 等仿寫出一批元件後，把它複製或抽取到 `02-refactor-practice` 做重構。
 4. 最後在 `03-enterprise-wrapper` 裡封裝真正接近公司業務場景的元件。
 
