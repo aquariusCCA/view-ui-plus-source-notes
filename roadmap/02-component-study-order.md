@@ -1,104 +1,163 @@
 # Component Study Order
 
-本筆記規劃 View UI Plus 元件學習順序。
+本文件定義 View UI Plus 元件原始碼的學習順序。它不是只列核心 25 個元件，而是分成兩層：
 
-原則：
+- 主學習順序：以可獨立理解的父元件或能力群組為單位，避免把子元件拆成沒有上下文的章節。
+- 全量元件盤點：以 `origin/source/view-ui-plus-v1.3.20/src/components/index.js` 的 128 個公開 export 為準，逐一列出並掛到對應學習單元。
 
-```text
-先簡單，再複雜。
-先展示，再輸入。
-先局部互動，再高互動。
-先單一元件，再複合元件。
-```
+## 來源與規則
 
-## 第一批：基礎展示與低互動元件
+| 項目 | 規則 |
+|---|---|
+| 全量來源 | `src/components/index.js` 的 `export { default as ... }` |
+| Demo 參考 | `examples/main.js` 的 router path；只用來輔助學習，不作為全量來源 |
+| 子元件 | 仍列入全量盤點，但跟著父元件一起讀，例如 `Option` 跟 `Select` |
+| 優先級 | `P0` 是原本核心 25 個；`P1` 是常用補齊；`P2` 是進階/業務型；`隨 Px/元件` 代表跟父元件同批學 |
 
-| 順序 | 元件 | 學習重點 | 可順便觀察 | 狀態 |
+## 主學習順序
+
+| 階段 | 學習單元 | 重點 |
+|---:|---|---|
+| 1 | `Icon`, `Button`, `Tag`, `Alert`, `Badge` | 最小可視元件、props、slots、class 命名、install/export 模式 |
+| 2 | `Input`, `Radio`, `Checkbox`, `Switch`, `Select` | `v-model`、group 注入、表單值同步、dropdown/option 管理 |
+| 3 | `Tooltip`, `Poptip`, `Modal`, `Drawer`, `Message`, `Notice` | overlay、portal/transfer、全域 API、z-index、confirm 類互動 |
+| 4 | `Card`, `List`, `Table`, `Page` | 資料展示、render/slot、分頁狀態、複雜表格資料流 |
+| 5 | `Form`, `Upload`, `DatePicker`, `Tree`, `Menu` | 表單驗證、檔案上傳、日期面板、樹狀資料、導覽狀態 |
+| 6 | `Layout`, `Grid`, `Space`, `Divider`, `Affix`, `BackTop`, `Split` | 版面容器、響應式配置、固定定位、分割面板 |
+| 7 | `InputNumber`, `AutoComplete`, `Cascader`, `TimePicker`, `Time`, `Slider`, `Rate`, `ColorPicker`, `Transfer`, `TreeSelect`, `City`, `WordCount` | 表單輸入補齊、複合選擇器、時間/數值/地區/字數類能力 |
+| 8 | `Dropdown`, `Breadcrumb`, `Anchor`, `Tabs`, `Steps`, `Timeline`, `PageHeader`, `Scroll`, `ScrollTop`, `ScrollIntoView` | 導覽、錨點、頁面定位、分段流程與滾動工具 |
+| 9 | `Progress`, `Spin`, `Skeleton`, `Circle`, `Avatar`, `AvatarList`, `Image`, `Carousel`, `Collapse`, `Cell`, `Calendar`, `Typography`, `Ellipsis`, `Result`, `Exception` | 顯示型元件、載入狀態、媒體、折疊、排版、結果頁 |
+| 10 | `Notification`, `LoadingBar`, `TablePaste`, `TagSelect`, `DescriptionList`, `CountDown`, `CountUp`, `Numeral`, `NumberInfo`, `Trend`, `FooterToolbar`, `GlobalFooter`, `Login`, `Auth`, `Copy` | 進階回饋、企業/業務元件、資料貼上、登入表單、複製工具 |
+
+## 全量元件盤點
+
+| Export | 學習單元 | 角色 | 優先級 | Demo |
 |---|---|---|---|---|
-| 1 | Button | type、size、loading、disabled、icon、slot | class 命名、props 型別、install | 未開始 |
-| 2 | Icon | class、圖示渲染、樣式命名 | 公開 API、樣式規則 | 未開始 |
-| 3 | Tag | closable、color、事件、slot | emits、狀態樣式 | 未開始 |
-| 4 | Alert | type、show-icon、closable、slot | slot fallback、icon 使用 | 未開始 |
-| 5 | Badge | count、dot、overflow-count、slot 包裹 | 數值展示邏輯 | 未開始 |
-
-## 第二批：基礎表單元件
-
-| 順序 | 元件 | 學習重點 | 可順便觀察 | 狀態 |
-|---|---|---|---|---|
-| 6 | Input | v-model、clearable、prefix、suffix、textarea | 表單關聯、型別設計 | 未開始 |
-| 7 | Radio | checked、RadioGroup、value 同步 | group 通訊 | 未開始 |
-| 8 | Checkbox | checked、indeterminate、CheckboxGroup | group 通訊、狀態設計 | 未開始 |
-| 9 | Switch | true-value、false-value、loading、disabled | value 映射 | 未開始 |
-| 10 | Select | option、dropdown、value 同步、filterable | 下拉、指令、浮層 | 未開始 |
-
-## 第三批：彈層與回饋元件
-
-| 順序 | 元件 | 學習重點 | 可順便觀察 | 狀態 |
-|---|---|---|---|---|
-| 11 | Tooltip | trigger、placement、浮層定位 | 指令、定位、事件監聽 | 未開始 |
-| 12 | Poptip | confirm、title、content、slot | confirm 流程 | 未開始 |
-| 13 | Modal | visible、footer、confirm、cancel | portal、body 掛載、z-index | 未開始 |
-| 14 | Drawer | visible、placement、slot | 動畫、掛載位置 | 未開始 |
-| 15 | Message | 動態掛載、函式式呼叫、全域提示 | 插件、全域 API | 未開始 |
-| 16 | Notice | 動態掛載、通知管理、關閉邏輯 | 插件、實例管理 | 未開始 |
-
-## 第四批：資料展示元件
-
-| 順序 | 元件 | 學習重點 | 可順便觀察 | 狀態 |
-|---|---|---|---|---|
-| 17 | Card | header、extra、slot 結構 | slot 設計 | 未開始 |
-| 18 | List | data、item、slot 渲染 | 資料渲染規則 | 未開始 |
-| 19 | Table | columns、data、render、slot、狀態管理 | 複雜 API、型別 | 未開始 |
-| 20 | Page | current、page-size、total、事件同步 | v-model、事件設計 | 未開始 |
-
-## 第五批：複雜表單與高互動元件
-
-| 順序 | 元件 | 學習重點 | 可順便觀察 | 狀態 |
-|---|---|---|---|---|
-| 21 | Form | FormItem、validate、rules、欄位註冊 | 表單系統、型別 | 未開始 |
-| 22 | Upload | 檔案狀態、上傳流程、事件設計 | 非同步流程 | 未開始 |
-| 23 | DatePicker | 日期狀態、面板切換、格式化 | 複雜狀態、浮層 | 未開始 |
-| 24 | Tree | 節點資料、展開、選取、遞迴渲染 | 資料結構 | 未開始 |
-| 25 | Menu | active、open、巢狀結構、路由場景 | 階層狀態 | 未開始 |
-
-## 第一階段建議完成清單
-
-```text
-Button
-Icon
-Tag
-Alert
-Badge
-Input
-Radio
-Checkbox
-Switch
-Select
-```
-
-完成後再評估是否進入：
-
-```text
-Tooltip
-Modal
-Message
-Table
-Form
-```
-
-## 不建議一開始深入的元件
-
-- Table
-- Form
-- Upload
-- DatePicker
-- Tree
-- Menu
-
-原因：
-
-- 狀態多
-- 互動多
-- 依賴其他元件
-- 抽象層較厚
-- 容易讓第一階段卡住
+| `Affix` | `Affix` | 主元件 | P1 | `/affix` |
+| `Alert` | `Alert` | 主元件 | P0 | `/alert` |
+| `Anchor` | `Anchor` | 主元件 | P1 | `/anchor` |
+| `AnchorLink` | `Anchor` | 子元件 | 隨 P1/Anchor | via `Anchor` |
+| `Auth` | `Auth` | 主元件 | P2 | `/auth` |
+| `AutoComplete` | `AutoComplete` | 主元件 | P1 | `/auto-complete` |
+| `Avatar` | `Avatar` | 主元件 | P1 | `/avatar` |
+| `AvatarList` | `AvatarList` | 主元件 | P2 | `/avatar-list` |
+| `BackTop` | `BackTop` | 主元件 | P1 | `/backtop` |
+| `Badge` | `Badge` | 主元件 | P0 | `/badge` |
+| `Breadcrumb` | `Breadcrumb` | 主元件 | P1 | `/breadcrumb` |
+| `BreadcrumbItem` | `Breadcrumb` | 子元件 | 隨 P1/Breadcrumb | via `Breadcrumb` |
+| `Button` | `Button` | 主元件 | P0 | `/button` |
+| `ButtonGroup` | `Button` | 子元件 | 隨 P0/Button | via `Button` |
+| `Calendar` | `Calendar` | 主元件 | P2 | `/calendar` |
+| `Captcha` | `Login` | 表單子元件 | 隨 P2/Login | via `Login` |
+| `Card` | `Card` | 主元件 | P0 | `/card` |
+| `Carousel` | `Carousel` | 主元件 | P1 | `/carousel` |
+| `CarouselItem` | `Carousel` | 子元件 | 隨 P1/Carousel | via `Carousel` |
+| `Cascader` | `Cascader` | 主元件 | P1 | `/cascader` |
+| `Cell` | `Cell` | 主元件 | P1 | `/cell` |
+| `CellGroup` | `Cell` | 子元件 | 隨 P1/Cell | via `Cell` |
+| `Checkbox` | `Checkbox` | 主元件 | P0 | `/checkbox` |
+| `CheckboxGroup` | `Checkbox` | 子元件 | 隨 P0/Checkbox | via `Checkbox` |
+| `Circle` | `Circle` | 主元件 | P1 | `/circle` |
+| `City` | `City` | 主元件 | P2 | `/city` |
+| `Col` | `Grid` | 版面子元件 | 隨 P1/Grid | via `Grid` |
+| `Collapse` | `Collapse` | 主元件 | P1 | `/collapse` |
+| `ColorPicker` | `ColorPicker` | 主元件 | P1 | `/color-picker` |
+| `Content` | `Layout` | 版面子元件 | 隨 P1/Layout | via `Layout` |
+| `Copy` | `Copy` | 工具型元件 | P2 | `/copy` |
+| `CountDown` | `CountDown` | 主元件 | P2 | `/count-down` |
+| `CountUp` | `CountUp` | 主元件 | P2 | `/count-up` |
+| `DatePicker` | `DatePicker` | 主元件 | P0 | `/date` |
+| `Description` | `DescriptionList` | 子元件 | 隨 P2/DescriptionList | via `DescriptionList` |
+| `DescriptionList` | `DescriptionList` | 主元件 | P2 | `/description-list` |
+| `Divider` | `Divider` | 主元件 | P1 | `/divider` |
+| `Drawer` | `Drawer` | 主元件 | P0 | `/drawer` |
+| `Dropdown` | `Dropdown` | 主元件 | P1 | `/dropdown` |
+| `DropdownItem` | `Dropdown` | 子元件 | 隨 P1/Dropdown | via `Dropdown` |
+| `DropdownMenu` | `Dropdown` | 子元件 | 隨 P1/Dropdown | via `Dropdown` |
+| `Ellipsis` | `Ellipsis` | 主元件 | P2 | `/ellipsis` |
+| `Email` | `Login` | 表單子元件 | 隨 P2/Login | via `Login` |
+| `Exception` | `Exception` | 主元件 | P2 | `/exception` |
+| `Footer` | `Layout` | 版面子元件 | 隨 P1/Layout | via `Layout` |
+| `FooterToolbar` | `FooterToolbar` | 主元件 | P2 | `/footer-toolbar` |
+| `Form` | `Form` | 主元件 | P0 | `/form` |
+| `FormItem` | `Form` | 子元件 | 隨 P0/Form | via `Form` |
+| `GlobalFooter` | `GlobalFooter` | 主元件 | P2 | `/global-footer` |
+| `Grid` | `Grid` | 主元件 | P1 | `/grid` |
+| `GridItem` | `Grid` | 子元件 | 隨 P1/Grid | `/grid-component` |
+| `Header` | `Layout` | 版面子元件 | 隨 P1/Layout | via `Layout` |
+| `Icon` | `Icon` | 主元件 | P0 | `/icon` |
+| `Image` | `Image` | 主元件 | P1 | `/image` |
+| `ImagePreview` | `Image` | 子元件 | 隨 P1/Image | via `Image` |
+| `Input` | `Input` | 主元件 | P0 | `/input` |
+| `InputNumber` | `InputNumber` | 主元件 | P1 | `/input-number` |
+| `Layout` | `Layout` | 主元件 | P1 | `/layout` |
+| `Link` | `Typography` | 排版子元件 | 隨 P2/Typography | via `Typography` |
+| `List` | `List` | 主元件 | P0 | `/list` |
+| `ListItem` | `List` | 子元件 | 隨 P0/List | via `List` |
+| `ListItemMeta` | `List` | 子元件 | 隨 P0/List | via `List` |
+| `LoadingBar` | `LoadingBar` | API/服務型元件 | P2 | `/loading-bar` |
+| `Login` | `Login` | 主元件 | P2 | `/login` |
+| `Menu` | `Menu` | 主元件 | P0 | `/menu` |
+| `MenuGroup` | `Menu` | 子元件 | 隨 P0/Menu | via `Menu` |
+| `MenuItem` | `Menu` | 子元件 | 隨 P0/Menu | via `Menu` |
+| `Message` | `Message` | API/服務型元件 | P0 | `/message` |
+| `Mobile` | `Login` | 表單子元件 | 隨 P2/Login | via `Login` |
+| `Modal` | `Modal` | 主元件/API | P0 | `/modal` |
+| `Notice` | `Notice` | API/服務型元件 | P0 | `/notice` |
+| `Notification` | `Notification` | 主元件 | P2 | `/notification` |
+| `NotificationItem` | `Notification` | 子元件 | 隨 P2/Notification | via `Notification` |
+| `NotificationTab` | `Notification` | 子元件 | 隨 P2/Notification | via `Notification` |
+| `NumberInfo` | `NumberInfo` | 主元件 | P2 | `/number-info` |
+| `Numeral` | `Numeral` | 主元件 | P2 | `/numeral` |
+| `Option` | `Select` | 子元件 | 隨 P0/Select | via `Select` |
+| `OptionGroup` | `Select` | 子元件 | 隨 P0/Select | via `Select` |
+| `Page` | `Page` | 主元件 | P0 | `/page` |
+| `PageHeader` | `PageHeader` | 主元件 | P1 | `/page-header` |
+| `Panel` | `Collapse` | 子元件 | 隨 P1/Collapse | via `Collapse` |
+| `Paragraph` | `Typography` | 排版子元件 | 隨 P2/Typography | via `Typography` |
+| `Password` | `Login` | 表單子元件 | 隨 P2/Login | via `Login` |
+| `Poptip` | `Poptip` | 主元件 | P0 | `/poptip` |
+| `Progress` | `Progress` | 主元件 | P1 | `/progress` |
+| `Radio` | `Radio` | 主元件 | P0 | `/radio` |
+| `RadioGroup` | `Radio` | 子元件 | 隨 P0/Radio | via `Radio` |
+| `Rate` | `Rate` | 主元件 | P1 | `/rate` |
+| `Result` | `Result` | 主元件 | P2 | `/result` |
+| `Row` | `Grid` | 版面子元件 | 隨 P1/Grid | via `Grid` |
+| `Scroll` | `Scroll` | 主元件 | P1 | `/scroll` |
+| `ScrollIntoView` | `ScrollIntoView` | 工具型元件 | P2 | `/scroll-into-view` |
+| `ScrollTop` | `ScrollTop` | 工具型元件 | P2 | `/scroll-top` |
+| `Select` | `Select` | 主元件 | P0 | `/select` |
+| `Sider` | `Layout` | 版面子元件 | 隨 P1/Layout | via `Layout` |
+| `Skeleton` | `Skeleton` | 主元件 | P1 | `/skeleton` |
+| `SkeletonItem` | `Skeleton` | 子元件 | 隨 P1/Skeleton | via `Skeleton` |
+| `Slider` | `Slider` | 主元件 | P1 | `/slider` |
+| `Space` | `Space` | 主元件 | P1 | `/space` |
+| `Spin` | `Spin` | 主元件/API | P1 | `/spin` |
+| `Split` | `Split` | 主元件 | P1 | `/split` |
+| `Step` | `Steps` | 子元件 | 隨 P1/Steps | via `Steps` |
+| `Steps` | `Steps` | 主元件 | P1 | `/steps` |
+| `Submenu` | `Menu` | 子元件 | 隨 P0/Menu | via `Menu` |
+| `Submit` | `Login` | 表單子元件 | 隨 P2/Login | via `Login` |
+| `Switch` | `Switch` | 主元件 | P0 | `/switch` |
+| `Table` | `Table` | 主元件 | P0 | `/table` |
+| `TablePaste` | `TablePaste` | 主元件 | P2 | `/table-paste` |
+| `TabPane` | `Tabs` | 子元件 | 隨 P1/Tabs | via `Tabs` |
+| `Tabs` | `Tabs` | 主元件 | P1 | `/tabs` |
+| `Tag` | `Tag` | 主元件 | P0 | `/tag` |
+| `TagSelect` | `TagSelect` | 主元件 | P2 | `/tag-select` |
+| `TagSelectOption` | `TagSelect` | 子元件 | 隨 P2/TagSelect | via `TagSelect` |
+| `Text` | `Typography` | 排版子元件 | 隨 P2/Typography | via `Typography` |
+| `Time` | `Time` | 主元件 | P1 | `/time` |
+| `Timeline` | `Timeline` | 主元件 | P1 | `/timeline` |
+| `TimelineItem` | `Timeline` | 子元件 | 隨 P1/Timeline | via `Timeline` |
+| `TimePicker` | `TimePicker` | 主元件 | P1 | via `/date` |
+| `Title` | `Typography` | 排版子元件 | 隨 P2/Typography | via `Typography` |
+| `Tooltip` | `Tooltip` | 主元件 | P0 | `/tooltip` |
+| `Transfer` | `Transfer` | 主元件 | P1 | `/transfer` |
+| `Tree` | `Tree` | 主元件 | P0 | `/tree` |
+| `TreeSelect` | `TreeSelect` | 主元件 | P2 | `/tree-select` |
+| `Trend` | `Trend` | 主元件 | P2 | `/trend` |
+| `Typography` | `Typography` | 主元件 | P2 | `/typography` |
+| `Upload` | `Upload` | 主元件 | P0 | `/upload` |
+| `UserName` | `Login` | 表單子元件 | 隨 P2/Login | via `Login` |
+| `WordCount` | `WordCount` | 主元件 | P2 | `/word-count` |
