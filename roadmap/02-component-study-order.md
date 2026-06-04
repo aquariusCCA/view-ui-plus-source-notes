@@ -1,79 +1,67 @@
 # Component Study Order
 
-本筆記用來規劃 View UI Plus 元件的學習順序。
+本筆記規劃 View UI Plus 元件學習順序。
 
-原則是：
+原則：
 
 ```text
 先簡單，再複雜。
-先單一狀態，再多狀態。
-先展示元件，再表單元件。
-先局部互動，再複雜互動。
+先展示，再輸入。
+先局部互動，再高互動。
+先單一元件，再複合元件。
 ```
 
 ## 第一批：基礎展示與低互動元件
 
-這一批適合用來熟悉元件庫基本結構。
-
-| 順序 | 元件 | 學習重點 | 狀態 |
-|---|---|---|---|
-| 1 | Button | type、size、loading、disabled、icon、slot | 未開始 |
-| 2 | Icon | icon class、渲染方式、樣式命名 | 未開始 |
-| 3 | Tag | closable、color、事件、slot | 未開始 |
-| 4 | Alert | type、show-icon、closable、slot | 未開始 |
-| 5 | Badge | count、dot、overflow-count、slot 包裹 | 未開始 |
+| 順序 | 元件 | 學習重點 | 可順便觀察 | 狀態 |
+|---|---|---|---|---|
+| 1 | Button | type、size、loading、disabled、icon、slot | class 命名、props 型別、install | 未開始 |
+| 2 | Icon | class、圖示渲染、樣式命名 | 公開 API、樣式規則 | 未開始 |
+| 3 | Tag | closable、color、事件、slot | emits、狀態樣式 | 未開始 |
+| 4 | Alert | type、show-icon、closable、slot | slot fallback、icon 使用 | 未開始 |
+| 5 | Badge | count、dot、overflow-count、slot 包裹 | 數值展示邏輯 | 未開始 |
 
 ## 第二批：基礎表單元件
 
-這一批開始接觸資料輸入、狀態同步與事件設計。
-
-| 順序 | 元件 | 學習重點 | 狀態 |
-|---|---|---|---|
-| 6 | Input | v-model、clearable、prefix、suffix、textarea | 未開始 |
-| 7 | Radio | checked 狀態、RadioGroup、value 同步 | 未開始 |
-| 8 | Checkbox | checked、indeterminate、CheckboxGroup | 未開始 |
-| 9 | Switch | true-value、false-value、loading、disabled | 未開始 |
-| 10 | Select | option、dropdown、value 同步、filterable | 未開始 |
+| 順序 | 元件 | 學習重點 | 可順便觀察 | 狀態 |
+|---|---|---|---|---|
+| 6 | Input | v-model、clearable、prefix、suffix、textarea | 表單關聯、型別設計 | 未開始 |
+| 7 | Radio | checked、RadioGroup、value 同步 | group 通訊 | 未開始 |
+| 8 | Checkbox | checked、indeterminate、CheckboxGroup | group 通訊、狀態設計 | 未開始 |
+| 9 | Switch | true-value、false-value、loading、disabled | value 映射 | 未開始 |
+| 10 | Select | option、dropdown、value 同步、filterable | 下拉、指令、浮層 | 未開始 |
 
 ## 第三批：彈層與回饋元件
 
-這一批開始接觸動態顯示、彈層控制與使用者回饋。
-
-| 順序 | 元件 | 學習重點 | 狀態 |
-|---|---|---|---|
-| 11 | Tooltip | trigger、placement、浮層定位 | 未開始 |
-| 12 | Poptip | confirm、title、content、slot | 未開始 |
-| 13 | Modal | visible 控制、footer、confirm/cancel | 未開始 |
-| 14 | Drawer | visible 控制、placement、slot | 未開始 |
-| 15 | Message | 動態掛載、函式式呼叫、全域提示 | 未開始 |
-| 16 | Notice | 動態掛載、通知管理、關閉邏輯 | 未開始 |
+| 順序 | 元件 | 學習重點 | 可順便觀察 | 狀態 |
+|---|---|---|---|---|
+| 11 | Tooltip | trigger、placement、浮層定位 | 指令、定位、事件監聽 | 未開始 |
+| 12 | Poptip | confirm、title、content、slot | confirm 流程 | 未開始 |
+| 13 | Modal | visible、footer、confirm、cancel | portal、body 掛載、z-index | 未開始 |
+| 14 | Drawer | visible、placement、slot | 動畫、掛載位置 | 未開始 |
+| 15 | Message | 動態掛載、函式式呼叫、全域提示 | 插件、全域 API | 未開始 |
+| 16 | Notice | 動態掛載、通知管理、關閉邏輯 | 插件、實例管理 | 未開始 |
 
 ## 第四批：資料展示元件
 
-這一批會開始出現資料結構與渲染規則。
-
-| 順序 | 元件 | 學習重點 | 狀態 |
-|---|---|---|---|
-| 17 | Card | header、extra、slot 結構 | 未開始 |
-| 18 | List | data、item、slot 渲染 | 未開始 |
-| 19 | Table | columns、data、render、slot、狀態管理 | 未開始 |
-| 20 | Page | current、page-size、total、事件同步 | 未開始 |
+| 順序 | 元件 | 學習重點 | 可順便觀察 | 狀態 |
+|---|---|---|---|---|
+| 17 | Card | header、extra、slot 結構 | slot 設計 | 未開始 |
+| 18 | List | data、item、slot 渲染 | 資料渲染規則 | 未開始 |
+| 19 | Table | columns、data、render、slot、狀態管理 | 複雜 API、型別 | 未開始 |
+| 20 | Page | current、page-size、total、事件同步 | v-model、事件設計 | 未開始 |
 
 ## 第五批：複雜表單與高互動元件
 
-這一批不建議一開始就讀，適合累積基礎後再處理。
+| 順序 | 元件 | 學習重點 | 可順便觀察 | 狀態 |
+|---|---|---|---|---|
+| 21 | Form | FormItem、validate、rules、欄位註冊 | 表單系統、型別 | 未開始 |
+| 22 | Upload | 檔案狀態、上傳流程、事件設計 | 非同步流程 | 未開始 |
+| 23 | DatePicker | 日期狀態、面板切換、格式化 | 複雜狀態、浮層 | 未開始 |
+| 24 | Tree | 節點資料、展開、選取、遞迴渲染 | 資料結構 | 未開始 |
+| 25 | Menu | active、open、巢狀結構、路由場景 | 階層狀態 | 未開始 |
 
-| 順序 | 元件 | 學習重點 | 狀態 |
-|---|---|---|---|
-| 21 | Form | FormItem、validate、rules、欄位註冊 | 未開始 |
-| 22 | Upload | 檔案狀態、上傳流程、事件設計 | 未開始 |
-| 23 | DatePicker | 日期狀態、面板切換、格式化 | 未開始 |
-| 24 | Tree | 節點資料、展開、選取、遞迴渲染 | 未開始 |
-| 25 | Menu | active、open、巢狀結構、路由場景 | 未開始 |
-
-## 優先建議
-
-第一階段可以先完成這 10 個：
+## 第一階段建議完成清單
 
 ```text
 Button
@@ -88,18 +76,17 @@ Switch
 Select
 ```
 
-完成這 10 個後，再考慮是否進入：
+完成後再評估是否進入：
 
 ```text
-Modal
 Tooltip
+Modal
+Message
 Table
 Form
 ```
 
-## 不建議一開始就學的元件
-
-以下元件較複雜，不建議第一批就深入：
+## 不建議一開始深入的元件
 
 - Table
 - Form
@@ -112,6 +99,6 @@ Form
 
 - 狀態多
 - 互動多
-- 內部抽象多
-- 依賴其他元件或共用邏輯
-- 容易卡住學習節奏
+- 依賴其他元件
+- 抽象層較厚
+- 容易讓第一階段卡住

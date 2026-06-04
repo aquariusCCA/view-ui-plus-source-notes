@@ -1,84 +1,105 @@
 # Phase Plan
 
-本筆記用來整理 `View UI Plus` 源碼學習的三個階段。
+本筆記整理 View UI Plus 源碼學習的三個階段。
 
 ## Phase 1：01-clone-practice
 
-第一階段是目前最重要的階段。
+第一階段是目前主線。
 
-目標是先仿寫一批 View UI Plus 元件，透過實作理解元件設計。
+目標是先仿寫一批元件，透過實作理解元件庫的基本設計。
 
-### 核心目標
+### 核心任務
 
-- 理解元件基本結構
-- 理解 props 設計
-- 理解 events / emits 設計
-- 理解 slots 設計
-- 理解 class name 與樣式規則
-- 理解 disabled、size、type、loading 等常見狀態
-- 能做出簡化版元件
+- 閱讀單一元件源碼
+- 拆解 props、emits、slots
+- 理解 v-model 設計
+- 理解樣式 class 組裝
+- 理解 disabled、size、type、loading 等狀態
+- 實作簡化版元件
+- 補充正式筆記到 `docs/`
 
-### 適合元件
+### 建議元件
 
-初期可以從以下元件開始：
+第一批：
 
 - Button
 - Icon
 - Tag
 - Alert
+- Badge
+
+第二批：
+
 - Input
 - Radio
 - Checkbox
 - Switch
 - Select
-- Modal
 
-### 產出
+### 第一階段順便觀察
 
-- `apps/01-clone-practice/` 中有可執行元件
-- `docs/` 中有對應學習筆記
-- `roadmap/03-progress-tracker.md` 有進度紀錄
+雖然主線是元件，但可以順便觀察：
 
-### 暫時不要做
+- 元件如何引入樣式
+- 元件如何 export
+- 元件如何 install
+- props 型別如何定義
+- emits 型別如何定義
+- 是否依賴 directive
+- 是否依賴全域配置
 
-- 不急著重構
-- 不急著抽取大型共用邏輯
-- 不急著做企業級封裝
-- 不急著看完整套 View UI Plus
+這些觀察可以先放到 `06-backlog.md`，不用立刻深入。
+
+### 第一階段完成條件
+
+建議條件：
+
+- 至少完成 8 到 10 個元件仿寫
+- 至少包含 Button、Input、Select
+- 每個元件都有可執行 demo
+- 每個元件都有一份基本源碼筆記
+- 能說明元件的 props、emits、slots 與主要狀態
 
 ---
 
 ## Phase 2：02-refactor-practice
 
-第二階段是在完成一批元件仿寫後，回頭整理重複邏輯並練習重構。
+第二階段是重構練習。
 
-### 進入條件
+當完成一批元件仿寫後，再回頭看哪些邏輯可以整理成共用設計。
 
-建議至少完成 8 到 10 個元件仿寫後，再進入此階段。
+### 核心任務
 
-### 核心目標
+- 比較多個元件的重複邏輯
+- 抽取共用 props
+- 抽取 class name 組裝規則
+- 抽取 composables / hooks
+- 整理元件狀態規則
+- 改善程式碼可維護性
 
-- 找出多個元件之間的重複邏輯
-- 抽取共用 hooks / composables
-- 抽取共用 props 設計
-- 抽取共用 class name 組裝邏輯
-- 改善元件可維護性
-- 練習更清楚的元件內部結構
+### 適合重構的主題
 
-### 可能重構方向
+- size
+- disabled
+- loading
+- type
+- class name
+- slot fallback
+- form item 關聯
+- group 元件通訊
+- visible 控制
 
-- size 狀態共用
-- disabled 狀態共用
-- loading 狀態共用
-- class name 組裝
-- form item 關聯邏輯
-- controlled / uncontrolled 狀態設計
-- emits 設計規則
+### 第二階段應搭配的副線
 
-### 產出
+- 樣式系統
+- 公開 API 與型別系統
+- 插件系統
 
-- `apps/02-refactor-practice/` 中有重構後版本
-- `docs/` 中有重構前後比較筆記
+### 第二階段產出
+
+- `apps/02-refactor-practice/`
+- 重構前後比較筆記
+- 共用邏輯整理筆記
 
 ---
 
@@ -86,28 +107,19 @@
 
 第三階段是企業級二次封裝。
 
-這個階段不是重新做一套元件庫，而是練習如何根據公司業務場景，在既有元件基礎上設計更好用的業務元件。
+目標不是重寫 View UI Plus，而是練習如何根據公司業務場景，在既有元件基礎上封裝更好用的業務元件。
 
-### 進入條件
+### 核心任務
 
-建議已經完成：
+- 設計業務元件 API
+- 封裝常見查詢條件
+- 封裝常見表單場景
+- 封裝表格操作區
+- 降低業務頁面重複程式碼
+- 兼顧彈性與維護性
 
-- 一批元件仿寫
-- 一批重構練習
-- 對常見元件 API 設計有基本理解
+### 候選元件
 
-### 核心目標
-
-- 練習業務元件 API 設計
-- 練習封裝常見表單場景
-- 練習封裝查詢條件區
-- 練習封裝表格操作區
-- 練習降低業務頁面的重複程式碼
-- 練習兼顧可用性、彈性與維護性
-
-### 可能封裝方向
-
-- EnterpriseButton
 - SearchForm
 - QueryPanel
 - DataTable
@@ -115,23 +127,26 @@
 - DetailDrawer
 - PermissionButton
 - StatusTag
+- AmountInput
+- DateRangeSearch
 
-### 產出
+### 第三階段產出
 
-- `apps/03-enterprise-wrapper/` 中有業務封裝元件
-- `docs/` 中有 API 設計與封裝思路筆記
+- `apps/03-enterprise-wrapper/`
+- 企業元件 API 設計筆記
+- 業務場景封裝案例
 
 ---
 
-## 階段總結
+## 總結
 
 ```text
 01-clone-practice
-= 先做出來，理解元件怎麼設計。
+= 先做出來，理解元件本身。
 
 02-refactor-practice
-= 做多了之後，整理重複邏輯，改善維護性。
+= 做多後，抽取共用邏輯。
 
 03-enterprise-wrapper
-= 面向業務場景，設計更好用的二次封裝元件。
+= 面向業務場景做二次封裝。
 ```
