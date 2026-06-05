@@ -1,6 +1,6 @@
 {
   "name": "@kevinxiao0210/myui",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "main": "dist/myui.umd.cjs",
   "module": "dist/myui.es.js",
