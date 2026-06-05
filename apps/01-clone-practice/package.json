@@ -2,7 +2,7 @@
   "name": "@kevinxiao0210/myui",
   "version": "0.1.0",
   "type": "module",
-  "main": "dist/myui.umd.js",
+  "main": "dist/myui.umd.cjs",
   "module": "dist/myui.es.js",
   "types": "types/index.d.ts",
   "style": "dist/styles/myui.css",
@@ -10,7 +10,7 @@
     ".": {
       "types": "./types/index.d.ts",
       "import": "./dist/myui.es.js",
-      "require": "./dist/myui.umd.js"
+      "require": "./dist/myui.umd.cjs"
     },
     "./style.css": "./dist/styles/myui.css"
   },  

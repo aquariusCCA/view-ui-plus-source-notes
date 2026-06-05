@@ -17,7 +17,7 @@ export default defineConfig({
       formats: ['es', 'umd'],
       fileName: (format) => {
         if (format === 'es') return 'myui.es.js'
-        return 'myui.umd.js'
+        return 'myui.umd.cjs'
       },
     },
 

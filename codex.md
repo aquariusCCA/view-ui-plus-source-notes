@@ -1,9 +1,26 @@
-PS C:\Users\wtlc\Documents\view-ui-plus-source-notes\apps\02-refactor-practice> npm i @kevinxiao0210/myui
-npm error code E404
-npm error 404 Not Found - GET https://registry.npmjs.org/@kevinxiao0210%2fmyui - Not found
-npm error 404
-npm error 404  The requested resource '@kevinxiao0210/myui@*' could not be found or you do not have permission to access it.
-npm error 404
-npm error 404 Note that you can also install from a
-npm error 404 tarball, folder, http url, or git url.
-npm error A complete log of this run can be found in: C:\Users\wtlc\AppData\Local\npm-cache\_logs\2026-06-04T09_28_18_302Z-debug-0.log
+目前我已經將 `apps\01-clone-practice` 專案搭建起來了。
+
+首先我將模仿 `View UI Plus`:
+
+- `src/`: 真正的元件庫原始碼
+    - `src/index.js` = 元件庫本身的總入口
+
+- `examples/`: 開發時用來展示、測試元件的 demo app
+    - `examples/main.js` = 開發展示站的總入口
+
+然後一樣模仿 `View UI Plus` 設計了三個設定檔:
+
+- `vite.config.js`   → 開發時跑 examples 展示站
+- `vite.lib.config.js`  → 正式打包 JS 元件庫
+- `vite.style.config.js`  → 正式打包 CSS 
+
+`package.json` 對應腳本如下:
+
+```json
+"dev": "vite",
+"build": "npm run build:lib && npm run build:style",
+"build:lib": "vite build --config vite.lib.config.js",
+"build:style": "vite build --config vite.style.config.js"
+```
+
+我想請你針對這個架構設計跟我討論該如何編寫一篇高品質的教學筆記。
