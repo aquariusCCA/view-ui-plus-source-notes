@@ -2,7 +2,9 @@
 
 ## 1. 學習背景
 
-這個 `apps/01-clone-practice/src/components/icon/icon.vue` 組件是參考 View UI Plus 的 `Icon` 組件設計思路後，自己實作的簡化練習版本。
+這個 `apps/01-clone-practice/src/components/my-icon/my-icon.vue` 組件是參考 View UI Plus 的 `Icon` 組件設計思路後，自己實作的簡化練習版本。
+
+這裡的「模仿」不是逐行還原 View UI Plus 官方原始碼，而是借用它的封裝方向，再配合自己的 iconfont 資源做練習。
 
 這份筆記的重點不是完整解析 View UI Plus 官方原始碼，而是透過一個小型 Icon 組件，理解 UI 組件庫常見的封裝思路：
 
@@ -49,7 +51,7 @@ Icon 組件本身不直接畫圖示，而是包裝一個 `<i>` 標籤。
 ### 3.1 使用內建 icon
 
 ```vue
-<Icon type="check-circle" :size="24" color="#19be6b" />
+<MyIcon type="check-circle" :size="24" color="#19be6b" />
 ```
 
 最後會渲染成類似：
@@ -64,22 +66,30 @@ Icon 組件本身不直接畫圖示，而是包裝一個 `<i>` 標籤。
 ### 3.2 使用第三方 icon
 
 ```vue
-<Icon custom="iconfont icon-user" />
+<MyIcon custom="iconfont icon-EURO" />
 ```
 
 最後會渲染成類似：
 
 ```html
-<i class="iconfont icon-user"></i>
+<i class="iconfont icon-EURO"></i>
+```
+
+這裡的 `iconfont icon-EURO` 不屬於內建的 `my-icon` iconfont 系統，而是外部第三方 iconfont class。`custom` 只負責把外部 class 原樣交給 `<i>`，真正能不能顯示圖標，取決於外部樣式是否已經被載入。
+
+在目前範例頁中，這份外部樣式是由 `apps/01-clone-practice/examples/main.js` 引入：
+
+```js
+import './style/iconfont.less';
 ```
 
 ---
 
-## 4. Iconfont 樣式來源
+## 4. 內建 my-icon 的 Iconfont 樣式來源
 
-這次練習中的 icon 圖形不是由 `Icon.vue` 直接畫出來的，而是先從 Iconfont 下載字體圖標，再整理成本地樣式。
+這次練習中的內建 icon 圖形不是由 `my-icon.vue` 直接畫出來的，而是先從 Iconfont 下載字體圖標，再整理成本地樣式。
 
-相關檔案包含：
+以下檔案負責的是內建的 `my-icon` iconfont 系統：
 
 - `apps/01-clone-practice/src/style/common/iconfont/fonts/iconfont.ttf`
 - `apps/01-clone-practice/src/style/common/iconfont/_icons.less`
@@ -93,13 +103,13 @@ Icon 組件本身不直接畫圖示，而是包裝一個 `<i>` 標籤。
 
 ```text
 check-circle
-close
-search
-home
-user
+ci
+dollar
+compass
+close-circle
 ```
 
-下載後通常會得到類似以下檔案：
+下載後可能會得到類似以下檔案：
 
 ```text
 iconfont.css
@@ -108,17 +118,31 @@ iconfont.woff
 iconfont.woff2
 ```
 
-在專案中可以整理成：
+內建的 `my-icon` 系統目前實際只使用 `iconfont.ttf`，並整理到：
+
+```text
+apps/01-clone-practice/src/style/common/iconfont/
+  fonts/
+    iconfont.ttf
+  _icons.less
+  _variables.less
+  iconfont.less
+```
+
+如果之後要做得更接近正式組件庫，也可以保留 `woff`、`woff2` 等格式，讓瀏覽器有更多字體格式可以選擇。例如：
 
 ```text
 src/
-  styles/
-    icon/
-      iconfont.less
-      fonts/
-        iconfont.ttf
-        iconfont.woff
-        iconfont.woff2
+  style/
+    common/
+      iconfont/
+        fonts/
+          iconfont.ttf
+          iconfont.woff
+          iconfont.woff2
+        _icons.less
+        _variables.less
+        iconfont.less
 ```
 
 ---
@@ -162,15 +186,15 @@ Iconfont 的核心是透過 `@font-face` 載入字體檔，再透過 `content` �
 範例：
 
 ```less
+@my-icon-font-family: "my-iconfont";
+
 @font-face {
-  font-family: 'my-icon';
-  src: url('./fonts/iconfont.woff2') format('woff2'),
-       url('./fonts/iconfont.woff') format('woff'),
-       url('./fonts/iconfont.ttf') format('truetype');
+  font-family: @my-icon-font-family;
+  src: url('./fonts/iconfont.ttf') format('truetype');
 }
 
 .my-icon {
-  font-family: 'my-icon' !important;
+  font-family: @my-icon-font-family !important;
   font-style: normal;
   font-weight: normal;
   line-height: 1;
@@ -181,22 +205,22 @@ Iconfont 的核心是透過 `@font-face` 載入字體檔，再透過 `content` �
 }
 
 .my-icon-check-circle::before {
-  content: '\e601';
+  content: '\e77d';
 }
 
-.my-icon-close::before {
-  content: '\e602';
+.my-icon-ci::before {
+  content: '\e77e';
 }
 
-.my-icon-search::before {
-  content: '\e603';
+.my-icon-dollar::before {
+  content: '\e77f';
 }
 ```
 
 這裡真正讓 `<i>` 顯示成圖標的關鍵是：
 
 ```text
-.my-icon 提供 font-family
+.my-icon 提供 font-family，也就是 my-iconfont 這套字體
 .my-icon-check-circle::before 提供 content 編碼
 ```
 
@@ -229,13 +253,13 @@ Iconfont 的核心是透過 `@font-face` 載入字體檔，再透過 `content` �
 `type` 適合使用組件庫內建 icon。
 
 ```vue
-<Icon type="check-circle" />
+<MyIcon type="check-circle" />
 ```
 
 `custom` 適合接入第三方 iconfont。
 
 ```vue
-<Icon custom="iconfont icon-user" />
+<MyIcon custom="iconfont icon-EURO" />
 ```
 
 也就是：
@@ -273,7 +297,7 @@ const classes = computed(() => {
 如果傳入 `custom`：
 
 ```vue
-<Icon custom="iconfont icon-user" />
+<MyIcon custom="iconfont icon-EURO" />
 ```
 
 則直接回傳：
@@ -285,6 +309,8 @@ return props.custom
 代表外部可以完全控制 icon 的 class。
 
 這種設計可以讓組件支援第三方 iconfont 或其他 icon class。
+
+這是這次練習版的簡化設計：只要傳了 `custom`，就不再自動加上 `my-icon` 和 `my-icon-${type}`。View UI Plus 原版的做法不同，它會保留基礎的 `ivu-icon` class，再額外加上 `custom` class。
 
 ---
 
@@ -302,7 +328,7 @@ return [
 例如：
 
 ```vue
-<Icon type="check-circle" />
+<MyIcon type="check-circle" />
 ```
 
 會產生：
@@ -370,7 +396,7 @@ color → color
 如果 `size` 是數字：
 
 ```vue
-<Icon :size="24" />
+<MyIcon :size="24" />
 ```
 
 會轉成：
@@ -384,7 +410,7 @@ color → color
 如果 `size` 是字串：
 
 ```vue
-<Icon size="2em" />
+<MyIcon size="2em" />
 ```
 
 會保留原本單位：
@@ -402,12 +428,14 @@ color → color
 傳 String → 保留彈性，可以使用 px、em、rem 等單位
 ```
 
+這裡也是練習版自己的處理方式。View UI Plus 原版會直接把 `size` 組成 `${size}px`，所以如果傳入 `size="2em"`，會得到類似 `font-size: 2empx` 的結果，不會像這個版本一樣保留原本單位。
+
 ---
 
 ### 7.2 color 的處理
 
 ```vue
-<Icon color="#19be6b" />
+<MyIcon color="#19be6b" />
 ```
 
 會轉成：
@@ -449,19 +477,21 @@ custom → 使用第三方 icon class
 custom 優先於 type
 ```
 
+這裡說的是 `MyIcon` 這個練習版的規則，不是 View UI Plus 原始碼的完整規則。View UI Plus 原版會把基礎 class、`type` class 和 `custom` class 放在同一個 class 陣列中，而不是讓 `custom` 直接取代 `type`。
+
 例如：
 
 ```vue
-<Icon type="check-circle" custom="iconfont icon-user" />
+<MyIcon type="check-circle" custom="iconfont icon-EURO" />
 ```
 
-實際上會使用：
+在 `MyIcon` 目前實作中，實際上會使用：
 
 ```html
-<i class="iconfont icon-user"></i>
+<i class="iconfont icon-EURO"></i>
 ```
 
-同時透過 `console.warn` 提醒開發者不要混用。
+同時透過 `console.warn` 提醒開發者不要混用。換成 View UI Plus 原版時，class 會同時包含基礎 class、`type` class 和 `custom` class。
 
 ---
 
@@ -494,7 +524,17 @@ View UI Plus Icon 給這份練習的啟發是：
 3. 透過 props 控制 icon 類型、大小、顏色
 4. 同時保留 `custom` 擴充能力
 
-我的 `Icon` 是根據這個思路實作出的簡化版。
+我的 `MyIcon` 是根據這個思路實作出的簡化版。
+
+但具體實作上，我有幾個地方刻意簡化或調整：
+
+| 對照項目 | View UI Plus 原版 | MyIcon 練習版 |
+|---|---|---|
+| class 前綴 | `ivu-icon` | `my-icon` |
+| icon 資源 | Ionicons | Iconfont 阿里圖標庫 |
+| `custom` 行為 | 保留基礎 class，並同時加入 `type` class 與 `custom` class | `custom` 優先，直接回傳外部 class |
+| `size` 處理 | 直接組成 `${size}px` | Number 補 `px`，String 保留原本單位 |
+| 筆記定位 | 官方源碼可參考對象 | 仿寫與封裝思路練習 |
 
 因此這份筆記的定位不是：
 

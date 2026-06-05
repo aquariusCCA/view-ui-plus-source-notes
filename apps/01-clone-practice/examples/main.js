@@ -12,8 +12,8 @@ export const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
-            path: '/icon',
-            component: () => import('./routers/icon.vue')
+            path: '/my-icon',
+            component: () => import('./routers/my-icon.vue')
         },
     ],
 })
