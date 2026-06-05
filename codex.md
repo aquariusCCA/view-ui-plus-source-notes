@@ -2,14 +2,20 @@
 
 `apps\01-clone-practice\src\components\icon\icon.vue` 是我訪寫的成果。
 
-樣式的部分在 `apps\01-clone-practice\src\style`。
+樣式的部分如下：
+
+- `apps/01-clone-practice/src/style/common/iconfont/fonts/iconfont.ttf`
+- `apps/01-clone-practice/src/style/common/iconfont/_icons.less`
+- `apps/01-clone-practice/src/style/common/iconfont/_variables.less`
+- `apps/01-clone-practice/src/style/common/iconfont/iconfont.less`
 
 我的思路是:
 
 - 先去 **Iconfont（阿里图标库）** 挑圖標。
 - 下載至本地之後放到專案目錄下。
-- 接著對這個 `.css` 檔案做加工:
+- 接著對這些樣式做加工:
     - 轉為 `.less`
-    - 類名改為 `my-` 開頭
+    - 類名改為 `my-icon` 開頭
+    - 定義 `font-family`
 
-你可以參照 `View UI Plus` Icon 組件，幫我設計一篇關於開發 Icon 組件的教學筆記嗎?
+你認為 `docs/view-ui-plus-icon-note.md` 寫的教學筆記是否合理？

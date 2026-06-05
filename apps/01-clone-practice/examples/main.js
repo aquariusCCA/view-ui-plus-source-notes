@@ -5,6 +5,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import MyUI from '../src/index';
 import '../src/style/index.less'
+import './style/iconfont.less';
 
 // 路由配置
 export const router = createRouter({
